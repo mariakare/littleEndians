@@ -29,6 +29,7 @@ class HelloWorldController {
     @GetMapping("/api/whoami")
     public User whoami() throws InterruptedException, ExecutionException {
         var user = WebSecurityConfig.getUser();
+        //comment line below to allow all roles to see whoami
         if (!user.isManager()) throw new AuthorizationServiceException("You are not a manager");
 
         UUID buuid = UUID.randomUUID();

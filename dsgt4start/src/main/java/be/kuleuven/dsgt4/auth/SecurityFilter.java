@@ -1,6 +1,8 @@
 package be.kuleuven.dsgt4.auth;
 
 import be.kuleuven.dsgt4.User;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.springframework.security.core.Authentication;
@@ -32,55 +34,27 @@ public class SecurityFilter extends OncePerRequestFilter {
         // TODO: (level 1) decode Identity Token and assign correct email and role
         // TODO: (level 2) verify Identity Token
 
-        String token="";
-
         String authorizationHeader = request.getHeader("Authorization");
-
+        String token= null;
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7);}
+            token = authorizationHeader.substring(7);
+        }
 
+        DecodedJWT decodedJWT = JWT.decode(token);
+        System.out.println("Decoded JWT: " + decodedJWT);
 
-        System.out.println("Bruh");
-
-
-
-        String[] parts = token.split("\\.", 0);
-
-        // Extract the payload part (second part)
-        byte[] payloadBytes = Base64.getUrlDecoder().decode(parts[1]);
-        String payload = new String(payloadBytes, StandardCharsets.UTF_8);
-
-        // Parse the payload as JSON
-        JsonObject payloadJson = new Gson().fromJson(payload, JsonObject.class);
-
-        // Extract the email claim from the payload
-        String email = payloadJson.get("email").getAsString();
-
-        // Print or use the email address as needed
+        String email = decodedJWT.getClaim("email").asString();
         System.out.println("Email: " + email);
-
-        // You can also extract other claims similarly
-        // For example, to extract the user ID:
-        String userId = payloadJson.get("user_id").getAsString();
-        System.out.println("User ID: " + userId);
-
-
-
-//        for (String part : parts) {
-//            byte[] bytes = Base64.getUrlDecoder().decode(part);
-//            String decodedString = new String(bytes, StandardCharsets.UTF_8);
-//
-//            System.out.println("Decodeddddddddddddddd: " + decodedString);
-//        }
-
-
-
-
-        var user = new User(email, "manager");
+        String role = decodedJWT.getClaim("role").asString();
+        if (role == null || role.isEmpty()) {
+            role = "manager"; //we see what to do w this later
+        }
+        var user = new User(email, role);
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new FirebaseAuthentication(user));
 
         filterChain.doFilter(request, response);
+
     }
 
     @Override
