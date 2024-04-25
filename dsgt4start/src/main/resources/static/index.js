@@ -162,7 +162,7 @@ function getHello(token) {
     .then((data) => {
 
       console.log(data);
-      addContent(data);
+//      addContent(data);
     })
     .catch(function (error) {
       console.log(error);
@@ -181,7 +181,7 @@ function whoami(token) {
     })
     .then((data) => {
       console.log(data.email + data.role);
-      addContent("Whoami at rest service: " + data.email + " - " + data.role);
+//      addContent("Whoami at rest service: " + data.email + " - " + data.role);
 
     })
     .catch(function (error) {

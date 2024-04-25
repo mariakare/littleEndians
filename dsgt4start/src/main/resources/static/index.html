@@ -1,32 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
+
+
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>DSGT 4 Broker</title>
+    <title>Product Page</title>
+
     <link rel="stylesheet" href="index.css" />
+    <!-- add more stylesheets + -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
+
+
+
 <body>
 <script type="module" src="index.js">
 
 </script>
 
+
+<!--<header>-->
+<!--    <div id="headerdiv" class="header-menu">-->
+<!--        <a href="/">-->
+<!--            <div class="header-title">Random Shit Specials</div>-->
+<!--        </a>-->
+
+<!--        <div class="header-name" id="namediv"></div>-->
+
+<!--        <button  class="icon-button"><i class="fas fa-shopping-basket"></i> View Orders</button>-->
+<!--        <button  id="btnLogout" class="header-icon"><i class="fas fa-sign-out-alt"></i> Logout</button>-->
+<!--    </div>-->
+<!--</header>-->
+
 <header>
-    <div id="headerdiv" class="header-menu">
+    <div class="header-menu">
         <a href="/">
-            <div class="header-title">DSGT4 Broker</div>
+            <div class="header-title">Random Shit Specials</div>
         </a>
+        <div class="header-name" id="namediv"></div>
 
-                <div class="header-name" id="namediv"></div>
-
-            <span id="btnLogout"
-                    class="header-icon">
-              <img src="/images/logout.svg" height="24" />
-            </span>
-        </span>
+        <div class="icon-buttons-container">
+            <button  class="icon-button"><i class="fas fa-shopping-basket"></i> View Orders</button>
+            <button  id="btnLogout" class="header-icon"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
     </div>
 </header>
+
 
 
 <div id="logindiv" class="login">
@@ -42,7 +64,78 @@
     <div class="login-button" id="btnSignUp">Sign up</div>
     <div class="login-button" id="btnSignIn">Sign In</div>
 </div>
-<div class="page" id="contentdiv"></div>
+
+
+<div class="page" id="contentdiv">
+
+
+
+    <div class="product">
+
+        <!-- FOR THIS CHANGE! USE AJAX CALL TO OUR SERVER. IN SERVER CHECK DB. SEND ALL OUR BUNDLES AND BUILD HTML LOCALLY -->
+
+        <h2 class="bundle-title">Bundle 1</h2>
+        <div class="product-bundle">
+            <!-- Product 1 -->
+            <div class="product-item">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s" alt="Product Image">
+                <h3 class="product-title">Product 1</h3>
+                <p class="product-description">Short description for Product 1. Yes Yes Yes Yes Yes Yes Yes Yes Yes Yes </p>
+            </div>
+            <!-- Product 2 -->
+            <div class="product-item">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s" alt="Product Image">
+                <h3 class="product-title">Product 2</h3>
+                <p class="product-description">Short description for Product 2.</p>
+            </div>
+            <!-- Product 3 -->
+            <div class="product-item">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s" alt="Product Image">
+                <h3 class="product-title">Product 3</h3>
+                <p class="product-description">Short description for Product 3.</p>
+            </div>
+        </div>
+        <p class="bundle-description">Bundle 1 description goes here.</p>
+        <a href="#" class="add-to-cart">Add to Cart</a>
+    </div>
+
+    <!-- Bundle 2 -->
+    <div class="product">
+        <h2 class="bundle-title">Bundle 2</h2>
+        <div class="product-bundle">
+            <!-- Product 1 -->
+            <div class="product-item">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s" alt="Product Image">
+                <h3 class="product-title">Product 1</h3>
+                <p class="product-description">Short description for Product 1.</p>
+            </div>
+            <!-- Product 2 -->
+            <div class="product-item">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s" alt="Product Image">
+                <h3 class="product-title">Product 2</h3>
+                <p class="product-description">Short description for Product 2.</p>
+            </div>
+            <!-- Product 3 -->
+            <div class="product-item">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s" alt="Product Image">
+                <h3 class="product-title">Product 3</h3>
+                <p class="product-description">Short description for Product 3.</p>
+            </div>
+        </div>
+        <p class="bundle-description">Bundle 2 description goes here.</p>
+        <a href="#" class="add-to-cart">Add to Cart</a>
+    </div>
+
+
+
+
+</div>
+
+
+
+<footer class="bottom-bar">
+    <p>&copy; 2024 The Little Endians. All rights reserved.</p>
+</footer>
 
 </body>
 </html>
