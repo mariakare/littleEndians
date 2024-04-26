@@ -135,8 +135,7 @@ function fetchData(token) {
 function showAuthenticated(username) {
   //document.getElementById("namediv").innerHTML = "Hello " + username;
   document.getElementById("logindiv").style.display = "none";
-  document.getElementById("contentdiv").style.display = "block";
-  window.location.reload();
+  document.getElementById("contentdiv").style.display = "flex";
 }
 
 function showUnAuthenticated() {
