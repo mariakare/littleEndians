@@ -62,10 +62,31 @@ header {
     margin-bottom: 10px;
 }
 
-.product img {
-    width: 100%;
-    height: auto;
-    margin-bottom: 10px;
+.page {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 20px;
+    margin-bottom: 50px;
+    min-height: 500px;
+}
+
+
+
+.product {
+    width: 45%; /* Adjusted width to fit two bundles next to each other */
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 768px) {
+    .product {
+        width: 100%; /* Adjusted width for smaller screens */
+    }
 }
 
 .product-title {

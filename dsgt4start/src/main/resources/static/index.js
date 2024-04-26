@@ -133,9 +133,10 @@ function fetchData(token) {
   whoami(token);
 }
 function showAuthenticated(username) {
-  document.getElementById("namediv").innerHTML = "Hello " + username;
+  //document.getElementById("namediv").innerHTML = "Hello " + username;
   document.getElementById("logindiv").style.display = "none";
   document.getElementById("contentdiv").style.display = "block";
+  window.location.reload();
 }
 
 function showUnAuthenticated() {
