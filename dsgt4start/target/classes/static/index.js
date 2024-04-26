@@ -136,14 +136,18 @@ function showAuthenticated(username) {
   //document.getElementById("namediv").innerHTML = "Hello " + username;
   document.getElementById("logindiv").style.display = "none";
   document.getElementById("contentdiv").style.display = "flex";
+  document.getElementById("divHeaderButtons").style.display = "flex";
 }
 
 function showUnAuthenticated() {
-  document.getElementById("namediv").innerHTML = "";
-  document.getElementById("email").value = "";
-  document.getElementById("password").value = "";
-  document.getElementById("logindiv").style.display = "block";
-  document.getElementById("contentdiv").style.display = "none";
+    document.getElementById("namediv").innerHTML = "";
+    document.getElementById("email").value = "";
+    document.getElementById("password").value = "";
+    document.getElementById("logindiv").style.display = "block";
+    document.getElementById("contentdiv").style.display = "none";
+
+    document.getElementById("divHeaderButtons").style.display = "none";
+
 }
 
 function addContent(text) {
