@@ -67,39 +67,32 @@ function wireGuiUpEvents() {
   });
 
   signUpButton.addEventListener("click", function () {
-    // Sign up the user using Firebase's createUserWithEmailAndPassword method
     createUserWithEmailAndPassword(getAuth(), email.value, password.value)
-        .then(function (userCredential) {
-          const user = userCredential.user;
+         .then(function (userCredential) {
+           return userCredential.user.getIdToken(); // Get the user access token
+         })
+         .then(function (token) {
+           return fetch("/api/newUser", {
+             headers: {
+               Authorization: `Bearer ${token}` // Include the token in the Authorization header
+             }
+           });
+         })
+         .then(function (response) {
+           if (!response.ok) {
+             throw new Error(`Error retrieving user info: ${response.text()}`);
+           }
 
-          // Get user name from the form (assuming it's not required for your User class)
-          // const name = document.getElementById("name").value;
-
-          // Create user data object with just email and role (assuming role is retrieved elsewhere)
-          const userData = {
-            uid: user.uid,
-            email: email.value,
-            role: "manager",
-          };
-
-          return fetch("/api/users", {
-            method: "POST",
-            body: JSON.stringify(userData),
-          });
-        })
-        .then(function (response) {
-          if (!response.ok) {
-            throw new Error(`Error creating user: ${response.text()}`);
-          }
-
-          console.log("User created successfully!");
-          // Handle successful user creation (e.g., redirect to profile page)
-        })
-        .catch(function (error) {
-          console.error("Error creating user:", error.message);
-          alert("Error creating user: " + error.message); // More user-friendly message
-        });
-    });
+           return response.json();
+         })
+         .then(function (userData) {
+           console.log("Current user:", userData); // You can use the user data here
+         })
+         .catch(function (error) {
+           console.error("Error:", error.message);
+           alert("Error: " + error.message); // More user-friendly message
+         });
+     });
 
   logoutButton.addEventListener("click", function () {
     try {

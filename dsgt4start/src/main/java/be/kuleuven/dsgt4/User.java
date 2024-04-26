@@ -21,4 +21,6 @@ public class User {
     public boolean isManager() {
         return this.role != null && this.role.equals("manager");
     }
+
+
 }

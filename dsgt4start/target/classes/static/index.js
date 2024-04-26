@@ -67,19 +67,32 @@ function wireGuiUpEvents() {
   });
 
   signUpButton.addEventListener("click", function () {
-    // Sign up the user using Firebase's createUserWithEmailAndPassword method
-
     createUserWithEmailAndPassword(getAuth(), email.value, password.value)
-      .then(function () {
-        console.log("created");
-      })
-      .catch(function (error) {
-        // Show an error message
-        console.log("error createUserWithEmailAndPassword:");
-        console.log(error.message);
-        alert(error.message);
-      });
-  });
+         .then(function (userCredential) {
+           return userCredential.user.getIdToken(); // Get the user access token
+         })
+         .then(function (token) {
+           return fetch("/api/newUser", {
+             headers: {
+               Authorization: `Bearer ${token}` // Include the token in the Authorization header
+             }
+           });
+         })
+         .then(function (response) {
+           if (!response.ok) {
+             throw new Error(`Error retrieving user info: ${response.text()}`);
+           }
+
+           return response.json();
+         })
+         .then(function (userData) {
+           console.log("Current user:", userData); // You can use the user data here
+         })
+         .catch(function (error) {
+           console.error("Error:", error.message);
+           alert("Error: " + error.message); // More user-friendly message
+         });
+     });
 
   logoutButton.addEventListener("click", function () {
     try {

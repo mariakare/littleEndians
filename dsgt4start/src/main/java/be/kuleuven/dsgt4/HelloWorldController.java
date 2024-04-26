@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.*;
 
 // Add the controller.
 @RestController
@@ -43,20 +44,19 @@ class HelloWorldController {
         return user;
     }
 
-    @PostMapping("/users")
-    public ResponseEntity<String> createUser(@RequestBody User user) {
+    @GetMapping("/api/newUser")
+    public User newuser() throws InterruptedException, ExecutionException {
+        var user = WebSecurityConfig.getUser();
 
-        try {
+        Map<String, Object> data = new HashMap<>();
+        data.put("user", user.getEmail().toString());
+        data.put("role", "manager");
 
-            this.db.collection("users")
-                    .add(user)
-                    .get();
+        this.db.collection("user").document(user.getEmail().toString()).set(data).get();
 
-            return ResponseEntity.ok("User created successfully!");
-        } catch (Exception e) {
-            System.out.println("Error creating user: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating user");
-        }
+        return user;
     }
+
+
 }
 
