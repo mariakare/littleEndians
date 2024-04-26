@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import static java.util.stream.Collectors.*;
 import java.util.*;
 
 // Add the controller.
@@ -44,7 +45,8 @@ class HelloWorldController {
         return user;
     }
 
-    @GetMapping("/api/newUser")
+    @PostMapping("/api/newUser")
+    @ResponseBody
     public User newuser() throws InterruptedException, ExecutionException {
         var user = WebSecurityConfig.getUser();
 
@@ -52,11 +54,26 @@ class HelloWorldController {
         data.put("user", user.getEmail().toString());
         data.put("role", "manager");
 
-        this.db.collection("user").document(user.getEmail().toString()).set(data).get();
+        this.db.collection("user").document(user.getEmail().toString()).set(data);
 
         return user;
     }
 
+    /*
+    @GetMapping("/api/users")
+    public List<String> getUsers() {
 
+        List<String> emails = this.db.collection("users")
+                .get()
+                .get()
+                .getDocuments()
+                .stream()
+                .map(document -> document.getString("email"))
+                .collect(Collectors.toList());
+
+        return emails;
+    }
+
+*/
 }
 

@@ -73,8 +73,9 @@ function wireGuiUpEvents() {
          })
          .then(function (token) {
            return fetch("/api/newUser", {
+             method: 'POST',
              headers: {
-               Authorization: `Bearer ${token}` // Include the token in the Authorization header
+               Authorization: 'Bearer ' + token  // Include the token in the Authorization header
              }
            });
          })
@@ -107,7 +108,7 @@ function wireUpAuthChange() {
 
   var auth = getAuth();
   onAuthStateChanged(auth, (user) => {
-    console.log("onAuthStateChanged");
+    console.log("onAuthStateChanged: User is", user ? user.email : "null"); // Log user email or null
     if (user == null) {
       console.log("user is null");
       showUnAuthenticated();
