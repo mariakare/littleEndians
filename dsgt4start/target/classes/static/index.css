@@ -71,7 +71,7 @@ header {
     min-height: 500px;
 }
 
-
+.login {display: none;}
 
 .product {
     width: 45%; /* Adjusted width to fit two bundles next to each other */
