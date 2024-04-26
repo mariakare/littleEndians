@@ -68,18 +68,38 @@ function wireGuiUpEvents() {
 
   signUpButton.addEventListener("click", function () {
     // Sign up the user using Firebase's createUserWithEmailAndPassword method
-
     createUserWithEmailAndPassword(getAuth(), email.value, password.value)
-      .then(function () {
-        console.log("created");
-      })
-      .catch(function (error) {
-        // Show an error message
-        console.log("error createUserWithEmailAndPassword:");
-        console.log(error.message);
-        alert(error.message);
-      });
-  });
+        .then(function (userCredential) {
+          const user = userCredential.user;
+
+          // Get user name from the form (assuming it's not required for your User class)
+          // const name = document.getElementById("name").value;
+
+          // Create user data object with just email and role (assuming role is retrieved elsewhere)
+          const userData = {
+            uid: user.uid,
+            email: email.value,
+            role: "manager",
+          };
+
+          return fetch("/api/users", {
+            method: "POST",
+            body: JSON.stringify(userData),
+          });
+        })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error(`Error creating user: ${response.text()}`);
+          }
+
+          console.log("User created successfully!");
+          // Handle successful user creation (e.g., redirect to profile page)
+        })
+        .catch(function (error) {
+          console.error("Error creating user:", error.message);
+          alert("Error creating user: " + error.message); // More user-friendly message
+        });
+    });
 
   logoutButton.addEventListener("click", function () {
     try {

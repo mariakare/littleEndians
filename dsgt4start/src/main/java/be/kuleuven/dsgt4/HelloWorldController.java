@@ -6,8 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -38,4 +42,21 @@ class HelloWorldController {
 
         return user;
     }
+
+    @PostMapping("/users")
+    public ResponseEntity<String> createUser(@RequestBody User user) {
+
+        try {
+
+            this.db.collection("users")
+                    .add(user)
+                    .get();
+
+            return ResponseEntity.ok("User created successfully!");
+        } catch (Exception e) {
+            System.out.println("Error creating user: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating user");
+        }
+    }
 }
+
