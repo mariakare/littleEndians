@@ -121,7 +121,8 @@ function wireUpAuthChange() {
 
       //fetch data from server when authentication was successful. 
       var token = idTokenResult.token;
-      fetchData(token);
+      getBundles(token);
+      //fetchData(token);
 
     });
 
@@ -157,7 +158,7 @@ function addContent(text) {
 // calling /api/hello on the rest service to illustrate text based data retrieval
 function getHello(token) {
 
-  fetch('/api/getBundles', {
+  fetch('/api/hello', {
     headers: { Authorization: 'Bearer ' + token}
   })
     .then((response) => {
@@ -166,7 +167,7 @@ function getHello(token) {
     .then((data) => {
 
       console.log(data);
-      displayBundles(data);
+      addContent(data);
     })
     .catch(function (error) {
       console.log(error);
@@ -174,6 +175,31 @@ function getHello(token) {
 
 
 }
+
+/**
+ *  Get all available bundles and display them as content on the page
+ * @param token
+ */
+function getBundles(token) {
+
+  fetch('/api/getBundles', {
+    headers: { Authorization: 'Bearer ' + token}
+  })
+      .then((response) => {
+        return response.text();
+      })
+      .then((data) => {
+
+        console.log(data);
+        displayBundles(data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+
+
+}
+
 // calling /api/whoami on the rest service to illustrate JSON based data retrieval
 function whoami(token) {
 
@@ -198,7 +224,8 @@ function displayBundles(data) {
 
   const bundles = JSON.parse(data).bundles;
   const contentDiv = document.getElementById('contentdiv');
-
+  // Clear the contentdiv before adding new bundles
+  contentDiv.innerHTML = '';
   // Loop through each bundle
   bundles.forEach(bundle => {
     // Create a div element for the bundle
