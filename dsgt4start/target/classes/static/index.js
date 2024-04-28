@@ -157,7 +157,7 @@ function addContent(text) {
 // calling /api/hello on the rest service to illustrate text based data retrieval
 function getHello(token) {
 
-  fetch('/api/hello', {
+  fetch('/api/getBundles', {
     headers: { Authorization: 'Bearer ' + token}
   })
     .then((response) => {
@@ -166,7 +166,7 @@ function getHello(token) {
     .then((data) => {
 
       console.log(data);
-//      addContent(data);
+      displayBundles(data);
     })
     .catch(function (error) {
       console.log(error);
@@ -185,13 +185,62 @@ function whoami(token) {
     })
     .then((data) => {
       console.log(data.email + data.role);
-//      addContent("Whoami at rest service: " + data.email + " - " + data.role);
 
     })
     .catch(function (error) {
       console.log(error);
     });
 
-
 }
 
+
+function displayBundles(data) {
+// Parse the JSON data
+  const bundles = JSON.parse(data).bundles;
+
+  // Get the contentdiv container
+  const contentDiv = document.getElementById('contentdiv');
+
+  // Loop through each bundle
+  bundles.forEach(bundle => {
+    // Create a div element for the bundle
+    const bundleDiv = document.createElement('div');
+    bundleDiv.classList.add('product');
+
+    // Set the bundle title
+    bundleDiv.innerHTML = `<h2 class="bundle-title">${bundle.name}</h2>`;
+
+    // Create a div element for the product bundle
+    const productBundleDiv = document.createElement('div');
+    productBundleDiv.classList.add('product-bundle');
+
+    // Loop through each product in the bundle
+    bundle.products.forEach(product => {
+      // Create a div element for the product item
+      const productItemDiv = document.createElement('div');
+      productItemDiv.classList.add('product-item');
+
+      // Set the product image, title, and description
+      productItemDiv.innerHTML = `
+        <img src="${product.image}" alt="Product Image">
+        <h3 class="product-title">${product.name}</h3>
+        <p class="product-description">${product.description}</p>
+      `;
+
+      // Append the product item to the product bundle
+      productBundleDiv.appendChild(productItemDiv);
+    });
+
+    // Append the product bundle to the bundle div
+    bundleDiv.appendChild(productBundleDiv);
+
+    // Set the bundle description
+    bundleDiv.innerHTML += `<p class="bundle-description">${bundle.description}</p>`;
+
+    // Create a link to add the bundle to cart (you can modify this as needed)
+    bundleDiv.innerHTML += `<a href="#" class="add-to-cart">Add to Cart</a>`;
+
+    // Append the bundle div to the contentdiv container
+    contentDiv.appendChild(bundleDiv);
+  });
+}
