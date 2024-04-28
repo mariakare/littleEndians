@@ -9,6 +9,8 @@ import {
   signInWithEmailAndPassword,
 } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-auth.js";
 
+import {getBundles} from "./getContent.js";
+
 // we setup the authentication, and then wire up some key events to event handlers
 setupAuth();
 wireGuiUpEvents();
@@ -129,10 +131,7 @@ function wireUpAuthChange() {
   });
 }
 
-function fetchData(token) {
-  getHello(token);
-  whoami(token);
-}
+
 function showAuthenticated(username) {
   //document.getElementById("namediv").innerHTML = "Hello " + username;
   document.getElementById("logindiv").style.display = "none";
@@ -151,109 +150,3 @@ function showUnAuthenticated() {
 
 }
 
-function addContent(text) {
-  document.getElementById("contentdiv").innerHTML += (text + "<br/>");
-}
-
-// calling /api/hello on the rest service to illustrate text based data retrieval
-function getHello(token) {
-
-  fetch('/api/hello', {
-    headers: { Authorization: 'Bearer ' + token}
-  })
-    .then((response) => {
-      return response.text();
-    })
-    .then((data) => {
-
-      console.log(data);
-      addContent(data);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-
-
-}
-
-/**
- *  Get all available bundles and display them as content on the page
- * @param token
- */
-function getBundles(token) {
-
-  fetch('/api/getBundles', {
-    headers: { Authorization: 'Bearer ' + token}
-  })
-      .then((response) => {
-        return response.text();
-      })
-      .then((data) => {
-
-        console.log(data);
-        displayBundles(data);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-
-
-}
-
-// calling /api/whoami on the rest service to illustrate JSON based data retrieval
-function whoami(token) {
-
-  fetch('/api/whoami', {
-    headers: { Authorization: 'Bearer ' + token }
-  })
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      console.log(data.email + data.role);
-
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-
-}
-
-
-function displayBundles(data) {
-
-  const bundles = JSON.parse(data).bundles;
-  const contentDiv = document.getElementById('contentdiv');
-  // Clear the contentdiv before adding new bundles
-  contentDiv.innerHTML = '';
-  // Loop through each bundle
-  bundles.forEach(bundle => {
-    // Create a div element for the bundle
-    const bundleDiv = document.createElement('div');
-    bundleDiv.classList.add('product');
-
-    bundleDiv.innerHTML = `<h2 class="bundle-title">${bundle.name}</h2>`;
-    const productBundleDiv = document.createElement('div');
-    productBundleDiv.classList.add('product-bundle');
-
-    // Loop through each product in the bundle
-    bundle.products.forEach(product => {
-
-      const productItemDiv = document.createElement('div');
-      productItemDiv.classList.add('product-item');
-
-      productItemDiv.innerHTML = `
-        <img src="${product.image}" alt="Product Image">
-        <h3 class="product-title">${product.name}</h3>
-        <p class="product-description">${product.description}</p>
-      `;
-      productBundleDiv.appendChild(productItemDiv);
-    });
-
-    bundleDiv.appendChild(productBundleDiv);
-    bundleDiv.innerHTML += `<p class="bundle-description">${bundle.description}</p>`;
-    bundleDiv.innerHTML += `<a href="#" class="add-to-cart">Add to Cart</a>`;
-
-    contentDiv.appendChild(bundleDiv);
-  });
-}
