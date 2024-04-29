@@ -1,0 +1,12 @@
+/home/sudarshan/Documents/projects/dapp2024work/dsgt2-rest/dsgt-rest/src/main/java/be/kuleuven/foodrestservice/controllers/MealsRestController.java
+/home/sudarshan/Documents/projects/dapp2024work/dsgt2-rest/dsgt-rest/src/main/java/be/kuleuven/foodrestservice/exceptions/MealNotFoundAdvice.java
+/home/sudarshan/Documents/projects/dapp2024work/dsgt2-rest/dsgt-rest/src/main/java/be/kuleuven/foodrestservice/exceptions/AddressNotFoundException.java
+/home/sudarshan/Documents/projects/dapp2024work/dsgt2-rest/dsgt-rest/src/main/java/be/kuleuven/foodrestservice/controllers/MealsRestRpcStyleController.java
+/home/sudarshan/Documents/projects/dapp2024work/dsgt2-rest/dsgt-rest/src/main/java/be/kuleuven/foodrestservice/FoodRestServiceApplication.java
+/home/sudarshan/Documents/projects/dapp2024work/dsgt2-rest/dsgt-rest/src/main/java/be/kuleuven/foodrestservice/domain/MealType.java
+/home/sudarshan/Documents/projects/dapp2024work/dsgt2-rest/dsgt-rest/src/main/java/be/kuleuven/foodrestservice/domain/MealsRepository.java
+/home/sudarshan/Documents/projects/dapp2024work/dsgt2-rest/dsgt-rest/src/main/java/be/kuleuven/foodrestservice/domain/Order.java
+/home/sudarshan/Documents/projects/dapp2024work/dsgt2-rest/dsgt-rest/src/main/java/be/kuleuven/foodrestservice/exceptions/MealNotFoundException.java
+/home/sudarshan/Documents/projects/dapp2024work/dsgt2-rest/dsgt-rest/src/main/java/be/kuleuven/foodrestservice/domain/OrderConfirmation.java
+/home/sudarshan/Documents/projects/dapp2024work/dsgt2-rest/dsgt-rest/src/main/java/be/kuleuven/foodrestservice/domain/Meal.java
+/home/sudarshan/Documents/projects/dapp2024work/dsgt2-rest/dsgt-rest/src/main/java/be/kuleuven/foodrestservice/exceptions/AddressNotFoundAdvice.java
