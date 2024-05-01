@@ -6,14 +6,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-
 @ControllerAdvice
-class AddressNotFoundAdvice {
+class SuitNotFoundAdvice {
 
     @ResponseBody
-    @ExceptionHandler(AddressNotFoundException.class)
+    @ExceptionHandler(SuitNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String addressNotFoundHandler(AddressNotFoundException ex) {
+    String suitNotFoundHandler(SuitNotFoundException ex) {
         return ex.getMessage();
     }
 }
