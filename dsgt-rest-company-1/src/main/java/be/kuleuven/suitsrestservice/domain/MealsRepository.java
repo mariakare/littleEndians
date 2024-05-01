@@ -1,7 +1,7 @@
 package be.kuleuven.suitsrestservice.domain;
 
-import be.kuleuven.suitsrestservice.exceptions.AddressNotFoundException;
-import be.kuleuven.suitsrestservice.exceptions.MealNotFoundException;
+import be.kuleuven.suitsrestservice.exceptions.ReservationException;
+import be.kuleuven.suitsrestservice.exceptions.SuitNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -91,7 +91,7 @@ public class MealsRepository {
 
         for (String mealId : order.getMealIds()) {
             Meal meal = findMeal(mealId)
-                    .orElseThrow(() -> new MealNotFoundException("Meal with ID " + mealId + " not found."));
+                    .orElseThrow(() -> new SuitNotFoundException("Meal with ID " + mealId + " not found."));
             orderedMeals.add(meal);
             totalPrice += meal.getPrice();
         }
@@ -101,14 +101,14 @@ public class MealsRepository {
 
     private void verifyOrderLegality(Order order) {
         if(order.getMealIds()==null && order.getAddress()==null){
-            throw new AddressNotFoundException("Please provide both an address as well as mealIds.");
+            throw new ReservationException("Please provide both an address as well as mealIds.");
         }
 
         if (order.getMealIds() == null || order.getMealIds().isEmpty()) {
-            throw new MealNotFoundException();
+            throw new SuitNotFoundException();
         }
         if(order.getAddress()==null){
-            throw new AddressNotFoundException();
+            throw new ReservationException();
         }
     }
 }

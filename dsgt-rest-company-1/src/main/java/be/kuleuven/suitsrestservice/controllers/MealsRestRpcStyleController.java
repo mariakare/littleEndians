@@ -2,7 +2,7 @@ package be.kuleuven.suitsrestservice.controllers;
 
 import be.kuleuven.suitsrestservice.domain.Meal;
 import be.kuleuven.suitsrestservice.domain.MealsRepository;
-import be.kuleuven.suitsrestservice.exceptions.MealNotFoundException;
+import be.kuleuven.suitsrestservice.exceptions.SuitNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +23,7 @@ public class MealsRestRpcStyleController {
     Meal getMealById(@PathVariable String id) {
         Optional<Meal> meal = mealsRepository.findMeal(id);
 
-        return meal.orElseThrow(() -> new MealNotFoundException(id));
+        return meal.orElseThrow(() -> new SuitNotFoundException(id));
     }
 
     @GetMapping("/restrpc/meals")

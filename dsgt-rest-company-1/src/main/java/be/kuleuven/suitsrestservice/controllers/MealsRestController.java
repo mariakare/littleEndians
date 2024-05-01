@@ -4,7 +4,7 @@ import be.kuleuven.suitsrestservice.domain.Meal;
 import be.kuleuven.suitsrestservice.domain.MealsRepository;
 import be.kuleuven.suitsrestservice.domain.Order;
 import be.kuleuven.suitsrestservice.domain.OrderConfirmation;
-import be.kuleuven.suitsrestservice.exceptions.MealNotFoundException;
+import be.kuleuven.suitsrestservice.exceptions.SuitNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -29,7 +29,7 @@ public class MealsRestController {
 
     @GetMapping("/rest/meals/{id}")
     EntityModel<Meal> getMealById(@PathVariable String id) {
-        Meal meal = mealsRepository.findMeal(id).orElseThrow(() -> new MealNotFoundException(id));
+        Meal meal = mealsRepository.findMeal(id).orElseThrow(() -> new SuitNotFoundException(id));
 
         return mealToEntityModel(id, meal);
     }
@@ -76,7 +76,7 @@ public class MealsRestController {
     @PutMapping("/rest/meals/{id}")
     ResponseEntity<EntityModel<Meal>> updateMeal(@PathVariable String id, @RequestBody Meal updatedMeal) {
         Meal existingMeal = mealsRepository.findMeal(id)
-                .orElseThrow(() -> new MealNotFoundException(id));
+                .orElseThrow(() -> new SuitNotFoundException(id));
         updatedMeal.setId(id);
         boolean updated = mealsRepository.updateMeal(updatedMeal);
         if (updated) {
@@ -93,7 +93,7 @@ public class MealsRestController {
     @DeleteMapping("/rest/meals/{id}")
     ResponseEntity<EntityModel<Meal>> deleteMeal(@PathVariable String id) {
         Meal meal = mealsRepository.findMeal(id)
-                .orElseThrow(() -> new MealNotFoundException(id));
+                .orElseThrow(() -> new SuitNotFoundException(id));
         mealsRepository.deleteMeal(id);
         return ResponseEntity
                 .status(HttpStatus.OK)
