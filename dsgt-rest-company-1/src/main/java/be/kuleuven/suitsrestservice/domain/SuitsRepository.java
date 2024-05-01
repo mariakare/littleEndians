@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-
+import java.util.stream.Collectors;
 
 
 @Component
@@ -117,6 +117,46 @@ public class SuitsRepository {
         reservations.put(reservationId, reservation);
         return reservation;
     }
+
+    public Reservation getReservationById(String reservationId) {
+        Reservation reservation = reservations.get(reservationId);
+        if (reservation == null) {
+            throw new ReservationException("Reservation with ID " + reservationId + " not found.");
+        }
+        return reservation;
+    }
+
+    public void cancelReservation(String reservationId, String userId) {
+        //this method is wrong lol...
+        //coz if any of the reservations involved a certain suit is accepted, then the amount for suit shouldn't be changed again
+        //TODO: fix method
+        Reservation reservation = getReservationById(reservationId);
+        if (!reservation.getUserId().equals(userId)) {
+            throw new ReservationException("Reservation does not belong to the user");
+        }
+        // I have to update suit quantities by going through the reservation, getting suits, and updating the amount available
+        for (Map.Entry<String, Integer> entry : reservation.getSuits().entrySet()) {
+            String suitId = entry.getKey();
+            int quantity = entry.getValue();
+            Suit suit = getSuitById(suitId);
+            suit.setAmountAvailable(suit.getAmountAvailable() + quantity);
+        }
+        // Update reservation status
+        reservation.setStatus(Reservation.Status.CANCELLED);
+    }
+
+    //some potentially useful methods
+    public List<Reservation> getReservationsForUser(String userId) {
+        return reservations.values().stream()
+                .filter(r -> r.getUserId().equals(userId))
+                .collect(Collectors.toList());
+    }
+    public List<Reservation> getAllReservations() {
+        // Implement access control for manager role on broker side??
+        return new ArrayList<>(reservations.values());
+    }
+
+
 
 }
 
