@@ -58,12 +58,9 @@ public class SuitsRepository {
 
     }
 
-    public Suit getSuitById(String id) {
+    public Optional<Suit> getSuitById(String id) {
         Suit suit = suits.get(id);
-        if (suit == null) {
-            throw new SuitNotFoundException(id);
-        }
-        return suit;
+         return Optional.ofNullable(suit);
     }
 
     public List<Suit> getAllSuits() {
@@ -103,7 +100,7 @@ public class SuitsRepository {
         for (Map.Entry<String, Integer> entry : suitsToReserve.entrySet()) {
             String suitId = entry.getKey();
             int quantity = entry.getValue();
-            Suit suit = getSuitById(suitId);
+            Suit suit = getSuitById(suitId).orElseThrow(() -> new SuitNotFoundException(suitId));
             if (suit.getAmountAvailable() < quantity) {
                 reservation = null;
                 throw new ReservationException("Not enough " + suit.getName() + " suits available.");
@@ -137,17 +134,17 @@ public class SuitsRepository {
         for (Map.Entry<String, Integer> entry : reservation.getSuits().entrySet()) {
             String suitId = entry.getKey();
             int quantity = entry.getValue();
-            Suit suit = getSuitById(suitId);
-            if (suit.getAmountAvailable() < quantity) {
-                // Suit is no longer available, potentially reserved by someone else
-                reservation.setStatus(Reservation.Status.CANCELLED);
-                throw new ReservationException("Suit(s) in reservation are no longer available.");
-            }
-            else{
+            Suit suit = getSuitById(suitId).orElseThrow(() -> new SuitNotFoundException(suitId));
+//            if (suit.getAmountAvailable() < quantity) {
+//                // Suit is no longer available, potentially reserved by someone else
+//                reservation.setStatus(Reservation.Status.CANCELLED);
+//                throw new ReservationException("Suit(s) in reservation are no longer available.");
+//            }
+//            else{
                 // Suit is available but idk manager cancels reservation for instance
                 suit.setAmountAvailable(suit.getAmountAvailable() + quantity);
                 reservation.setStatus(Reservation.Status.CANCELLED);
-            }
+            //}
         }
 
     }
