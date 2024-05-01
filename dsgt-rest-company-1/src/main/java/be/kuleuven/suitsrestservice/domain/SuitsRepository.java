@@ -126,23 +126,30 @@ public class SuitsRepository {
         return reservation;
     }
 
-    public void cancelReservation(String reservationId, String userId) {
-        //this method is wrong lol...
-        //coz if any of the reservations involved a certain suit is accepted, then the amount for suit shouldn't be changed again
-        //TODO: fix method
+    public synchronized void cancelReservation(String reservationId, String userId) {
+
         Reservation reservation = getReservationById(reservationId);
         if (!reservation.getUserId().equals(userId)) {
             throw new ReservationException("Reservation does not belong to the user");
         }
         // I have to update suit quantities by going through the reservation, getting suits, and updating the amount available
+        // Check if any suits in the reservation have become unavailable
         for (Map.Entry<String, Integer> entry : reservation.getSuits().entrySet()) {
             String suitId = entry.getKey();
             int quantity = entry.getValue();
             Suit suit = getSuitById(suitId);
-            suit.setAmountAvailable(suit.getAmountAvailable() + quantity);
+            if (suit.getAmountAvailable() < quantity) {
+                // Suit is no longer available, potentially reserved by someone else
+                reservation.setStatus(Reservation.Status.CANCELLED);
+                throw new ReservationException("Suit(s) in reservation are no longer available.");
+            }
+            else{
+                // Suit is available but idk manager cancels reservation for instance
+                suit.setAmountAvailable(suit.getAmountAvailable() + quantity);
+                reservation.setStatus(Reservation.Status.CANCELLED);
+            }
         }
-        // Update reservation status
-        reservation.setStatus(Reservation.Status.CANCELLED);
+
     }
 
     //some potentially useful methods
