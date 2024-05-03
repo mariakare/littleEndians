@@ -9,6 +9,8 @@ import java.util.Objects;
 
 public class Reservation {
 
+
+
     enum Status {
         PENDING,
         CONFIRMED,
@@ -16,8 +18,7 @@ public class Reservation {
     }
 
     private String reservationId;
-    private String suitId;
-    private String userId;
+
 
     //date and time of reservation uses ISO 8601 format (yyyy-MM-dd'T'HH:mm:ss.SSS'Z')
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
@@ -28,11 +29,11 @@ public class Reservation {
     private Map<String, Integer> suits; // Map of suitId to quantity
 
     // Constructors
-    public Reservation() {}
+    public Reservation() {
+    }
 
-    public Reservation(String reservationId, String userId, LocalDateTime timestamp) {
+    public Reservation(String reservationId, LocalDateTime timestamp) {
         this.reservationId = reservationId;
-        this.userId = userId;
         this.timestamp = timestamp;
         this.status = Status.PENDING;
         this.suits = new HashMap<>();
@@ -45,14 +46,6 @@ public class Reservation {
 
     public void setReservationId(String reservationId) {
         this.reservationId = reservationId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public LocalDateTime getTimestamp() {
@@ -95,13 +88,15 @@ public class Reservation {
         if (o == null || getClass() != o.getClass()) return false;
         Reservation that = (Reservation) o;
         return Objects.equals(reservationId, that.reservationId) &&
-                Objects.equals(suitId, that.suitId) &&
-                Objects.equals(userId, that.userId) &&
-                Objects.equals(timestamp, that.timestamp);
+                Objects.equals(timestamp, that.timestamp) &&
+                status == that.status &&
+                Objects.equals(suits, that.suits);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(reservationId, suitId, userId, timestamp);
+        return Objects.hash(reservationId, timestamp, status, suits);
     }
 }
+
+

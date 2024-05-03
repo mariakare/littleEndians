@@ -9,12 +9,8 @@ import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
+
 
 
 @Component
@@ -92,10 +88,10 @@ public class SuitsRepository {
     }
 
 
-    public synchronized Reservation reserveSuits(Map<String, Integer> suitsToReserve, String userId) {
+    public synchronized Reservation reserveSuits(Map<String, Integer> suitsToReserve) {
 
         String reservationId = UUID.randomUUID().toString();
-        Reservation reservation = new Reservation(reservationId, userId, LocalDateTime.now());
+        Reservation reservation = new Reservation(reservationId, LocalDateTime.now());
 
         for (Map.Entry<String, Integer> entry : suitsToReserve.entrySet()) {
             String suitId = entry.getKey();
@@ -123,12 +119,10 @@ public class SuitsRepository {
         return reservation;
     }
 
-    public synchronized void cancelReservation(String reservationId, String userId) {
+    public synchronized void cancelReservation(String reservationId) {
 
         Reservation reservation = getReservationById(reservationId);
-        if (!reservation.getUserId().equals(userId)) {
-            throw new ReservationException("Reservation does not belong to the user");
-        }
+
         // I have to update suit quantities by going through the reservation, getting suits, and updating the amount available
         // Check if any suits in the reservation have become unavailable
         for (Map.Entry<String, Integer> entry : reservation.getSuits().entrySet()) {
@@ -141,7 +135,7 @@ public class SuitsRepository {
 //                throw new ReservationException("Suit(s) in reservation are no longer available.");
 //            }
 //            else{
-                // Suit is available but idk manager cancels reservation for instance
+                // Suit is available but I don't know...manager cancels reservation for instance
                 suit.setAmountAvailable(suit.getAmountAvailable() + quantity);
                 reservation.setStatus(Reservation.Status.CANCELLED);
             //}
@@ -149,12 +143,6 @@ public class SuitsRepository {
 
     }
 
-    //some potentially useful methods
-    public List<Reservation> getReservationsForUser(String userId) {
-        return reservations.values().stream()
-                .filter(r -> r.getUserId().equals(userId))
-                .collect(Collectors.toList());
-    }
     public List<Reservation> getAllReservations() {
         // Implement access control for manager role on broker side??
         return new ArrayList<>(reservations.values());
