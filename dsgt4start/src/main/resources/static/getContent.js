@@ -13,7 +13,7 @@ export function getBundles(token) {
         .then((data) => {
 
             console.log(data);
-            displayBundles(data);
+            displayBundles(data,token);
         })
         .catch(function (error) {
             console.log(error);
@@ -23,7 +23,7 @@ export function getBundles(token) {
 }
 
 
-function displayBundles(data) {
+function displayBundles(data,token) {
 
     const bundles = JSON.parse(data).bundles;
     const contentDiv = document.getElementById('contentdiv');
@@ -55,8 +55,49 @@ function displayBundles(data) {
 
         bundleDiv.appendChild(productBundleDiv);
         bundleDiv.innerHTML += `<p class="bundle-description">${bundle.description}</p>`;
-        bundleDiv.innerHTML += `<a href="#" class="add-to-cart">Add to Cart</a>`;
+
+        // Create the "Add to Cart" button
+        const addToCartButton = document.createElement('a');
+        addToCartButton.href = '#';
+        addToCartButton.classList.add('add-to-cart');
+        addToCartButton.textContent = 'Add to Cart';
+        // Attach event listener to the "Add to Cart" button
+        addToCartButton.addEventListener('click', function() {
+            // Get the bundle ID from the bundle object (assuming each bundle has an ID)
+            const bundleId = bundle.name; // Change this according to your bundle structure
+            console.log(bundleId)
+            // Call a function to add the bundle to the cart
+            addToCart(bundleId, token);
+        });
+        bundleDiv.appendChild(addToCartButton);
 
         contentDiv.appendChild(bundleDiv);
     });
+}
+
+function addToCart(bundleId, token) {
+    // Send a fetch request to the backend
+    fetch('/api/addToCart', {
+        method: 'POST',
+        headers: {
+            Authorization: 'Bearer ' + token
+        },
+        body: bundleId
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text();
+        })
+        .then(data => {
+            // Handle success response (optional)
+            console.log(data);
+            alert('Bundle added to cart!');
+        })
+        .catch(error => {
+            // Handle error response (optional)
+            console.error(error);
+            alert('Error adding bundle to cart: ' + error.message);
+        });
 }
