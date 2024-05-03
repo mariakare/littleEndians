@@ -9,7 +9,7 @@ import {
   signInWithEmailAndPassword,
 } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-auth.js";
 
-import {getBundles} from "./getContent.js";
+import {getBundles, getCart} from "./getContent.js";
 
 // we setup the authentication, and then wire up some key events to event handlers
 setupAuth();
@@ -139,6 +139,10 @@ function wireUpAuthChange() {
       var token = idTokenResult.token;
       getBundles(token);
       //fetchData(token);
+
+      document.getElementById('btnShoppingBasket').addEventListener('click', function() {
+        getCart(token);
+      });
 
     });
 

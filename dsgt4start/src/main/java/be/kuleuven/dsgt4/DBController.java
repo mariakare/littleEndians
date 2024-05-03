@@ -1,7 +1,7 @@
 package be.kuleuven.dsgt4;
 
 import be.kuleuven.dsgt4.auth.WebSecurityConfig;
-import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.security.access.AuthorizationServiceException;
@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.google.cloud.firestore.Firestore;
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.DocumentReference;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -132,5 +130,22 @@ class DBController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bundle with ID: " + bundleId + " does not exist");
         }
+    }
+
+    @GetMapping("/api/getCart")
+    public List<Map<String, Object>> getCart() throws ExecutionException, InterruptedException {
+        var user = WebSecurityConfig.getUser();
+
+        // Reference to the user's document
+        CollectionReference basketRef = db.collection("user").document(user.getEmail()).collection("basket");
+
+        ApiFuture<QuerySnapshot> querySnapshot = basketRef.get();
+        List<Map<String, Object>> shoppingCart = new ArrayList<>();
+        for (QueryDocumentSnapshot document : querySnapshot.get().getDocuments()) {
+            Map<String, Object> itemData = document.getData();
+            shoppingCart.add(itemData);
+        }
+        return shoppingCart;
+
     }
 }

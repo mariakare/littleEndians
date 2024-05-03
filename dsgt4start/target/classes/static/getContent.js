@@ -22,6 +22,25 @@ export function getBundles(token) {
 
 }
 
+export function getCart(token) {
+
+    fetch('/api/getCart', {
+        headers: { Authorization: 'Bearer ' + token}
+    })
+        .then((response) => {
+            return response.json();
+        })
+        .then((data) => {
+            console.log(data);
+            displayShoppingCart(data,token);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+
+
+}
+
 
 function displayBundles(data,token) {
 
@@ -101,3 +120,39 @@ function addToCart(bundleId, token) {
             alert('Error adding bundle to cart: ' + error.message);
         });
 }
+
+function displayShoppingCart(data) {
+    const contentDiv = document.getElementById('contentdiv');
+    contentDiv.innerHTML = '';
+
+    // Create a container div for the heading and list
+    const containerDiv = document.createElement('div');
+    containerDiv.classList.add('shopping-cart-container');
+
+    // Create elements to display shopping cart contents
+    const heading = document.createElement('h2');
+    heading.textContent = 'Shopping Cart';
+
+    // Append heading to containerDiv
+    containerDiv.appendChild(heading);
+
+    // Create an unordered list to display items vertically
+    const itemList = document.createElement('ul');
+
+    // Loop through shopping cart items and display them vertically
+    data.forEach(item => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${item.name}`;
+        // You can customize the display of each item as needed
+        itemList.appendChild(listItem);
+    });
+
+    // Append the list to the containerDiv
+    containerDiv.appendChild(itemList);
+
+    // Append the containerDiv to the contentdiv
+    contentDiv.appendChild(containerDiv);
+}
+
+
+
