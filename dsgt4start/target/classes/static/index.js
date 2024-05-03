@@ -9,6 +9,8 @@ import {
   signInWithEmailAndPassword,
 } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-auth.js";
 
+import {getBundles} from "./getContent.js";
+
 // we setup the authentication, and then wire up some key events to event handlers
 setupAuth();
 wireGuiUpEvents();
@@ -135,73 +137,30 @@ function wireUpAuthChange() {
 
       //fetch data from server when authentication was successful. 
       var token = idTokenResult.token;
-      fetchData(token);
+      getBundles(token);
+      //fetchData(token);
 
     });
 
   });
 }
 
-function fetchData(token) {
-  getHello(token);
-  whoami(token);
-}
+
 function showAuthenticated(username) {
   //document.getElementById("namediv").innerHTML = "Hello " + username;
   document.getElementById("logindiv").style.display = "none";
   document.getElementById("contentdiv").style.display = "flex";
+  document.getElementById("divHeaderButtons").style.display = "flex";
 }
 
 function showUnAuthenticated() {
-  document.getElementById("namediv").innerHTML = "";
-  document.getElementById("email").value = "";
-  document.getElementById("password").value = "";
-  document.getElementById("logindiv").style.display = "block";
-  document.getElementById("contentdiv").style.display = "none";
-}
+    document.getElementById("namediv").innerHTML = "";
+    document.getElementById("email").value = "";
+    document.getElementById("password").value = "";
+    document.getElementById("logindiv").style.display = "block";
+    document.getElementById("contentdiv").style.display = "none";
 
-function addContent(text) {
-  document.getElementById("contentdiv").innerHTML += (text + "<br/>");
-}
-
-// calling /api/hello on the rest service to illustrate text based data retrieval
-function getHello(token) {
-
-  fetch('/api/hello', {
-    headers: { Authorization: 'Bearer ' + token}
-  })
-    .then((response) => {
-      return response.text();
-    })
-    .then((data) => {
-
-      console.log(data);
-//      addContent(data);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-
-
-}
-// calling /api/whoami on the rest service to illustrate JSON based data retrieval
-function whoami(token) {
-
-  fetch('/api/whoami', {
-    headers: { Authorization: 'Bearer ' + token }
-  })
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      console.log(data.email + data.role);
-//      addContent("Whoami at rest service: " + data.email + " - " + data.role);
-
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-
+    document.getElementById("divHeaderButtons").style.display = "none";
 
 }
 
