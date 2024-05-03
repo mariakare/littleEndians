@@ -38,4 +38,67 @@ class HelloWorldController {
 
         return user;
     }
+
+
+    @GetMapping("/api/getBundles")
+    public String getBundles() throws InterruptedException, ExecutionException {
+        //required level: user
+        var user = WebSecurityConfig.getUser();
+
+        /*
+         * Everything in here is absolute bs
+         * I am just using this as a temp to test a dynamic page
+         */
+
+
+        String jsonData = "{\n" +
+                "  \"bundles\": [\n" +
+                "    {\n" +
+                "      \"name\": \"Bundle 1\",\n" +
+                "      \"description\": \"Bundle 1 description goes here.\",\n" +
+                "      \"products\": [\n" +
+                "        {\n" +
+                "          \"name\": \"Product 1\",\n" +
+                "          \"description\": \"Short description for Product 1. Yes Yes Yes Yes Yes Yes Yes Yes Yes Yes\",\n" +
+                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"name\": \"Product 2\",\n" +
+                "          \"description\": \"Short description for Product 2.\",\n" +
+                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"name\": \"Product 3\",\n" +
+                "          \"description\": \"Short description for Product 3.\",\n" +
+                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"name\": \"Bundle 2\",\n" +
+                "      \"description\": \"Bundle 2 description goes here.\",\n" +
+                "      \"products\": [\n" +
+                "        {\n" +
+                "          \"name\": \"Product 4\",\n" +
+                "          \"description\": \"Short description for Product 4.\",\n" +
+                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"name\": \"Product 5\",\n" +
+                "          \"description\": \"Short description for Product 5.\",\n" +
+                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"name\": \"Product 6\",\n" +
+                "          \"description\": \"Short description for Product 6.\",\n" +
+                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+
+        return jsonData;
+    }
+
 }
