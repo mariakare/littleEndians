@@ -42,6 +42,7 @@ class HelloWorldController {
 
     @GetMapping("/api/getBundles")
     public String getBundles() throws InterruptedException, ExecutionException {
+        //required level: user
         var user = WebSecurityConfig.getUser();
 
         /*
