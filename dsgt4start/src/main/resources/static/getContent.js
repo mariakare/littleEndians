@@ -60,3 +60,72 @@ function displayBundles(data) {
         contentDiv.appendChild(bundleDiv);
     });
 }
+
+export function setupManagerPage(token){
+    adaptHeaderManager();
+    removeViewCartButton();
+    getManager();
+}
+function getManager(token) {
+
+    fetch('/api/getManagerBundles', {
+        headers: { Authorization: 'Bearer ' + token}
+    })
+        .then((response) => {
+            return response.text();
+        })
+        .then((data) => {
+            console.log(data);
+            displayBundles(data);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+
+
+}
+
+function adaptHeaderManager(){
+    // Create the tabs
+    const tab1 = createTab("Active bundles", "/page1");
+    const tab2 = createTab("Add new bunldes", "/page2");
+
+    // Append tabs to the header menu
+    const headerMenu = document.querySelector(".header-menu");
+    headerMenu.insertBefore(tab2, headerMenu.lastElementChild); // Insert Page 2 tab before logout button
+    headerMenu.insertBefore(tab1, tab2); // Insert Page 1 tab before Page 2 tab
+
+    // Initially set the first tab as active
+    setActiveTab(tab1);
+
+
+}
+
+// Function to create a tab element
+function createTab(label, url) {
+    const tab = document.createElement("div");
+    tab.textContent = label;
+    tab.classList.add("header-tab");
+    tab.addEventListener("click", () => {
+        setActiveTab(tab);
+        // window.location.href = url;
+        // ADD HERE WHAT SHOULD HAPPEN ON CLICK
+    });
+    return tab;
+}
+
+// Function to set active tab
+function setActiveTab(tab) {
+    const tabs = document.querySelectorAll(".header-tab");
+    tabs.forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+}
+
+
+
+function removeViewCartButton() {
+    const viewCartButton = document.getElementById("btnShoppingBasket");
+    if (viewCartButton) {
+        viewCartButton.parentNode.removeChild(viewCartButton);
+    }
+}
