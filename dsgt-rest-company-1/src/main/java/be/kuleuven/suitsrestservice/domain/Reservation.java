@@ -11,7 +11,7 @@ public class Reservation {
 
 
 
-    enum Status {
+    public enum Status {
         PENDING,
         CONFIRMED,
         CANCELLED
