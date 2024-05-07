@@ -142,6 +142,12 @@ public class SuitsRepository {
         }
 
     }
+    //confirm reservation
+    public synchronized void confirmReservation(String reservationId) {
+        Reservation reservation = getReservationById(reservationId);
+        reservation.setStatus(Reservation.Status.CONFIRMED);
+    }
+
 
     public List<Reservation> getAllReservations() {
         // Implement access control for manager role on broker side??
