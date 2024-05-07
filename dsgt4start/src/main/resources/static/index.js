@@ -9,7 +9,7 @@ import {
   signInWithEmailAndPassword,
 } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-auth.js";
 
-import {getBundles} from "./getContent.js";
+import {setupUserPage} from "./getContent.js";
 import {setupManagerPage} from "./getContent.js";
 
 // we setup the authentication, and then wire up some key events to event handlers
@@ -126,7 +126,7 @@ function wireUpAuthChange() {
       var token = idTokenResult.token;
       const isManager = checkUserRole(token)
       console.log("Is user a manager? ", isManager);
-      if(!isManager) getBundles(token);
+      if(!isManager) setupUserPage(token);
       else setupManagerPage(token);
       //fetchData(token);
 

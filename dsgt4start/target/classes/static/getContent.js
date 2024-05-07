@@ -1,25 +1,30 @@
+export function setupUserPage(token)    {
+    getBundles(token)
+        .then((data) => {
+            displayBundles(data);
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+}
+
 /**
  *  Get all available bundles and display them as content on the page
  * @param token
  */
 export function getBundles(token) {
-
-    fetch('/api/getBundles', {
+    return fetch('/api/getBundles', {
         headers: { Authorization: 'Bearer ' + token}
     })
         .then((response) => {
             return response.text();
         })
         .then((data) => {
-
-            console.log(data);
-            displayBundles(data);
+            return data;
         })
         .catch(function (error) {
             console.log(error);
         });
-
-
 }
 
 
@@ -61,29 +66,97 @@ function displayBundles(data) {
     });
 }
 
+function displayManagerBundles(data) {
+    const bundles = JSON.parse(data).bundles;
+    const contentDiv = document.getElementById('contentdiv');
+    // Clear the contentdiv before adding new bundles
+    contentDiv.innerHTML = '';
+    // Loop through each bundle
+    bundles.forEach(bundle => {
+        // Create a div element for the bundle
+        const bundleDiv = document.createElement('div');
+        bundleDiv.classList.add('product');
+
+        bundleDiv.innerHTML = `<h2 class="bundle-title">${bundle.name}</h2>`;
+        const productBundleDiv = document.createElement('div');
+        productBundleDiv.classList.add('product-bundle');
+
+        // Loop through each product in the bundle
+        bundle.products.forEach(product => {
+
+            const productItemDiv = document.createElement('div');
+            productItemDiv.classList.add('product-item');
+
+            productItemDiv.innerHTML = `
+        <img src="${product.image}" alt="Product Image">
+        <h3 class="product-title">${product.name}</h3>
+        <p class="product-description">${product.description}</p>
+      `;
+            productBundleDiv.appendChild(productItemDiv);
+        });
+
+        bundleDiv.appendChild(productBundleDiv);
+        bundleDiv.innerHTML += `<p class="bundle-description">${bundle.description}</p>`;
+
+        // Add an "Edit Bundle" button
+        const editButton = document.createElement('button');
+        editButton.textContent = "Edit Bundle";
+        editButton.classList.add('edit-button');
+        editButton.style.backgroundColor = "#007bff"; // Set background color to blue
+        editButton.style.color = "#fff"; // Set text color to white
+        editButton.addEventListener('click', () => {
+            // Call a function to handle editing of the bundle
+            editBundle(bundle.id); // You need to implement this function
+        });
+        bundleDiv.appendChild(editButton);
+
+        // Replace the "Add to Cart" button with a "Delete" button
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = "Delete Bundle";
+        deleteButton.classList.add('delete-button');
+        deleteButton.style.backgroundColor = "#dc3545"; // Set background color to red
+        deleteButton.style.color = "#fff"; // Set text color to white
+        deleteButton.addEventListener('click', () => {
+            // Call a function to handle deletion of the bundle
+            deleteBundle(bundle.id); // You need to implement this function
+        });
+        bundleDiv.appendChild(deleteButton);
+
+        contentDiv.appendChild(bundleDiv);
+    });
+}
+
+
 export function setupManagerPage(token){
     adaptHeaderManager();
     removeViewCartButton();
-    getManager();
-}
-function getManager(token) {
-
-    fetch('/api/getManagerBundles', {
-        headers: { Authorization: 'Bearer ' + token}
-    })
-        .then((response) => {
-            return response.text();
-        })
+    getBundles(token)
         .then((data) => {
-            console.log(data);
-            displayBundles(data);
+            displayManagerBundles(data);
         })
-        .catch(function (error) {
-            console.log(error);
+        .catch((error) => {
+            console.error(error);
         });
 
-
 }
+// function getManager(token) {
+//
+//     fetch('/api/getManagerBundles', {
+//         headers: { Authorization: 'Bearer ' + token}
+//     })
+//         .then((response) => {
+//             return response.text();
+//         })
+//         .then((data) => {
+//             console.log(data);
+//             displayBundles(data);
+//         })
+//         .catch(function (error) {
+//             console.log(error);
+//         });
+//
+//
+// }
 
 function adaptHeaderManager(){
     // Create the tabs
