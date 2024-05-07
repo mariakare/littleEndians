@@ -1,4 +1,7 @@
+let tkn;
+
 export function setupUserPage(token)    {
+    tkn = token;
     getBundles(token)
         .then((data) => {
             displayBundles(data);
@@ -116,10 +119,18 @@ function displayManagerBundles(data) {
         deleteButton.classList.add('delete-button');
         deleteButton.style.backgroundColor = "#dc3545"; // Set background color to red
         deleteButton.style.color = "#fff"; // Set text color to white
+
         deleteButton.addEventListener('click', () => {
-            // Call a function to handle deletion of the bundle
-            deleteBundle(bundle.id); // You need to implement this function
+            // Display confirmation window
+            const isConfirmed = confirm("Are you sure you want to delete this bundle?");
+
+            // If user confirms deletion
+            if (isConfirmed) {
+                // Call a function to handle deletion of the bundle
+                deleteBundle(bundle.id); // You need to implement this function
+            }
         });
+
         bundleDiv.appendChild(deleteButton);
 
         contentDiv.appendChild(bundleDiv);
@@ -128,6 +139,7 @@ function displayManagerBundles(data) {
 
 
 export function setupManagerPage(token){
+    tkn = token;
     adaptHeaderManager();
     removeViewCartButton();
     getBundles(token)
@@ -181,6 +193,24 @@ function createTab(label, url) {
     tab.classList.add("header-tab");
     tab.addEventListener("click", () => {
         setActiveTab(tab);
+        if(label == "Active bundles"){
+            //call function to display bundles
+            getBundles(tkn)
+                .then((data) => {
+                    displayManagerBundles(data);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        }
+        else{
+            //call function to display new bundles page
+
+            //FOR NOW JUST CLEAR:
+            const contentDiv = document.getElementById('contentdiv');
+            // Clear the contentdiv before adding new bundles
+            contentDiv.innerHTML = '';
+        }
         // window.location.href = url;
         // ADD HERE WHAT SHOULD HAPPEN ON CLICK
     });
@@ -201,4 +231,32 @@ function removeViewCartButton() {
     if (viewCartButton) {
         viewCartButton.parentNode.removeChild(viewCartButton);
     }
+}
+
+
+
+function deleteBundle(bundleId) {
+    fetch(`/api/deleteBundle/${bundleId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+            // Add any other headers if needed
+        },
+        // Add any other options if needed
+    })
+        .then(response => {
+            if (response.ok) {
+                // Bundle deleted successfully
+                console.log("Bundle deleted successfully");
+                displayManagerBundles(tkn);
+            } else {
+                // Error occurred while deleting the bundle
+                console.error("Error deleting bundle:", response.statusText);
+                // Optionally, you can display an error message to the user
+            }
+        })
+        .catch(error => {
+            console.error("Error deleting bundle:", error);
+            // Optionally, you can display an error message to the user
+        });
 }

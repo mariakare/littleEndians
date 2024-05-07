@@ -1,4 +1,7 @@
+let tkn;
+
 export function setupUserPage(token)    {
+    tkn = token;
     getBundles(token)
         .then((data) => {
             displayBundles(data);
@@ -128,6 +131,7 @@ function displayManagerBundles(data) {
 
 
 export function setupManagerPage(token){
+    tkn = token;
     adaptHeaderManager();
     removeViewCartButton();
     getBundles(token)
@@ -181,6 +185,24 @@ function createTab(label, url) {
     tab.classList.add("header-tab");
     tab.addEventListener("click", () => {
         setActiveTab(tab);
+        if(label == "Active bundles"){
+            //call function to display bundles
+            getBundles(tkn)
+                .then((data) => {
+                    displayManagerBundles(data);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        }
+        else{
+            //call function to display new bundles page
+
+            //FOR NOW JUST CLEAR:
+            const contentDiv = document.getElementById('contentdiv');
+            // Clear the contentdiv before adding new bundles
+            contentDiv.innerHTML = '';
+        }
         // window.location.href = url;
         // ADD HERE WHAT SHOULD HAPPEN ON CLICK
     });

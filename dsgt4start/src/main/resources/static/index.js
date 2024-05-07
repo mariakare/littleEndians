@@ -87,6 +87,7 @@ function wireGuiUpEvents() {
   logoutButton.addEventListener("click", function () {
     try {
       var auth = getAuth();
+      removeTabsAndLogoutButton()
       auth.signOut();
     } catch (err) { }
   });
@@ -126,6 +127,8 @@ function wireUpAuthChange() {
       var token = idTokenResult.token;
       const isManager = checkUserRole(token)
       console.log("Is user a manager? ", isManager);
+      const logoutButton = document.getElementById("btnLogout");
+      logoutButton.style.display = "";
       if(!isManager) setupUserPage(token);
       else setupManagerPage(token);
       //fetchData(token);
@@ -172,6 +175,21 @@ function checkUserRole(token) {
   } else {
     // User does not have manager role
     return false;
+  }
+}
+
+
+function removeTabsAndLogoutButton() {
+  // Remove all tabs
+  const tabs = document.querySelectorAll(".header-tab");
+  tabs.forEach(tab => {
+    tab.parentNode.removeChild(tab);
+  });
+
+  // Remove logout button
+  const logoutButton = document.getElementById("btnLogout");
+  if (logoutButton) {
+    logoutButton.style.display = "none";
   }
 }
 
