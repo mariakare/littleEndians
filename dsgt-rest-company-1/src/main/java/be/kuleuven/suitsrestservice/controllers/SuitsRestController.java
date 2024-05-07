@@ -19,7 +19,6 @@ import be.kuleuven.suitsrestservice.exceptions.ReservationException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
@@ -95,83 +94,5 @@ public class SuitsRestController {
         suitsRepository.confirmReservation(id);
         return ResponseEntity.ok().build();
     }
-
-
-//    @GetMapping("/suits/{id}")
-//    public ResponseEntity<EntityModel<Suit>> getSuitById(@PathVariable String id) {
-//        return suitsRepository.getSuitById(id)
-//                .map(this::toEntityModel)
-//                .map(ResponseEntity::ok)
-//                .orElse(ResponseEntity.notFound().build());
-//    }
-//
-//    @GetMapping("/suits")
-//    public ResponseEntity<CollectionModel<EntityModel<Suit>>> getAllSuits() {
-//        List<EntityModel<Suit>> suitEntities = suitsRepository.getAllSuits().stream()
-//                .map(this::toEntityModel)
-//                .collect(Collectors.toList());
-//        return ResponseEntity.ok(CollectionModel.of(suitEntities,
-//                linkTo(methodOn(SuitsRestController.class).getAllSuits()).withSelfRel()));
-//    }
-//
-//    // 2. Reserve Suits
-//    @PostMapping("/suits/reserve")
-//    public ResponseEntity<EntityModel<Reservation>> reserve(@RequestBody Map<String, Integer> suitsToReserve) {
-//        Reservation reservation = suitsRepository.reserveSuits(suitsToReserve);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(toEntityModel(reservation));
-//    }
-//
-//
-//    @PostMapping("/suits/reservations/{reservationId}/buy")
-//    public ResponseEntity<?> buySuits(@PathVariable String reservationId, @RequestBody Map<String, String> body) {
-//        try {
-//            suitsRepository.confirmReservation(reservationId);
-//            return ResponseEntity.ok(EntityModel.of(reservation,
-//                    linkTo(methodOn(SuitsRestController.class).getReservationById(reservationId)).withSelfRel(),
-//                    linkTo(methodOn(SuitsRestController.class).getAllSuits()).withRel("suits")));
-//        } catch (ReservationException ex) {
-//            return ResponseEntity.badRequest().body(ex.getMessage());
-//        }
-//    }
-//
-//    @DeleteMapping("/suits/reservations/{reservationId}/cancel")
-//    public ResponseEntity<?> cancelReservation(@PathVariable String reservationId) {
-//        try {
-//            suitsRepository.cancelReservation(reservationId);
-//            return ResponseEntity.noContent().build(); // 204 No Content
-//        } catch (ReservationException ex) {
-//            return ResponseEntity.badRequest().body(ex.getMessage());
-//        }
-//    }
-//
-//
-//
-//    // Get Reservation by ID
-//    @GetMapping("/suits/reservations/{id}")
-//    public ResponseEntity<EntityModel<Reservation>> getReservationById(@PathVariable String id) {
-//        try {
-//            Reservation reservation = suitsRepository.getReservationById(id);
-//            return ResponseEntity.ok(toEntityModel(reservation));
-//        } catch (ReservationException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-
-//    // Helper method to convert Suit to EntityModel with HATEOAS links
-//    private EntityModel<Suit> toEntityModel(Suit suit) {
-//        return EntityModel.of(suit,
-//                linkTo(methodOn(SuitsRestController.class).getSuitById(suit.getId())).withSelfRel(),
-//                linkTo(methodOn(SuitsRestController.class).getAllSuits()).withRel("suits"),
-//                Link.of("/suits/" + suit.getId() + "/reservations", "reserve")
-//        );
-//    }
-//
-//    // Helper method to convert Reservation to EntityModel with HATEOAS links
-//    private EntityModel<Reservation> toEntityModel(Reservation reservation) {
-//        return EntityModel.of(reservation,
-//                linkTo(methodOn(SuitsRestController.class).getReservationById(reservation.getReservationId())).withSelfRel(),
-//                linkTo(methodOn(SuitsRestController.class).getAllSuits()).withRel("suits")
-//        );
-//    }
 
 }
