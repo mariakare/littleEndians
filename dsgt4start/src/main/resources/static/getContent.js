@@ -1,5 +1,9 @@
 let tkn;
 
+/**
+ *
+ * @param token
+ */
 export function setupUserPage(token)    {
     tkn = token;
     getBundles(token)
