@@ -111,29 +111,84 @@ function createTab(label, url) {
     tab.classList.add("header-tab");
     tab.addEventListener("click", () => {
         setActiveTab(tab);
-        if(label == "Active bundles"){
-            //call function to display bundles
+        if (label == "Active bundles") {
+            // Call function to display bundles
             getBundles(tkn)
                 .then((data) => {
                     displayManagerBundles(data);
+                    // Reattach event listeners after displaying bundles
+                    attachEventListeners();
                 })
                 .catch((error) => {
                     console.error(error);
                 });
-        }
-        else{
-            //call function to display new bundles page
-
-            //FOR NOW JUST CLEAR:
+        } else {
+            // Call function to display new bundles page
             const contentDiv = document.getElementById('contentdiv');
             // Clear the contentdiv before adding new bundles
             contentDiv.innerHTML = '';
         }
-        // window.location.href = url;
-        // ADD HERE WHAT SHOULD HAPPEN ON CLICK
     });
     return tab;
 }
+
+// Function to attach event listeners
+function attachEventListeners() {
+    // Get the modal
+    const editBundleModal = document.getElementById("editBundleModal");
+
+    // Get the button that opens the modal
+    const editButtons = document.querySelectorAll(".edit-button");
+
+    // Get the <span> element that closes the modal
+    const closeBtn = document.querySelector(".close");
+
+    // When the user clicks the button, open the modal
+    editButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            // Get the current values of bundle title and description
+            const bundleTitle = button.parentNode.querySelector(".bundle-title").textContent;
+            const bundleDescription = button.parentNode.querySelector(".bundle-description").textContent;
+
+            // Set the current values in the form
+            document.getElementById("editBundleTitle").value = bundleTitle;
+            document.getElementById("editBundleDescription").value = bundleDescription;
+
+            // Show the modal
+            editBundleModal.style.display = "block";
+        });
+    });
+
+    // When the user clicks on <span> (x), close the modal
+    closeBtn.addEventListener("click", () => {
+        editBundleModal.style.display = "none";
+    });
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.addEventListener("click", (event) => {
+        if (event.target == editBundleModal) {
+            editBundleModal.style.display = "none";
+        }
+    });
+
+    // Handle form submission
+    const editBundleForm = document.getElementById("editBundleForm");
+    editBundleForm.addEventListener("submit", (event) => {
+        event.preventDefault(); // Prevent the form from submitting normally
+
+        // Get the edited values
+        const editedBundleTitle = document.getElementById("editBundleTitle").value;
+        const editedBundleDescription = document.getElementById("editBundleDescription").value;
+
+        // Perform AJAX call to update the bundle with the new values
+        // You need to implement this function
+        updateBundle(bundleId, editedBundleTitle, editedBundleDescription);
+
+        // Close the modal
+        editBundleModal.style.display = "none";
+    });
+}
+
 
 // Function to set active tab
 function setActiveTab(tab) {
