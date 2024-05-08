@@ -11,7 +11,7 @@ import {
 
 import {setupUserPage} from "./getContent.js";
 import {setupManagerPage} from "./getContent.js";
-import {getBundles, getCart} from "./getContent.js";
+import {getCart} from "./getContent.js";
 
 // we setup the authentication, and then wire up some key events to event handlers
 setupAuth();
@@ -110,7 +110,7 @@ function wireGuiUpEvents() {
 }
 
 function wireUpAuthChange() {
-
+  console.log("yooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
   var auth = getAuth();
   onAuthStateChanged(auth, (user) => {
     console.log("onAuthStateChanged: User is", user ? user.email : "null"); // Log user email or null
@@ -188,7 +188,8 @@ function decodeFirebaseToken(token) {
 // Parse token and check if user has manager role
 function checkUserRole(token) {
   const payload = decodeFirebaseToken(token);
-  if (payload && payload.roles && payload.roles.includes('manager')) {
+  console.log(payload);
+  if (payload && payload.role && payload.role.includes('manager')) {
     // User has manager role
     return true;
   } else {

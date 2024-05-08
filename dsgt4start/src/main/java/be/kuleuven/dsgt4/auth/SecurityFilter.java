@@ -47,7 +47,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         System.out.println("Email: " + email);
         String role = decodedJWT.getClaim("role").asString();
         if (role == null || role.isEmpty()) {
-            role = "manager"; //we see what to do w this later
+            role = "user"; //we see what to do w this later
         }
         var user = new User(email, role);
         SecurityContext context = SecurityContextHolder.getContext();

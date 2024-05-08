@@ -35,7 +35,7 @@ class DBController {
 
         Map<String, Object> data = new HashMap<>();
         data.put("user", user.getEmail().toString());
-        data.put("role", "manager");
+        data.put("role", user.getRole().toString());
 
         this.db.collection("user").document(user.getEmail().toString()).set(data);
 
