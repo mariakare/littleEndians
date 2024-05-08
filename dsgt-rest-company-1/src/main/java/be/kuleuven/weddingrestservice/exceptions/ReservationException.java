@@ -1,4 +1,4 @@
-package be.kuleuven.suitsrestservice.exceptions;
+package be.kuleuven.weddingrestservice.exceptions;
 
 public class ReservationException extends RuntimeException{
 

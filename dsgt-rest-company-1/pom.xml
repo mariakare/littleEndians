@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>be.kuleuven</groupId>
-	<artifactId>suits-rest-service</artifactId>
+	<artifactId>wedding-company-rest-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>suits-rest-service</name>
-	<description>REST Suits Service</description>
+	<name>wedding-rest-service</name>
+	<description>REST Wedding Service</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
