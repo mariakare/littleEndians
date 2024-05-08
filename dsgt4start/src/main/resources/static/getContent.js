@@ -9,6 +9,8 @@ export function setupUserPage(token)    {
     getBundles(token)
         .then((data) => {
             displayBundles(data);
+            wireupCartButton();
+
         })
         .catch((error) => {
             console.error(error);
@@ -176,4 +178,13 @@ function deleteCartItem(itemId) {
 }
 
 // commit
+
+function wireupCartButton(){
+
+    document.getElementById('btnShoppingBasket').addEventListener('click', function() {
+        getCart(tkn);
+    });
+
+
+}
 
