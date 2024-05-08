@@ -5,21 +5,14 @@ import com.google.cloud.firestore.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.security.access.AuthorizationServiceException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.google.api.core.ApiFuture;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-import static java.util.stream.Collectors.*;
 import java.util.*;
 
 @RestController
@@ -30,12 +23,12 @@ class DBController {
 
     @PostMapping("/api/newUser")
     @ResponseBody
-    public User newuser() throws InterruptedException, ExecutionException {
+    public User newuser() {
         var user = WebSecurityConfig.getUser();
 
         Map<String, Object> data = new HashMap<>();
-        data.put("user", user.getEmail().toString());
-        data.put("role", user.getRole().toString());
+        data.put("user", user.getEmail());
+        data.put("role", user.getRole());
 
         this.db.collection("user").document(user.getEmail().toString()).set(data);
 
@@ -45,7 +38,7 @@ class DBController {
 
 
     @GetMapping("/api/getBundles")
-    public String getBundles() throws InterruptedException, ExecutionException {
+    public String getBundles() {
         //required level: user
         var user = WebSecurityConfig.getUser();
 
@@ -121,10 +114,13 @@ class DBController {
         DocumentSnapshot bundleSnapshot = bundleFuture.get();
         if (bundleSnapshot.exists()) {
             Map<String, Object> bundleData = bundleSnapshot.getData();
+
             // Add the bundle document to the basket subcollection under the user's document
-            ApiFuture<DocumentReference> future = userRef.collection("basket").add(bundleData);
+            DocumentReference addedBundleRef = userRef.collection("basket").add(bundleData).get();
             // Wait for the result
-            DocumentReference addedBundleRef = future.get();
+            Map<String, Object> updatedBundleData = new HashMap<>();
+            updatedBundleData.put("cartBundleId", addedBundleRef.getId());
+            addedBundleRef.update(updatedBundleData);
             // Return a response
             return ResponseEntity.status(HttpStatus.CREATED).body("Bundle with ID: " + bundleId + " added to cart with ID: " + addedBundleRef.getId());
         } else {
@@ -148,4 +144,29 @@ class DBController {
         return shoppingCart;
 
     }
+
+    @DeleteMapping("/api/removeFromCart")
+    public ResponseEntity<String> removeFromCart(@RequestBody String bundleId) throws ExecutionException, InterruptedException {
+        // Get the current user's ID
+        var user = WebSecurityConfig.getUser();
+
+        // Reference to the user's document
+        CollectionReference userBasketRef = db.collection("user").document(user.getEmail()).collection("basket");
+
+        DocumentReference bundleRef = userBasketRef.document(bundleId);
+
+
+        bundleRef.delete();
+
+        // Check if the document still exists after deletion
+        boolean documentExists = bundleRef.get().get().exists();
+
+        // Check if the deletion was successful
+        if (!documentExists) {
+            return ResponseEntity.status(HttpStatus.OK).body("Bundle with ID: " + bundleId + " removed from cart");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bundle with ID: " + bundleId + " does not exist");
+        }
+    }
+
 }

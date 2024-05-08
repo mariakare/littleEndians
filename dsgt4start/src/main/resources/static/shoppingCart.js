@@ -73,7 +73,8 @@ function displayShoppingCart(data) {
         deleteButton.textContent = 'Delete';
         deleteButton.addEventListener('click', function() {
             // Handle delete action
-            deleteCartItem(item.id);
+            console.log(item);
+            deleteCartBundle(item.cartBundleId);
         });
         itemDiv.appendChild(deleteButton);
 
@@ -82,8 +83,23 @@ function displayShoppingCart(data) {
 }
 
 // Function to delete an item from the cart (to be implemented)
-function deleteCartItem(itemId) {
-    // Implement logic to delete the item from the cart
+function deleteCartBundle(bundleId) {
+    fetch('/api/removeFromCart', {
+        method: 'DELETE',
+        headers: {
+            Authorization: 'Bearer ' + tkn
+        },
+        body: bundleId
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to delete item');
+            }
+            console.log('Item deleted successfully');
+        })
+        .catch(error => {
+            console.error('Error deleting item:', error);
+        });
 }
 
 // commit
