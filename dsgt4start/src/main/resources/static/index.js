@@ -10,8 +10,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-auth.js";
 
 import {setupUserPage} from "./getContent.js";
-import {setupManagerPage} from "./getContent.js";
-import {getCart} from "./getContent.js";
+import {setupManagerPage} from "./managerPage.js";
+import * as authentication from "./authentication.js";
 
 // we setup the authentication, and then wire up some key events to event handlers
 setupAuth();
@@ -110,23 +110,23 @@ function wireGuiUpEvents() {
 }
 
 function wireUpAuthChange() {
-  console.log("yooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+
   var auth = getAuth();
   onAuthStateChanged(auth, (user) => {
     console.log("onAuthStateChanged: User is", user ? user.email : "null"); // Log user email or null
     if (user == null) {
       console.log("user is null");
-      showUnAuthenticated();
+      authentication.showUnAuthenticated();
       return;
     }
     if (auth == null) {
       console.log("auth is null");
-      showUnAuthenticated();
+      authentication.showUnAuthenticated();
       return;
     }
     if (auth.currentUser === undefined || auth.currentUser == null) {
       console.log("currentUser is undefined or null");
-      showUnAuthenticated();
+      authentication.showUnAuthenticated();
       return;
     }
 
@@ -134,13 +134,13 @@ function wireUpAuthChange() {
       // console.log("Hello " + auth.currentUser.email)
 
       //update GUI when user is authenticated
-      showAuthenticated(auth.currentUser.email);
+      authentication.showAuthenticated(auth.currentUser.email);
 
       // console.log("Token: " + idTokenResult.token);
 
       //fetch data from server when authentication was successful. 
       var token = idTokenResult.token;
-      const isManager = checkUserRole(token)
+      const isManager = authentication.checkUserRole(token)
       console.log("Is user a manager? ", isManager);
       const logoutButton = document.getElementById("btnLogout");
       logoutButton.style.display = "";
@@ -148,54 +148,9 @@ function wireUpAuthChange() {
       else setupManagerPage(token);
       //fetchData(token);
 
-      document.getElementById('btnShoppingBasket').addEventListener('click', function() {
-        getCart(token);
-      });
-
     });
 
   });
-}
-
-
-function showAuthenticated(username) {
-  //document.getElementById("namediv").innerHTML = "Hello " + username;
-  document.getElementById("logindiv").style.display = "none";
-  document.getElementById("contentdiv").style.display = "flex";
-  document.getElementById("divHeaderButtons").style.display = "flex";
-}
-
-function showUnAuthenticated() {
-    document.getElementById("namediv").innerHTML = "";
-    document.getElementById("email").value = "";
-    document.getElementById("password").value = "";
-    document.getElementById("logindiv").style.display = "block";
-    document.getElementById("contentdiv").style.display = "none";
-
-    document.getElementById("divHeaderButtons").style.display = "none";
-
-}
-
-
-
-// Function to decode Firebase token
-function decodeFirebaseToken(token) {
-  const [, payloadBase64] = token.split('.');
-  const payload = JSON.parse(atob(payloadBase64));
-  return payload;
-}
-
-// Parse token and check if user has manager role
-function checkUserRole(token) {
-  const payload = decodeFirebaseToken(token);
-  console.log(payload);
-  if (payload && payload.role && payload.role.includes('manager')) {
-    // User has manager role
-    return true;
-  } else {
-    // User does not have manager role
-    return false;
-  }
 }
 
 
