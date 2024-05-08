@@ -11,6 +11,7 @@ import {
 
 import {setupUserPage} from "./getContent.js";
 import {setupManagerPage} from "./getContent.js";
+import {getBundles, getCart} from "./getContent.js";
 
 // we setup the authentication, and then wire up some key events to event handlers
 setupAuth();
@@ -146,6 +147,10 @@ function wireUpAuthChange() {
       if(!isManager) setupUserPage(token);
       else setupManagerPage(token);
       //fetchData(token);
+
+      document.getElementById('btnShoppingBasket').addEventListener('click', function() {
+        getCart(token);
+      });
 
     });
 
