@@ -161,5 +161,5 @@ function deleteCartItem(itemId) {
     // Implement logic to delete the item from the cart
 }
 
-
+// commit
 
