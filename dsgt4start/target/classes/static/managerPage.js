@@ -145,7 +145,7 @@ function setActiveTab(tab) {
 function removeViewCartButton() {
     const viewCartButton = document.getElementById("btnShoppingBasket");
     if (viewCartButton) {
-        viewCartButton.parentNode.removeChild(viewCartButton);
+        viewCartButton.style.display = "none";
     }
 }
 
