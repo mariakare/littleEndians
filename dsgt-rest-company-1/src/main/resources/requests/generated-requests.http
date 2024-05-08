@@ -1,0 +1,96 @@
+###
+# Get All Suits
+###
+GET http://localhost:8080/suits
+
+<> 2024-05-07T194401.200.json
+
+###
+# Get Suit By ID (Existing Suit)
+###
+GET http://localhost:8080/suits/5268203c-de76-4921-a3e3-439db69c462a
+
+<> 2024-05-07T194420.200.json
+
+###
+# Get Suit By ID (Non-existent Suit)
+###
+GET http://localhost:8080/suits/non-existent-suit-id
+
+<> 2024-05-07T194410.404.txt
+
+###
+# Reserve Suits (Valid Reservation)
+###
+POST http://localhost:8080/suits/reserve
+Content-Type: application/json
+
+{
+  "5268203c-de76-4921-a3e3-439db69c462a": 2
+}
+
+<> 2024-05-07T202135.201.json
+<> 2024-05-07T194524.201.json
+
+###
+# Reserve Suits (Invalid Suit ID)
+###
+POST http://localhost:8080/suits/reserve
+Content-Type: application/json
+
+{
+  "invalid-suit-id": 1
+}
+
+<> 2024-05-07T194455.404.txt
+
+###
+# Reserve Suits (Insufficient Quantity)
+###
+POST http://localhost:8080/suits/reserve
+Content-Type: application/json
+
+{
+  "5268203c-de76-4921-a3e3-439db69c462a": 10
+}
+
+<> 2024-05-07T194515.404.txt
+
+###
+# Get Reservation By ID (Existing Reservation)
+###
+GET http://localhost:8080/reservations/7ff59174-4254-48a2-b7f0-7397e77f5d42
+
+<> 2024-05-07T202111.200.json
+<> 2024-05-07T194810.500.json
+<> 2024-05-07T194757.500.json
+###
+# Get Reservation By ID (Non-existent Reservation)
+###
+GET http://localhost:8080/reservations/non-existent-reservation-id
+
+<> 2024-05-07T194841.404.txt
+
+###
+# Cancel Reservation (Existing Reservation)
+###
+POST http://localhost:8080/reservations/7ff59174-4254-48a2-b7f0-7397e77f5d42/cancel
+
+###
+# Cancel Reservation (Non-existent Reservation)
+###
+POST http://localhost:8080/reservations/non-existent-reservation-id/cancel
+
+<> 2024-05-07T194734.404.txt
+
+###
+# Confirm Reservation (Existing Reservation)
+###
+POST http://localhost:8080/reservations/bbc614c0-722c-4fae-8742-7697d5997de7/confirm
+
+###
+# Confirm Reservation (Non-existent Reservation)
+###
+POST http://localhost:8080/reservations/non-existent-reservation-id/confirm
+
+<> 2024-05-07T202221.404.txt
