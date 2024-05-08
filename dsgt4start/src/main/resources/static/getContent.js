@@ -125,33 +125,40 @@ function displayShoppingCart(data) {
     const contentDiv = document.getElementById('contentdiv');
     contentDiv.innerHTML = '';
 
-    // Create a container div for the heading and list
-    const containerDiv = document.createElement('div');
-    containerDiv.classList.add('shopping-cart-container');
 
     // Create elements to display shopping cart contents
     const heading = document.createElement('h2');
     heading.textContent = 'Shopping Cart';
 
     // Append heading to containerDiv
-    containerDiv.appendChild(heading);
+    contentDiv.appendChild(heading);
 
-    // Create an unordered list to display items vertically
-    const itemList = document.createElement('ul');
-
-    // Loop through shopping cart items and display them vertically
     data.forEach(item => {
-        const listItem = document.createElement('li');
-        listItem.textContent = `${item.name}`;
-        // You can customize the display of each item as needed
-        itemList.appendChild(listItem);
+        // Create a div for each item
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('cart-item');
+
+        // Display item name
+        const itemName = document.createElement('span');
+        itemName.textContent = item.name;
+        itemDiv.appendChild(itemName);
+
+        // Create a delete button for each item
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', function() {
+            // Handle delete action
+            deleteCartItem(item.id);
+        });
+        itemDiv.appendChild(deleteButton);
+
+        contentDiv.appendChild(itemDiv);
     });
+}
 
-    // Append the list to the containerDiv
-    containerDiv.appendChild(itemList);
-
-    // Append the containerDiv to the contentdiv
-    contentDiv.appendChild(containerDiv);
+// Function to delete an item from the cart (to be implemented)
+function deleteCartItem(itemId) {
+    // Implement logic to delete the item from the cart
 }
 
 
