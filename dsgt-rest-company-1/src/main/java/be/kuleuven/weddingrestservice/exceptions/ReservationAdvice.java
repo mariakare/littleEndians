@@ -1,4 +1,4 @@
-package be.kuleuven.suitsrestservice.exceptions;
+package be.kuleuven.weddingrestservice.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -6,13 +6,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+
 @ControllerAdvice
-class SuitNotFoundAdvice {
+class ReservationAdvice {
 
     @ResponseBody
-    @ExceptionHandler(SuitNotFoundException.class)
+    @ExceptionHandler(ReservationException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String suitNotFoundHandler(SuitNotFoundException ex) {
+    String reservationHandler(ReservationException ex) {
         return ex.getMessage();
     }
 }

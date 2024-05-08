@@ -1,13 +1,13 @@
-package be.kuleuven.suitsrestservice.domain;
+package be.kuleuven.weddingrestservice.domain;
 
-public enum SuitType {
+public enum ProductType {
 
     TUXEDO("tuxedo"),
-    HAZMAT("hazmat"),
-    DIVING("diving");
+    GOWN("gown"),
+    DECORATION("decoration");
     private final String value;
 
-    SuitType(String v) {
+    ProductType(String v) {
         value = v;
     }
 
@@ -15,8 +15,8 @@ public enum SuitType {
         return value;
     }
 
-    public static SuitType fromValue(String v) {
-        for (SuitType c: SuitType.values()) {
+    public static ProductType fromValue(String v) {
+        for (ProductType c: ProductType.values()) {
             if (c.value.equals(v)) {
                 return c;
             }

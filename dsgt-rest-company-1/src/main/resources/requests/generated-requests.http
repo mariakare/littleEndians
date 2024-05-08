@@ -15,7 +15,7 @@ GET http://localhost:8080/suits/5268203c-de76-4921-a3e3-439db69c462a
 ###
 # Get Suit By ID (Non-existent Suit)
 ###
-GET http://localhost:8080/suits/non-existent-suit-id
+GET http://localhost:8080/suits/non-existent-product-id
 
 <> 2024-05-07T194410.404.txt
 
@@ -39,7 +39,7 @@ POST http://localhost:8080/suits/reserve
 Content-Type: application/json
 
 {
-  "invalid-suit-id": 1
+  "invalid-product-id": 1
 }
 
 <> 2024-05-07T194455.404.txt

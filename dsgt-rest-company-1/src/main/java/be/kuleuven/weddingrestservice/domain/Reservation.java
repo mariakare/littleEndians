@@ -1,4 +1,4 @@
-package be.kuleuven.suitsrestservice.domain;
+package be.kuleuven.weddingrestservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -26,7 +26,7 @@ public class Reservation {
 
     //TODO: add a timeout/expiration for reservation???
     private Status status;
-    private Map<String, Integer> suits; // Map of suitId to quantity
+    private Map<String, Integer> products; // Map of suitId to quantity
 
     // Constructors
     public Reservation() {
@@ -36,7 +36,7 @@ public class Reservation {
         this.reservationId = reservationId;
         this.timestamp = timestamp;
         this.status = Status.PENDING;
-        this.suits = new HashMap<>();
+        this.products = new HashMap<>();
     }
 
     // Getters and Setters
@@ -64,21 +64,21 @@ public class Reservation {
         this.status = status;
     }
 
-    public Map<String, Integer> getSuits() {
-        return suits;
+    public Map<String, Integer> getProducts() {
+        return products;
     }
 
-    public void setSuits(Map<String, Integer> suits) {
-        this.suits = suits;
+    public void setProducts(Map<String, Integer> products) {
+        this.products = products;
     }
 
 
     public void addSuit(String suitId, int quantity) {
-        suits.put(suitId, quantity);
+        products.put(suitId, quantity);
     }
 
     public void removeSuit(String suitId) {
-        suits.remove(suitId);
+        products.remove(suitId);
     }
 
     // Equals and HashCode for object comparison
@@ -90,12 +90,12 @@ public class Reservation {
         return Objects.equals(reservationId, that.reservationId) &&
                 Objects.equals(timestamp, that.timestamp) &&
                 status == that.status &&
-                Objects.equals(suits, that.suits);
+                Objects.equals(products, that.products);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(reservationId, timestamp, status, suits);
+        return Objects.hash(reservationId, timestamp, status, products);
     }
 }
 
