@@ -9,7 +9,8 @@ import {
   signInWithEmailAndPassword,
 } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-auth.js";
 
-import {getBundles} from "./getContent.js";
+import {setupUserPage} from "./getContent.js";
+import {setupManagerPage} from "./getContent.js";
 
 // we setup the authentication, and then wire up some key events to event handlers
 setupAuth();
@@ -100,6 +101,7 @@ function wireGuiUpEvents() {
   logoutButton.addEventListener("click", function () {
     try {
       var auth = getAuth();
+      removeTabsAndLogoutButton()
       auth.signOut();
     } catch (err) { }
   });
@@ -128,16 +130,21 @@ function wireUpAuthChange() {
     }
 
     auth.currentUser.getIdTokenResult().then((idTokenResult) => {
-      console.log("Hello " + auth.currentUser.email)
+      // console.log("Hello " + auth.currentUser.email)
 
       //update GUI when user is authenticated
       showAuthenticated(auth.currentUser.email);
 
-      console.log("Token: " + idTokenResult.token);
+      // console.log("Token: " + idTokenResult.token);
 
       //fetch data from server when authentication was successful. 
       var token = idTokenResult.token;
-      getBundles(token);
+      const isManager = checkUserRole(token)
+      console.log("Is user a manager? ", isManager);
+      const logoutButton = document.getElementById("btnLogout");
+      logoutButton.style.display = "";
+      if(!isManager) setupUserPage(token);
+      else setupManagerPage(token);
       //fetchData(token);
 
     });
@@ -162,5 +169,41 @@ function showUnAuthenticated() {
 
     document.getElementById("divHeaderButtons").style.display = "none";
 
+}
+
+
+
+// Function to decode Firebase token
+function decodeFirebaseToken(token) {
+  const [, payloadBase64] = token.split('.');
+  const payload = JSON.parse(atob(payloadBase64));
+  return payload;
+}
+
+// Parse token and check if user has manager role
+function checkUserRole(token) {
+  const payload = decodeFirebaseToken(token);
+  if (payload && payload.roles && payload.roles.includes('manager')) {
+    // User has manager role
+    return true;
+  } else {
+    // User does not have manager role
+    return false;
+  }
+}
+
+
+function removeTabsAndLogoutButton() {
+  // Remove all tabs
+  const tabs = document.querySelectorAll(".header-tab");
+  tabs.forEach(tab => {
+    tab.parentNode.removeChild(tab);
+  });
+
+  // Remove logout button
+  const logoutButton = document.getElementById("btnLogout");
+  if (logoutButton) {
+    logoutButton.style.display = "none";
+  }
 }
 
