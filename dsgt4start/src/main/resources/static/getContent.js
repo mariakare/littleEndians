@@ -1,3 +1,20 @@
+let tkn;
+
+/**
+ *
+ * @param token
+ */
+export function setupUserPage(token)    {
+    tkn = token;
+    getBundles(token)
+        .then((data) => {
+            displayBundles(data);
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+}
+
 /**
  *  Get all available bundles and display them as content on the page
  * @param token
@@ -19,17 +36,17 @@ export function getBundles(token) {
 
 }
 
-export function getCart(token) {
+export function getCart() {
 
     fetch('/api/getCart', {
-        headers: { Authorization: 'Bearer ' + token}
+        headers: { Authorization: 'Bearer ' + tkn}
     })
         .then((response) => {
             return response.json();
         })
         .then((data) => {
             console.log(data);
-            displayShoppingCart(data,token);
+            displayShoppingCart(data);
         })
         .catch(function (error) {
             console.log(error);
@@ -83,7 +100,7 @@ function displayBundles(data) {
             const bundleId = bundle.name; // Change this according to your bundle structure
             console.log(bundleId)
             // Call a function to add the bundle to the cart
-            addToCart(bundleId, token);
+            addToCart(bundleId);
         });
         bundleDiv.appendChild(addToCartButton);
 
@@ -91,12 +108,12 @@ function displayBundles(data) {
     });
 }
 
-function addToCart(bundleId, token) {
+function addToCart(bundleId) {
     // Send a fetch request to the backend
     fetch('/api/addToCart', {
         method: 'POST',
         headers: {
-            Authorization: 'Bearer ' + token
+            Authorization: 'Bearer ' + tkn
         },
         body: bundleId
     })
