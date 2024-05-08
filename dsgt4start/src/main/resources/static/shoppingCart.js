@@ -50,13 +50,15 @@ function displayShoppingCart(data) {
     const contentDiv = document.getElementById('contentdiv');
     contentDiv.innerHTML = '';
 
+    const cartDiv = document.createElement('div');
+    cartDiv.classList.add('cart');
 
     // Create elements to display shopping cart contents
     const heading = document.createElement('h2');
     heading.textContent = 'Shopping Cart';
 
     // Append heading to containerDiv
-    contentDiv.appendChild(heading);
+    cartDiv.appendChild(heading);
 
     data.forEach(item => {
         // Create a div for each item
@@ -78,8 +80,10 @@ function displayShoppingCart(data) {
         });
         itemDiv.appendChild(deleteButton);
 
-        contentDiv.appendChild(itemDiv);
+        cartDiv.appendChild(itemDiv);
     });
+
+    contentDiv.appendChild(cartDiv);
 }
 
 // Function to delete an item from the cart (to be implemented)
@@ -100,6 +104,7 @@ function deleteCartBundle(bundleId) {
         })
         .catch(error => {
             console.error('Error deleting item:', error);
+            getCart();
         });
 }
 

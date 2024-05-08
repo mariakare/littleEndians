@@ -275,3 +275,36 @@ input[type="password"] {
     background-color: darkblue;
 }
 
+.cart{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%
+}
+
+
+.cart-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 80%;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px; /* Add margin between items */
+}
+
+.cart-item span {
+    margin-right: 10px; /* Add spacing between item name and delete button */
+}
+
+.cart-item button {
+    background-color: #dc3545; /* Coral color */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.cart-item button:hover {
+    background-color: #ff5733; /* Darker coral color on hover */
+}
