@@ -96,6 +96,7 @@ function deleteCartBundle(bundleId) {
                 throw new Error('Failed to delete item');
             }
             console.log('Item deleted successfully');
+            getCart();
         })
         .catch(error => {
             console.error('Error deleting item:', error);
