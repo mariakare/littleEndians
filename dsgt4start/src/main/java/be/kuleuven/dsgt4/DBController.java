@@ -284,16 +284,17 @@ class DBController {
     }
 
     @PostMapping("/api/addBundle")
-    public ResponseEntity<String> addNewBundle(@RequestParam Map<String, String> bundleData) throws ExecutionException, InterruptedException {
+    public ResponseEntity<String> addNewBundle(@RequestParam String[] productIds) throws ExecutionException, InterruptedException {
         // Get the current user's ID
         var user = WebSecurityConfig.getUser();
 
-        String[] productIds = bundleData.get("productIds").split(",");
+        //String[] productIds = bundleData.get("productIds").split(",");
+
 
         // Create a map to hold the data for the new document
         Map<String, Object> data = new HashMap<>();
         data.put("name", "New Bundle");
-        data.put("productIds", productIds);
+        data.put("productIds", Arrays.asList(productIds));
 
         try{
 
@@ -306,10 +307,10 @@ class DBController {
             writeResult.get();
 
             // Retrieve the Firestore-generated ID of the new document
-            String documentId = bundleRef.getId();
+            String bundleId = bundleRef.getId();
 
             // Return a success response with the ID of the newly created document
-            return ResponseEntity.status(HttpStatus.CREATED).body("Document created with ID: " + documentId);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Bundle created with ID: " + bundleId);
         } catch (Exception e) {
             // Handle any exceptions that might occur during the operation
             e.printStackTrace();
@@ -318,4 +319,4 @@ class DBController {
 
     }
 
-    }
+}

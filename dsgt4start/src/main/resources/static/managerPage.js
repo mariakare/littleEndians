@@ -444,7 +444,6 @@ function checkValidBundle() {
 
 
     if(valid){
-
         // Display a confirmation dialog
         var confirmed = window.confirm('Are you sure you want to add this bundle?');
         if (confirmed) {
@@ -460,6 +459,8 @@ function checkValidBundle() {
 
 function addBundle(selectedProductIds){
         // Construct the request body
+        console.log("start addBundle");
+        console.log(selectedProductIds);
         const body = new URLSearchParams();
         body.append('productIds', JSON.stringify(selectedProductIds));
 
@@ -481,6 +482,7 @@ function addBundle(selectedProductIds){
             .then((data) => {
                 // Handle the response data if needed
                 console.log('Bundle added successfully:', data);
+                window.alert('The bundle has been added successfully');
                 return data;
             })
             .catch((error) => {
