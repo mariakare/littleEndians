@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.google.api.core.ApiFuture;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.concurrent.ExecutionException;
 
@@ -18,8 +19,15 @@ import java.util.*;
 @RestController
 class DBController {
 
+    private final WebClient.Builder webClientBuilder;
+
     @Autowired
     Firestore db;
+
+    @Autowired
+    public DBController(WebClient.Builder webClientBuilder) {
+        this.webClientBuilder = webClientBuilder;
+    }
 
     @PostMapping("/api/newUser")
     @ResponseBody
@@ -174,7 +182,19 @@ class DBController {
     @GetMapping("/api/getProducts")
     public String getProducts() {
         // Required level: user
+        /*
         var user = WebSecurityConfig.getUser();
+
+        WebClient webClient = webClientBuilder.build();
+
+        webClient.get()
+                .uri("http://localhost:8080/suits")
+                .retrieve()
+                .bodyToMono(String.class)
+                .subscribe(response -> {
+                    //processing
+                });
+    */
 
         // Dummy data
         String json = "{\n" +
@@ -262,4 +282,40 @@ class DBController {
 
         return json;
     }
-}
+
+    @PostMapping("/api/addBundle")
+    public ResponseEntity<String> addNewBundle(@RequestParam Map<String, String> bundleData) throws ExecutionException, InterruptedException {
+        // Get the current user's ID
+        var user = WebSecurityConfig.getUser();
+
+        String[] productIds = bundleData.get("productIds").split(",");
+
+        // Create a map to hold the data for the new document
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "New Bundle");
+        data.put("productIds", productIds);
+
+        try{
+
+            DocumentReference bundleRef = db.collection("bundles").document();
+
+
+            // Set the data for the new document
+            ApiFuture<WriteResult> writeResult = bundleRef.set(data);
+            // Wait for the operation to complete
+            writeResult.get();
+
+            // Retrieve the Firestore-generated ID of the new document
+            String documentId = bundleRef.getId();
+
+            // Return a success response with the ID of the newly created document
+            return ResponseEntity.status(HttpStatus.CREATED).body("Document created with ID: " + documentId);
+        } catch (Exception e) {
+            // Handle any exceptions that might occur during the operation
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating document: " + e.getMessage());
+        }
+
+    }
+
+    }
