@@ -357,11 +357,14 @@ function displayProducts(data){
     // Parse JSON data
     var suppliers = data.suppliers;
 
+    // Open container div for columns
+    html += '<div class="supplier-columns">';
+
     // Loop through suppliers
     for (var i = 0; i < suppliers.length; i++) {
         var supplier = suppliers[i];
         html += '<div class="supplier-column">';
-        html += '<h2>' + supplier.name + '</h2>';
+        html += '<h2>' + supplier.name + '</h2>'; // Title the column with supplier name
 
         // Check if products exist and is an array
         if (supplier.products && Array.isArray(supplier.products)) {
@@ -370,7 +373,7 @@ function displayProducts(data){
             for (var j = 0; j < products.length; j++) {
                 var product = products[j];
                 html += '<div class="product">';
-                html += '<input type="radio" name="product" value="' + product.id + '">'; // Radio button
+                html += '<input type="radio" name="supplier_' + i + '" value="' + product.id + '">'; // Radio button for product
                 html += '<img src="' + product.imageLink + '" alt="' + product.name + '">'; // Product image
                 html += '<div class="details">';
                 html += '<h3>' + product.name + '</h3>'; // Product name
@@ -385,6 +388,9 @@ function displayProducts(data){
 
         html += '</div>'; // End supplier-column
     }
+
+    // Close container div for columns
+    html += '</div>'; // End supplier-columns
 
     const contentDiv = document.getElementById('contentdiv');
     contentDiv.innerHTML = html;

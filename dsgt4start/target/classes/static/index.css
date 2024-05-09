@@ -308,3 +308,33 @@ input[type="password"] {
 .cart-item button:hover {
     background-color: #ff5733; /* Darker coral color on hover */
 }
+
+
+
+
+/*THE NEXT PART IS FOR PRODUCT DISPLAY ON NEW BUNDLES PAGE*/
+
+.supplier-columns {
+    display: flex;
+    justify-content: space-between;
+}
+
+.supplier-column {
+    flex: 1;
+    margin: 0 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+.product {
+    margin-bottom: 20px;
+}
+
+.product img {
+    max-width: 100%;
+    height: auto;
+}
+
+.details {
+    margin-top: 10px;
+}
