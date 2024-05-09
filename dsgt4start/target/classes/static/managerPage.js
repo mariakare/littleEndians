@@ -393,8 +393,70 @@ function displayProducts(data){
     html += '</div>'; // End supplier-columns
 
     // Add Complete button
-    html += '<button id="completeButton">Complete</button>';
+    html += '<button id="completeButton">Add New Bundle To Stock</button>';
 
     const contentDiv = document.getElementById('contentdiv');
     contentDiv.innerHTML = html;
+
+    setupEventListeners();
+}
+
+
+function     setupEventListeners(){
+
+
+    //// EVENT LISTENER FOR COMPLETE BUTTON
+    const completeButton = document.getElementById('completeButton');
+
+
+    if (completeButton) {
+        // Disable the button
+        //completeButton.disabled = true;
+        completeButton.addEventListener('click', checkValidBundle);
+    }
+
+}
+
+function checkValidBundle() {
+    // Your code to check the validity of the bundle goes here
+    console.log('Checking the validity of the bundle...');
+
+    let valid = true;
+    //ADD CODE HERE TO CHECK VALID BUNDLE
+    for (let i = 0; i < 3; i++) {
+        const radioGroupName = 'supplier_' + i;
+        const radioButtons = document.querySelectorAll('input[type="radio"][name="' + radioGroupName + '"]');
+        // I now have the radio buttons belonging to a specific supplied
+        let checked = false;
+        radioButtons.forEach(function(radioButton) {
+            if (radioButton.checked) {
+                checked = true; // At least one radio button is checked
+            }
+        });
+
+        if (!checked) {
+            valid = false;
+            break;
+        }
+    }
+
+
+    if(valid){
+
+        // Display a confirmation dialog
+        var confirmed = window.confirm('Are you sure you want to add this bundle?');
+        if (confirmed) {
+            addBundle();
+        }
+
+
+    }
+    else{
+        window.alert('The bundle is not valid. Please ensure you have one item per supplier!');
+    }
+}
+
+function addBundle(){
+    //add code here to extract info from page and add new bundle to db
+
 }
