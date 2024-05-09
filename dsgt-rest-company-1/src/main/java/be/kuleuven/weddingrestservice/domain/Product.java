@@ -60,7 +60,7 @@ public class Product {
         this.amountAvailable = amountAvailable;
     }
 
-    public ProductType getSuitType() {
+    public ProductType getProductType() {
         return productType;
     }
 
