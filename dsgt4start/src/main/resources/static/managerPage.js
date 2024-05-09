@@ -347,7 +347,7 @@ function setupEditForm(){
 
 function displayProducts(data){
     var html = '';
-    data=JSON.parse(data);
+    data = JSON.parse(data);
     // Check if data is valid
     if (!data || !data.suppliers || !Array.isArray(data.suppliers)) {
         console.error('Invalid data format.');
@@ -372,15 +372,15 @@ function displayProducts(data){
             var products = supplier.products;
             for (var j = 0; j < products.length; j++) {
                 var product = products[j];
-                html += '<div class="product">';
+                html += '<div class="new-product">';
                 html += '<input type="radio" name="supplier_' + i + '" value="' + product.id + '">'; // Radio button for product
                 html += '<img src="' + product.imageLink + '" alt="' + product.name + '">'; // Product image
-                html += '<div class="details">';
+                html += '<div class="new-details">';
                 html += '<h3>' + product.name + '</h3>'; // Product name
                 html += '<p>Price: $' + product.price.toFixed(2) + '</p>'; // Product price
                 html += '<p>' + product.description + '</p>'; // Product description
-                html += '</div>'; // End details
-                html += '</div>'; // End product
+                html += '</div>'; // End new-details
+                html += '</div>'; // End new-product
             }
         } else {
             console.error('Products data missing or invalid for supplier:', supplier.name);
@@ -391,6 +391,9 @@ function displayProducts(data){
 
     // Close container div for columns
     html += '</div>'; // End supplier-columns
+
+    // Add Complete button
+    html += '<button id="completeButton">Complete</button>';
 
     const contentDiv = document.getElementById('contentdiv');
     contentDiv.innerHTML = html;
