@@ -169,4 +169,97 @@ class DBController {
         }
     }
 
+
+
+    @GetMapping("/api/getProducts")
+    public String getProducts() {
+        // Required level: user
+        var user = WebSecurityConfig.getUser();
+
+        // Dummy data
+        String json = "{" +
+                "\"suppliers\": [" +
+                "{" +
+                "\"name\": \"Supplier 1\"," +
+                "\"products\": [" +
+                "{" +
+                "\"id\": 1," +
+                "\"name\": \"Product A\"," +
+                "\"price\": 10.99," +
+                "\"description\": \"Description of Product A\"," +
+                "\"imageLink\": \"https://example.com/imageA\"" +
+                "}," +
+                "{" +
+                "\"id\": 2," +
+                "\"name\": \"Product B\"," +
+                "\"price\": 19.99," +
+                "\"description\": \"Description of Product B\"," +
+                "\"imageLink\": \"https://example.com/imageB\"" +
+                "}," +
+                "{" +
+                "\"id\": 3," +
+                "\"name\": \"Product C\"," +
+                "\"price\": 29.99," +
+                "\"description\": \"Description of Product C\"," +
+                "\"imageLink\": \"https://example.com/imageC\"" +
+                "}" +
+                "]" +
+                "}," +
+                "{" +
+                "\"name\": \"Supplier 2\"," +
+                "\"products\": [" +
+                "{" +
+                "\"id\": 4," +
+                "\"name\": \"Product D\"," +
+                "\"price\": 15.99," +
+                "\"description\": \"Description of Product D\"," +
+                "\"imageLink\": \"https://example.com/imageD\"" +
+                "}," +
+                "{" +
+                "\"id\": 5," +
+                "\"name\": \"Product E\"," +
+                "\"price\": 25.99," +
+                "\"description\": \"Description of Product E\"," +
+                "\"imageLink\": \"https://example.com/imageE\"" +
+                "}," +
+                "{" +
+                "\"id\": 6," +
+                "\"name\": \"Product F\"," +
+                "\"price\": 35.99," +
+                "\"description\": \"Description of Product F\"," +
+                "\"imageLink\": \"https://example.com/imageF\"" +
+                "}" +
+                "]" +
+                "}," +
+                "{" +
+                "\"name\": \"Supplier 3\"," +
+                "\"products\": [" +
+                "{" +
+                "\"id\": 7," +
+                "\"name\": \"Product G\"," +
+                "\"price\": 12.99," +
+                "\"description\": \"Description of Product G\"," +
+                "\"imageLink\": \"https://example.com/imageG\"" +
+                "}," +
+                "{" +
+                "\"id\": 8," +
+                "\"name\": \"Product H\"," +
+                "\"price\": 22.99," +
+                "\"description\": \"Description of Product H\"," +
+                "\"imageLink\": \"https://example.com/imageH\"" +
+                "}," +
+                "{" +
+                "\"id\": 9," +
+                "\"name\": \"Product I\"," +
+                "\"price\": 32.99," +
+                "\"description\": \"Description of Product I\"," +
+                "\"imageLink\": \"https://example.com/imageI\"" +
+                "}" +
+                "]" +
+                "}" +
+                "]" +
+                "}";
+
+        return json;
+    }
 }
