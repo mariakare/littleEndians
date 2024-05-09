@@ -10,14 +10,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import be.kuleuven.weddingrestservice.domain.ProductsRepository;
-import be.kuleuven.weddingrestservice.exceptions.SuitNotFoundException;
+import be.kuleuven.weddingrestservice.exceptions.ProductNotFoundException;
 
 import be.kuleuven.weddingrestservice.domain.Reservation;
+import org.springframework.web.servlet.view.RedirectView;
 
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ArrayList;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
@@ -31,37 +33,40 @@ public class ProductsRestController {
         this.productsRepository = productsRepository;
     }
 
-
+    @GetMapping("/")
+    public RedirectView redirectToProducts() {
+        return new RedirectView("/products");
+    }
 
     // 1. Get All Products
-    @GetMapping("/suits")
+    @GetMapping("/products")
     public ResponseEntity<CollectionModel<EntityModel<Product>>> getAllProducts() {
         List<Product> allProducts = productsRepository.getAllProducts();
-        List<EntityModel<Product>> suitEntities = allProducts.stream()
+        List<EntityModel<Product>> productEntities = allProducts.stream()
                 .map(product -> EntityModel.of(product,
                         linkTo(methodOn(ProductsRestController.class).getProductById(product.getId())).withSelfRel(),
-                        linkTo(methodOn(ProductsRestController.class).getAllProducts()).withRel("suits"),
+                        linkTo(methodOn(ProductsRestController.class).getAllProducts()).withRel("products"),
                         linkTo(methodOn(ProductsRestController.class).reserveProduct(null)).withRel("reserve")))
                 .toList();
-        return ResponseEntity.ok(CollectionModel.of(suitEntities));
+        return ResponseEntity.ok(CollectionModel.of(productEntities));
     }
-    @GetMapping("/suits/{id}")
+    @GetMapping("/products/{id}")
     public ResponseEntity<EntityModel<Product>> getProductById(@PathVariable String id) {
-        Optional<Product> suit_maybe = productsRepository.getProductById(id);
-        if (suit_maybe.isEmpty()) {
-            throw new SuitNotFoundException("Suit with id " + id + " not found");
+        Optional<Product> product_maybe = productsRepository.getProductById(id);
+        if (product_maybe.isEmpty()) {
+            throw new ProductNotFoundException("with id " + id);
         }
-        Product product = suit_maybe.get();
+        Product product = product_maybe.get();
         return ResponseEntity.ok(EntityModel.of(product,
                 linkTo(methodOn(ProductsRestController.class).getProductById(product.getId())).withSelfRel(),
-                linkTo(methodOn(ProductsRestController.class).getAllProducts()).withRel("suits"),
+                linkTo(methodOn(ProductsRestController.class).getAllProducts()).withRel("products"),
                 linkTo(methodOn(ProductsRestController.class).reserveProduct(null)).withRel("reserve")));
     }
 
     // 3. Reserve Product
-    @PostMapping("/suits/reserve")
-    public ResponseEntity<EntityModel<Reservation>> reserveProduct(@RequestBody Map<String, Integer> suitsToReserve) {
-        Reservation reservation = productsRepository.reserveProducts(suitsToReserve);
+    @PostMapping("/products/reserve")
+    public ResponseEntity<EntityModel<Reservation>> reserveProduct(@RequestBody Map<String, Integer> productsToReserve) {
+        Reservation reservation = productsRepository.reserveProducts(productsToReserve);
         return ResponseEntity.status(HttpStatus.CREATED).body(EntityModel.of(reservation,
                 linkTo(methodOn(ProductsRestController.class).getReservationById(reservation.getReservationId())).withSelfRel(),
                 linkTo(methodOn(ProductsRestController.class).cancelReservation(reservation.getReservationId())).withRel("cancel"),
@@ -71,12 +76,13 @@ public class ProductsRestController {
     @GetMapping("/reservations/{id}")
     public ResponseEntity<EntityModel<Reservation>> getReservationById(@PathVariable String id) {
         Reservation reservation = productsRepository.getReservationById(id);
-        List<Link> links = List.of(
-                linkTo(methodOn(ProductsRestController.class).getReservationById(reservation.getReservationId())).withSelfRel());
-        if (reservation.getStatusEnum() == Reservation.Status.PENDING) {
+        List<Link> links = new ArrayList<>(List.of(
+                linkTo(methodOn(ProductsRestController.class).getReservationById(reservation.getReservationId())).withSelfRel()));
+        if (reservation.getStatusEnum().equals(Reservation.Status.PENDING)) {
             links.add(linkTo(methodOn(ProductsRestController.class).cancelReservation(id)).withRel("cancel"));
             links.add(linkTo(methodOn(ProductsRestController.class).confirmReservation(id)).withRel("confirm"));
         }
+
         return ResponseEntity.ok(EntityModel.of(reservation, links));
     }
 
