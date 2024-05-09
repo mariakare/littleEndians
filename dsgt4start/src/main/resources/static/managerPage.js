@@ -346,39 +346,46 @@ function setupEditForm(){
 
 
 function displayProducts(data){
+    var html = '';
+    data=JSON.parse(data);
+    // Check if data is valid
+    if (!data || !data.suppliers || !Array.isArray(data.suppliers)) {
+        console.error('Invalid data format.');
+        return;
+    }
+
+    // Parse JSON data
+    var suppliers = data.suppliers;
+
+    // Loop through suppliers
+    for (var i = 0; i < suppliers.length; i++) {
+        var supplier = suppliers[i];
+        html += '<div class="supplier-column">';
+        html += '<h2>' + supplier.name + '</h2>';
+
+        // Check if products exist and is an array
+        if (supplier.products && Array.isArray(supplier.products)) {
+            // Loop through products of the supplier
+            var products = supplier.products;
+            for (var j = 0; j < products.length; j++) {
+                var product = products[j];
+                html += '<div class="product">';
+                html += '<input type="radio" name="product" value="' + product.id + '">'; // Radio button
+                html += '<img src="' + product.imageLink + '" alt="' + product.name + '">'; // Product image
+                html += '<div class="details">';
+                html += '<h3>' + product.name + '</h3>'; // Product name
+                html += '<p>Price: $' + product.price.toFixed(2) + '</p>'; // Product price
+                html += '<p>' + product.description + '</p>'; // Product description
+                html += '</div>'; // End details
+                html += '</div>'; // End product
+            }
+        } else {
+            console.error('Products data missing or invalid for supplier:', supplier.name);
+        }
+
+        html += '</div>'; // End supplier-column
+    }
+
     const contentDiv = document.getElementById('contentdiv');
-    contentDiv.textContent = JSON.stringify(data, null, 2);
-    // Clear the contentdiv before adding new bundles
-    // contentDiv.innerHTML = '';
-    //
-    // var html = '';
-    //
-    // // Parse JSON data
-    // var suppliers = data.suppliers;
-    //
-    // // Loop through suppliers
-    // for (var i = 0; i < suppliers.length; i++) {
-    //     var supplier = suppliers[i];
-    //     html += '<div class="supplier-column">';
-    //     html += '<h2>' + supplier.name + '</h2>';
-    //
-    //     // Loop through products of the supplier
-    //     var products = supplier.products;
-    //     for (var j = 0; j < products.length; j++) {
-    //         var product = products[j];
-    //         html += '<div class="product">';
-    //         html += '<input type="radio" name="product" value="' + product.id + '">'; // Radio button
-    //         html += '<img src="' + product.imageLink + '" alt="' + product.name + '">'; // Product image
-    //         html += '<div class="details">';
-    //         html += '<h3>' + product.name + '</h3>'; // Product name
-    //         html += '<p>Price: $' + product.price.toFixed(2) + '</p>'; // Product price
-    //         html += '<p>' + product.description + '</p>'; // Product description
-    //         html += '</div>'; // End details
-    //         html += '</div>'; // End product
-    //     }
-    //
-    //     html += '</div>'; // End supplier-column
-    // }
-    //
-    // contentDiv.innerHTML = html;
+    contentDiv.innerHTML = html;
 }

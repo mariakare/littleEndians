@@ -177,87 +177,87 @@ class DBController {
         var user = WebSecurityConfig.getUser();
 
         // Dummy data
-        String json = "{" +
-                "\"suppliers\": [" +
-                "{" +
-                "\"name\": \"Supplier 1\"," +
-                "\"products\": [" +
-                "{" +
-                "\"id\": 1," +
-                "\"name\": \"Product A\"," +
-                "\"price\": 10.99," +
-                "\"description\": \"Description of Product A\"," +
-                "\"imageLink\": \"https://example.com/imageA\"" +
-                "}," +
-                "{" +
-                "\"id\": 2," +
-                "\"name\": \"Product B\"," +
-                "\"price\": 19.99," +
-                "\"description\": \"Description of Product B\"," +
-                "\"imageLink\": \"https://example.com/imageB\"" +
-                "}," +
-                "{" +
-                "\"id\": 3," +
-                "\"name\": \"Product C\"," +
-                "\"price\": 29.99," +
-                "\"description\": \"Description of Product C\"," +
-                "\"imageLink\": \"https://example.com/imageC\"" +
-                "}" +
-                "]" +
-                "}," +
-                "{" +
-                "\"name\": \"Supplier 2\"," +
-                "\"products\": [" +
-                "{" +
-                "\"id\": 4," +
-                "\"name\": \"Product D\"," +
-                "\"price\": 15.99," +
-                "\"description\": \"Description of Product D\"," +
-                "\"imageLink\": \"https://example.com/imageD\"" +
-                "}," +
-                "{" +
-                "\"id\": 5," +
-                "\"name\": \"Product E\"," +
-                "\"price\": 25.99," +
-                "\"description\": \"Description of Product E\"," +
-                "\"imageLink\": \"https://example.com/imageE\"" +
-                "}," +
-                "{" +
-                "\"id\": 6," +
-                "\"name\": \"Product F\"," +
-                "\"price\": 35.99," +
-                "\"description\": \"Description of Product F\"," +
-                "\"imageLink\": \"https://example.com/imageF\"" +
-                "}" +
-                "]" +
-                "}," +
-                "{" +
-                "\"name\": \"Supplier 3\"," +
-                "\"products\": [" +
-                "{" +
-                "\"id\": 7," +
-                "\"name\": \"Product G\"," +
-                "\"price\": 12.99," +
-                "\"description\": \"Description of Product G\"," +
-                "\"imageLink\": \"https://example.com/imageG\"" +
-                "}," +
-                "{" +
-                "\"id\": 8," +
-                "\"name\": \"Product H\"," +
-                "\"price\": 22.99," +
-                "\"description\": \"Description of Product H\"," +
-                "\"imageLink\": \"https://example.com/imageH\"" +
-                "}," +
-                "{" +
-                "\"id\": 9," +
-                "\"name\": \"Product I\"," +
-                "\"price\": 32.99," +
-                "\"description\": \"Description of Product I\"," +
-                "\"imageLink\": \"https://example.com/imageI\"" +
-                "}" +
-                "]" +
-                "}" +
-                "]" +
+        String json = "{\n" +
+                "  \"suppliers\": [\n" +
+                "    {\n" +
+                "      \"name\": \"Supplier 1\",\n" +
+                "      \"products\": [\n" +
+                "        {\n" +
+                "          \"id\": 1,\n" +
+                "          \"name\": \"Product A\",\n" +
+                "          \"price\": 10.99,\n" +
+                "          \"description\": \"Description of Product A\",\n" +
+                "          \"imageLink\": \"https://example.com/imageA\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"id\": 2,\n" +
+                "          \"name\": \"Product B\",\n" +
+                "          \"price\": 19.99,\n" +
+                "          \"description\": \"Description of Product B\",\n" +
+                "          \"imageLink\": \"https://example.com/imageB\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"id\": 3,\n" +
+                "          \"name\": \"Product C\",\n" +
+                "          \"price\": 29.99,\n" +
+                "          \"description\": \"Description of Product C\",\n" +
+                "          \"imageLink\": \"https://example.com/imageC\"\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"name\": \"Supplier 2\",\n" +
+                "      \"products\": [\n" +
+                "        {\n" +
+                "          \"id\": 4,\n" +
+                "          \"name\": \"Product D\",\n" +
+                "          \"price\": 15.99,\n" +
+                "          \"description\": \"Description of Product D\",\n" +
+                "          \"imageLink\": \"https://example.com/imageD\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"id\": 5,\n" +
+                "          \"name\": \"Product E\",\n" +
+                "          \"price\": 25.99,\n" +
+                "          \"description\": \"Description of Product E\",\n" +
+                "          \"imageLink\": \"https://example.com/imageE\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"id\": 6,\n" +
+                "          \"name\": \"Product F\",\n" +
+                "          \"price\": 35.99,\n" +
+                "          \"description\": \"Description of Product F\",\n" +
+                "          \"imageLink\": \"https://example.com/imageF\"\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"name\": \"Supplier 3\",\n" +
+                "      \"products\": [\n" +
+                "        {\n" +
+                "          \"id\": 7,\n" +
+                "          \"name\": \"Product G\",\n" +
+                "          \"price\": 12.99,\n" +
+                "          \"description\": \"Description of Product G\",\n" +
+                "          \"imageLink\": \"https://example.com/imageG\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"id\": 8,\n" +
+                "          \"name\": \"Product H\",\n" +
+                "          \"price\": 22.99,\n" +
+                "          \"description\": \"Description of Product H\",\n" +
+                "          \"imageLink\": \"https://example.com/imageH\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"id\": 9,\n" +
+                "          \"name\": \"Product I\",\n" +
+                "          \"price\": 32.99,\n" +
+                "          \"description\": \"Description of Product I\",\n" +
+                "          \"imageLink\": \"https://example.com/imageI\"\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ]\n" +
                 "}";
 
         return json;
