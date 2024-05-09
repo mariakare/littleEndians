@@ -2,6 +2,11 @@ import {getBundles} from "./getContent.js";
 
 let tkn;
 
+/**
+ * Function used to setup the manager page. By default, opens the view bundles tab
+ *  only works if token contains {"roles":"manager"}
+ * @param token - auth token
+ */
 export function setupManagerPage(token){
     tkn = token;
     adaptHeaderManager();
@@ -17,6 +22,10 @@ export function setupManagerPage(token){
 
 }
 
+/**
+ * Given json of all bundles, displays each bundle along with a edit and delete button
+ * @param data json containing all bundles
+ */
 function displayManagerBundles(data) {
     const bundles = JSON.parse(data).bundles;
     const contentDiv = document.getElementById('contentdiv');
@@ -86,7 +95,10 @@ function displayManagerBundles(data) {
 }
 
 
-
+/**
+ * Adapts the header for the manager page - adds 2 tabs. 1 for viewing all bundles and editing them
+ * and one for adding new bundles
+ */
 function adaptHeaderManager(){
     // Create the tabs
     const tab1 = createTab("Active bundles", "/page1");
@@ -104,8 +116,12 @@ function adaptHeaderManager(){
 }
 
 
-// Function to create a tab element
-function createTab(label, url) {
+/**
+ * Function to create tab for the page
+ * @param label label for the tab
+ * @returns {HTMLDivElement}
+ */
+function createTab(label) {
     const tab = document.createElement("div");
     tab.textContent = label;
     tab.classList.add("header-tab");
@@ -124,15 +140,42 @@ function createTab(label, url) {
                 });
         } else {
             // Call function to display new bundles page
-            const contentDiv = document.getElementById('contentdiv');
-            // Clear the contentdiv before adding new bundles
-            contentDiv.innerHTML = '';
+            getProducts(tkn)
+                .then((data) => {
+                    displayProducts(data);
+                    // Reattach event listeners after displaying bundles
+                    // attachEventListeners();
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+
         }
     });
     return tab;
 }
 
-// Function to attach event listeners
+function getProducts() {
+    return fetch('/api/getProducts', {
+        headers: { Authorization: 'Bearer ' + tkn}
+    })
+        .then((response) => {
+            return response.text();
+        })
+        .then((data) => {
+            return data;
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+
+
+}
+
+
+/**
+ * Attaches event listeners to edit button and the close button of tttttthe modal window
+ */
 function attachEventListeners() {
     // Get the modal
     const editBundleModal = document.getElementById("editBundleModal");
@@ -205,7 +248,10 @@ function removeViewCartButton() {
 }
 
 
-
+/**
+ * API call to delete a given bundle
+ * @param bundleId
+ */
 function deleteBundle(bundleId) {
     fetch(`/api/deleteBundle/${bundleId}`, {
         method: 'DELETE',
@@ -232,7 +278,9 @@ function deleteBundle(bundleId) {
         });
 }
 
-
+/**
+ * Basic setup for modal window used to edit bundles
+ */
 function setupEditForm(){
     // Get the modal
     const editBundleModal = document.getElementById("editBundleModal");
@@ -293,4 +341,60 @@ function setupEditForm(){
         // Make your AJAX call here
     }
 
+}
+
+
+
+function displayProducts(data){
+    var html = '';
+    data = JSON.parse(data);
+    // Check if data is valid
+    if (!data || !data.suppliers || !Array.isArray(data.suppliers)) {
+        console.error('Invalid data format.');
+        return;
+    }
+
+    // Parse JSON data
+    var suppliers = data.suppliers;
+
+    // Open container div for columns
+    html += '<div class="supplier-columns">';
+
+    // Loop through suppliers
+    for (var i = 0; i < suppliers.length; i++) {
+        var supplier = suppliers[i];
+        html += '<div class="supplier-column">';
+        html += '<h2>' + supplier.name + '</h2>'; // Title the column with supplier name
+
+        // Check if products exist and is an array
+        if (supplier.products && Array.isArray(supplier.products)) {
+            // Loop through products of the supplier
+            var products = supplier.products;
+            for (var j = 0; j < products.length; j++) {
+                var product = products[j];
+                html += '<div class="new-product">';
+                html += '<input type="radio" name="supplier_' + i + '" value="' + product.id + '">'; // Radio button for product
+                html += '<img src="' + product.imageLink + '" alt="' + product.name + '">'; // Product image
+                html += '<div class="new-details">';
+                html += '<h3>' + product.name + '</h3>'; // Product name
+                html += '<p>Price: $' + product.price.toFixed(2) + '</p>'; // Product price
+                html += '<p>' + product.description + '</p>'; // Product description
+                html += '</div>'; // End new-details
+                html += '</div>'; // End new-product
+            }
+        } else {
+            console.error('Products data missing or invalid for supplier:', supplier.name);
+        }
+
+        html += '</div>'; // End supplier-column
+    }
+
+    // Close container div for columns
+    html += '</div>'; // End supplier-columns
+
+    // Add Complete button
+    html += '<button id="completeButton">Complete</button>';
+
+    const contentDiv = document.getElementById('contentdiv');
+    contentDiv.innerHTML = html;
 }

@@ -169,4 +169,97 @@ class DBController {
         }
     }
 
+
+
+    @GetMapping("/api/getProducts")
+    public String getProducts() {
+        // Required level: user
+        var user = WebSecurityConfig.getUser();
+
+        // Dummy data
+        String json = "{\n" +
+                "  \"suppliers\": [\n" +
+                "    {\n" +
+                "      \"name\": \"Supplier 1\",\n" +
+                "      \"products\": [\n" +
+                "        {\n" +
+                "          \"id\": 1,\n" +
+                "          \"name\": \"Product A\",\n" +
+                "          \"price\": 10.99,\n" +
+                "          \"description\": \"Description of Product A\",\n" +
+                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"id\": 2,\n" +
+                "          \"name\": \"Product B\",\n" +
+                "          \"price\": 19.99,\n" +
+                "          \"description\": \"Description of Product B\",\n" +
+                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"id\": 3,\n" +
+                "          \"name\": \"Product C\",\n" +
+                "          \"price\": 29.99,\n" +
+                "          \"description\": \"Description of Product C\",\n" +
+                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"name\": \"Supplier 2\",\n" +
+                "      \"products\": [\n" +
+                "        {\n" +
+                "          \"id\": 4,\n" +
+                "          \"name\": \"Product D\",\n" +
+                "          \"price\": 15.99,\n" +
+                "          \"description\": \"Description of Product D\",\n" +
+                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"id\": 5,\n" +
+                "          \"name\": \"Product E\",\n" +
+                "          \"price\": 25.99,\n" +
+                "          \"description\": \"Description of Product E\",\n" +
+                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"id\": 6,\n" +
+                "          \"name\": \"Product F\",\n" +
+                "          \"price\": 35.99,\n" +
+                "          \"description\": \"Description of Product F\",\n" +
+                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"name\": \"Supplier 3\",\n" +
+                "      \"products\": [\n" +
+                "        {\n" +
+                "          \"id\": 7,\n" +
+                "          \"name\": \"Product G\",\n" +
+                "          \"price\": 12.99,\n" +
+                "          \"description\": \"Description of Product G\",\n" +
+                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"id\": 8,\n" +
+                "          \"name\": \"Product H\",\n" +
+                "          \"price\": 22.99,\n" +
+                "          \"description\": \"Description of Product H\",\n" +
+                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"id\": 9,\n" +
+                "          \"name\": \"Product I\",\n" +
+                "          \"price\": 32.99,\n" +
+                "          \"description\": \"Description of Product I\",\n" +
+                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+
+        return json;
+    }
 }
