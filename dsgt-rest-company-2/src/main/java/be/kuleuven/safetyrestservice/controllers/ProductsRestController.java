@@ -1,6 +1,8 @@
-package be.kuleuven.weddingrestservice.controllers;
+package be.kuleuven.safetyrestservice.controllers;
 
-import be.kuleuven.weddingrestservice.domain.Product;
+import be.kuleuven.safetyrestservice.domain.Product;
+import be.kuleuven.safetyrestservice.domain.ProductsRepository;
+import be.kuleuven.safetyrestservice.domain.Reservation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -9,10 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import be.kuleuven.weddingrestservice.domain.ProductsRepository;
-import be.kuleuven.weddingrestservice.exceptions.ProductNotFoundException;
+import be.kuleuven.safetyrestservice.exceptions.ProductNotFoundException;
 
-import be.kuleuven.weddingrestservice.domain.Reservation;
 import org.springframework.web.servlet.view.RedirectView;
 
 

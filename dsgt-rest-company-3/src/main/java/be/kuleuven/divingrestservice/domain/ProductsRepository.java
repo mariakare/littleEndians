@@ -1,7 +1,7 @@
-package be.kuleuven.weddingrestservice.domain;
+package be.kuleuven.divingrestservice.domain;
 
-import be.kuleuven.weddingrestservice.exceptions.ReservationException;
-import be.kuleuven.weddingrestservice.exceptions.ProductNotFoundException;
+import be.kuleuven.divingrestservice.exceptions.ProductNotFoundException;
+import be.kuleuven.divingrestservice.exceptions.ReservationException;
 
 import org.springframework.stereotype.Component;
 
@@ -22,35 +22,37 @@ public class ProductsRepository {
     @PostConstruct
     public void initializeProducts() {
 
-        Product suit = new Product();
-        suit.setId("5268203c-de76-4921-a3e3-439db69c462a");
-        suit.setName("Louis Vuitton Tuxedo");
-        suit.setPrice(600.0);
-        suit.setDescription("Classy black Louis Vuitton Tuxedo");
-        suit.setImageLink("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3vnWiKIhA254Vl7zbQkViPYn3LtuLdIefOQ&s");
-        suit.setAmountAvailable(5);
-        suit.setProductType(ProductType.TUXEDO);
-        products.put(suit.getId(), suit);
+        Product diving_suit = new Product();
+        diving_suit.setId("b379314d-ef87-5a32-b4f4-54aec7ad573b");
+        diving_suit.setName("Scuba Diving Wetsuit");
+        diving_suit.setPrice(200.0);
+        diving_suit.setDescription("Waterproof, thermal insulation high quality wetsuit");
+        diving_suit.setImageLink("https://img.fruugo.com/product/6/31/397698316_max.jpg");
+        diving_suit.setAmountAvailable(5);
+        diving_suit.setProductType(ProductType.SCUBA);
+        products.put(diving_suit.getId(), diving_suit);
 
-        Product gown = new Product();
-        gown.setId("4237681a-441f-47fc-a747-8e0169bacea1");
-        gown.setName("Dolce & Gabbana Bridal Gown");
-        gown.setPrice(800.0);
-        gown.setDescription("Gorgeous wedding dress by Dolce & Gabbana");
-        gown.setImageLink("https://i.ebayimg.com/images/g/WFIAAOSwet5lbf1S/s-l400.jpg");
-        gown.setAmountAvailable(7);
-        gown.setProductType(ProductType.GOWN);
-        products.put(gown.getId(), gown);
+        Product mask = new Product();
+        //shift all letters and numbers by 2 and modify every 5th character to a number
+        mask.setId("d1h5d3d6-3d3d-6d3d-8d3d-3d001d18dd3d");
+        mask.setName("Snorkeling Mask");
+        mask.setPrice(55.0);
+        mask.setDescription("FINA Approved. Recommended by 9/10 divers");
+        mask.setImageLink("https://img.fruugo.com/product/5/82/256626825_max.jpg");
+        mask.setAmountAvailable(30);
+        mask.setProductType(ProductType.SNORKEL_MASK);
+        products.put(mask.getId(), mask);
 
-        Product decorations = new Product();
-        decorations.setId("cfd1601f-29a0-485d-8d21-7607ec0340c8");
-        decorations.setName("Decoration Set");
-        decorations.setPrice(500.0);
-        decorations.setDescription("Complete set of wedding decorations");
-        decorations.setImageLink("https://tableclothsfactory.com/cdn/shop/collections/Wedding_Ceremony_Decor.jpg?v=1675883334&width=1200");
-        decorations.setAmountAvailable(20);
-        decorations.setProductType(ProductType.DECORATION);
-        products.put(decorations.getId(), decorations);
+        Product flippers = new Product();
+        //modify id to UUID not used before beginning with q and shifted by 17 letters back
+        flippers.setId("q268203c-de76-4921-a3e3-439db69c462a");
+        flippers.setName("MARES Flippers");
+        flippers.setPrice(65.50);
+        flippers.setDescription("Flippers for diving. Rated best flipper in 1980. Flips people off too.");
+        flippers.setImageLink("https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1658155246-mares-1658155241.jpg");
+        flippers.setAmountAvailable(30);
+        flippers.setProductType(ProductType.FLIPPERS);
+        products.put(flippers.getId(), flippers);
 
     }
 

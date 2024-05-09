@@ -1,28 +1,28 @@
 ###
 # Get All Suits
 ###
-GET http://localhost:8080/suits
+GET http://localhost:8090/products
 
 <> 2024-05-07T194401.200.json
 
 ###
 # Get Suit By ID (Existing Suit)
 ###
-GET http://localhost:8080/suits/5268203c-de76-4921-a3e3-439db69c462a
+GET http://localhost:8090/products/5268203c-de76-4921-a3e3-439db69c462a
 
 <> 2024-05-07T194420.200.json
 
 ###
 # Get Suit By ID (Non-existent Suit)
 ###
-GET http://localhost:8080/suits/non-existent-product-id
+GET http://localhost:8090/products/non-existent-product-id
 
 <> 2024-05-07T194410.404.txt
 
 ###
 # Reserve Suits (Valid Reservation)
 ###
-POST http://localhost:8080/suits/reserve
+POST http://localhost:8090/products/reserve
 Content-Type: application/json
 
 {
@@ -35,7 +35,7 @@ Content-Type: application/json
 ###
 # Reserve Suits (Invalid Suit ID)
 ###
-POST http://localhost:8080/suits/reserve
+POST http://localhost:8090/products/reserve
 Content-Type: application/json
 
 {
@@ -47,7 +47,7 @@ Content-Type: application/json
 ###
 # Reserve Suits (Insufficient Quantity)
 ###
-POST http://localhost:8080/suits/reserve
+POST http://localhost:8090/products/reserve
 Content-Type: application/json
 
 {
@@ -59,7 +59,7 @@ Content-Type: application/json
 ###
 # Get Reservation By ID (Existing Reservation)
 ###
-GET http://localhost:8080/reservations/7ff59174-4254-48a2-b7f0-7397e77f5d42
+GET http://localhost:8090/reservations/a4cc367b-34b3-4368-b2c3-19a7496796b0
 
 <> 2024-05-07T202111.200.json
 <> 2024-05-07T194810.500.json
@@ -67,30 +67,30 @@ GET http://localhost:8080/reservations/7ff59174-4254-48a2-b7f0-7397e77f5d42
 ###
 # Get Reservation By ID (Non-existent Reservation)
 ###
-GET http://localhost:8080/reservations/non-existent-reservation-id
+GET http://localhost:8090/reservations/non-existent-reservation-id
 
 <> 2024-05-07T194841.404.txt
 
 ###
 # Cancel Reservation (Existing Reservation)
 ###
-POST http://localhost:8080/reservations/7ff59174-4254-48a2-b7f0-7397e77f5d42/cancel
+POST http://localhost:8090/reservations/4f90052e-a6ab-49f1-9f43-1baec7db06db/cancel
 
 ###
 # Cancel Reservation (Non-existent Reservation)
 ###
-POST http://localhost:8080/reservations/non-existent-reservation-id/cancel
+POST http://localhost:8090/reservations/non-existent-reservation-id/cancel
 
 <> 2024-05-07T194734.404.txt
 
 ###
 # Confirm Reservation (Existing Reservation)
 ###
-POST http://localhost:8080/reservations/bbc614c0-722c-4fae-8742-7697d5997de7/confirm
+POST http://localhost:8090/reservations/4f90052e-a6ab-49f1-9f43-1baec7db06db/confirm
 
 ###
 # Confirm Reservation (Non-existent Reservation)
 ###
-POST http://localhost:8080/reservations/non-existent-reservation-id/confirm
+POST http://localhost:8090/reservations/non-existent-reservation-id/confirm
 
 <> 2024-05-07T202221.404.txt

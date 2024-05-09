@@ -1,4 +1,4 @@
-package be.kuleuven.weddingrestservice.domain;
+package be.kuleuven.safetyrestservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
