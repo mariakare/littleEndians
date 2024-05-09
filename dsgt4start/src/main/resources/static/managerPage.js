@@ -2,6 +2,11 @@ import {getBundles} from "./getContent.js";
 
 let tkn;
 
+/**
+ * Function used to setup the manager page. By default, opens the view bundles tab
+ *  only works if token contains {"roles":"manager"}
+ * @param token - auth token
+ */
 export function setupManagerPage(token){
     tkn = token;
     adaptHeaderManager();
@@ -17,6 +22,10 @@ export function setupManagerPage(token){
 
 }
 
+/**
+ * Given json of all bundles, displays each bundle along with a edit and delete button
+ * @param data json containing all bundles
+ */
 function displayManagerBundles(data) {
     const bundles = JSON.parse(data).bundles;
     const contentDiv = document.getElementById('contentdiv');
@@ -86,7 +95,10 @@ function displayManagerBundles(data) {
 }
 
 
-
+/**
+ * Adapts the header for the manager page - adds 2 tabs. 1 for viewing all bundles and editing them
+ * and one for adding new bundles
+ */
 function adaptHeaderManager(){
     // Create the tabs
     const tab1 = createTab("Active bundles", "/page1");
@@ -104,8 +116,12 @@ function adaptHeaderManager(){
 }
 
 
-// Function to create a tab element
-function createTab(label, url) {
+/**
+ * Function to create tab for the page
+ * @param label label for the tab
+ * @returns {HTMLDivElement}
+ */
+function createTab(label) {
     const tab = document.createElement("div");
     tab.textContent = label;
     tab.classList.add("header-tab");
@@ -132,7 +148,10 @@ function createTab(label, url) {
     return tab;
 }
 
-// Function to attach event listeners
+
+/**
+ * Attaches event listeners to edit button and the close button of tttttthe modal window
+ */
 function attachEventListeners() {
     // Get the modal
     const editBundleModal = document.getElementById("editBundleModal");
@@ -205,7 +224,10 @@ function removeViewCartButton() {
 }
 
 
-
+/**
+ * API call to delete a given bundle
+ * @param bundleId
+ */
 function deleteBundle(bundleId) {
     fetch(`/api/deleteBundle/${bundleId}`, {
         method: 'DELETE',
@@ -232,7 +254,9 @@ function deleteBundle(bundleId) {
         });
 }
 
-
+/**
+ * Basic setup for modal window used to edit bundles
+ */
 function setupEditForm(){
     // Get the modal
     const editBundleModal = document.getElementById("editBundleModal");
