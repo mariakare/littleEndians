@@ -460,10 +460,10 @@ function checkValidBundle() {
 function addBundle(selectedProductIds){
         // Construct the request body
         console.log("start addBundle");
-        console.log(selectedProductIds);
+        //console.log(selectedProductIds);
         const body = new URLSearchParams();
         body.append('productIds', JSON.stringify(selectedProductIds));
-
+        console.log(body);
         // Make the fetch request
         fetch('/api/addBundle', {
             method: 'POST',

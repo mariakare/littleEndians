@@ -121,14 +121,12 @@ class DBController {
         ApiFuture<DocumentSnapshot> bundleFuture = bundleRef.get();
         DocumentSnapshot bundleSnapshot = bundleFuture.get();
         if (bundleSnapshot.exists()) {
-            Map<String, Object> bundleData = bundleSnapshot.getData();
+            Map<String, Object> bundleData = new HashMap<>();
+            bundleData.put("BundleId",bundleRef.getId());
 
             // Add the bundle document to the basket subcollection under the user's document
             DocumentReference addedBundleRef = userRef.collection("basket").add(bundleData).get();
-            // Wait for the result
-            Map<String, Object> updatedBundleData = new HashMap<>();
-            updatedBundleData.put("cartBundleId", addedBundleRef.getId());
-            addedBundleRef.update(updatedBundleData);
+
             // Return a response
             return ResponseEntity.status(HttpStatus.CREATED).body("Bundle with ID: " + bundleId + " added to cart with ID: " + addedBundleRef.getId());
         } else {
@@ -284,11 +282,18 @@ class DBController {
     }
 
     @PostMapping("/api/addBundle")
-    public ResponseEntity<String> addNewBundle(@RequestParam String[] productIds) throws ExecutionException, InterruptedException {
+    public ResponseEntity<String> addNewBundle(@RequestParam Map<String,String> bundleData) throws ExecutionException, InterruptedException {
         // Get the current user's ID
         var user = WebSecurityConfig.getUser();
 
-        //String[] productIds = bundleData.get("productIds").split(",");
+        String productIdArrString = bundleData.get("productIds");
+        String productIdString = productIdArrString.substring(1, productIdArrString.length() - 1);
+        String[] productIds = productIdString.split(",");
+
+
+        for (int i = 0; i < productIds.length; i++) {
+            productIds[i] = productIds[i].replaceAll("\"", "");
+        }
 
 
         // Create a map to hold the data for the new document
