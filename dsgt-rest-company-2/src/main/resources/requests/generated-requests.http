@@ -1,0 +1,96 @@
+###
+# Get All Products
+###
+GET http://localhost:8091/products
+
+<> 2024-05-07T194401.200.json
+
+###
+# Get Product By ID (Existing Product)
+###
+GET http://localhost:8091/products/b1f3b1b4-1b1b-4b1b-8b1b-1b001b18cb1b
+
+<> 2024-05-07T194420.200.json
+
+###
+# Get Product By ID (Non-existent Product)
+###
+GET http://localhost:8091/products/non-existent-product-id
+
+<> 2024-05-07T194410.404.txt
+
+###
+# Reserve Products (Valid Reservation)
+###
+POST http://localhost:8091/products/reserve
+Content-Type: application/json
+
+{
+  "b1f3b1b4-1b1b-4b1b-8b1b-1b001b18cb1b": 2
+}
+
+<> 2024-05-07T202135.201.json
+<> 2024-05-07T194524.201.json
+
+###
+# Reserve Products (Invalid Product ID)
+###
+POST http://localhost:8091/products/reserve
+Content-Type: application/json
+
+{
+  "invalid-product-id": 1
+}
+
+<> 2024-05-07T194455.404.txt
+
+###
+# Reserve Products (Insufficient Quantity)
+###
+POST http://localhost:8091/products/reserve
+Content-Type: application/json
+
+{
+  "b1f3b1b4-1b1b-4b1b-8b1b-1b001b18cb1b": 100
+}
+
+<> 2024-05-07T194515.404.txt
+
+###
+# Get Reservation By ID (Existing Reservation)
+###
+GET http://localhost:8091/reservations/1aca2dba-860d-40bf-bcc1-596fc22b17b7
+
+<> 2024-05-07T202111.200.json
+<> 2024-05-07T194810.500.json
+<> 2024-05-07T194757.500.json
+###
+# Get Reservation By ID (Non-existent Reservation)
+###
+GET http://localhost:8091/reservations/non-existent-reservation-id
+
+<> 2024-05-07T194841.404.txt
+
+###
+# Cancel Reservation (Existing Reservation)
+###
+POST http://localhost:8091/reservations/1aca2dba-860d-40bf-bcc1-596fc22b17b7/cancel
+
+###
+# Cancel Reservation (Non-existent Reservation)
+###
+POST http://localhost:8091/reservations/non-existent-reservation-id/cancel
+
+<> 2024-05-07T194734.404.txt
+
+###
+# Confirm Reservation (Existing Reservation)
+###
+POST http://localhost:8091/reservations/1aca2dba-860d-40bf-bcc1-596fc22b17b7/confirm
+
+###
+# Confirm Reservation (Non-existent Reservation)
+###
+POST http://localhost:8091/reservations/non-existent-reservation-id/confirm
+
+<> 2024-05-07T202221.404.txt

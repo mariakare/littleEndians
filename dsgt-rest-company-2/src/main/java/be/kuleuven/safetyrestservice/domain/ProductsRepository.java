@@ -1,7 +1,7 @@
-package be.kuleuven.weddingrestservice.domain;
+package be.kuleuven.safetyrestservice.domain;
 
-import be.kuleuven.weddingrestservice.exceptions.ReservationException;
-import be.kuleuven.weddingrestservice.exceptions.ProductNotFoundException;
+import be.kuleuven.safetyrestservice.exceptions.ReservationException;
+import be.kuleuven.safetyrestservice.exceptions.ProductNotFoundException;
 
 import org.springframework.stereotype.Component;
 
@@ -22,35 +22,35 @@ public class ProductsRepository {
     @PostConstruct
     public void initializeProducts() {
 
-        Product suit = new Product();
-        suit.setId("5268203c-de76-4921-a3e3-439db69c462a");
-        suit.setName("Louis Vuitton Tuxedo");
-        suit.setPrice(600.0);
-        suit.setDescription("Classy black Louis Vuitton Tuxedo");
-        suit.setImageLink("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3vnWiKIhA254Vl7zbQkViPYn3LtuLdIefOQ&s");
-        suit.setAmountAvailable(5);
-        suit.setProductType(ProductType.TUXEDO);
-        products.put(suit.getId(), suit);
+        Product hazmat = new Product();
+        hazmat.setId("a268203c-de76-4921-a3e3-439db69c462a");
+        hazmat.setName("Hazmat Suit");
+        hazmat.setPrice(100.0);
+        hazmat.setDescription("High Quality, Full protection Hazmat Suit");
+        hazmat.setImageLink("https://www.renderhub.com/cgfed/hazmat-suit/hazmat-suit-03.jpg");
+        hazmat.setAmountAvailable(15);
+        hazmat.setProductType(ProductType.HAZMAT);
+        products.put(hazmat.getId(), hazmat);
 
-        Product gown = new Product();
-        gown.setId("4237681a-441f-47fc-a747-8e0169bacea1");
-        gown.setName("Dolce & Gabbana Bridal Gown");
-        gown.setPrice(800.0);
-        gown.setDescription("Gorgeous wedding dress by Dolce & Gabbana");
-        gown.setImageLink("https://i.ebayimg.com/images/g/WFIAAOSwet5lbf1S/s-l400.jpg");
-        gown.setAmountAvailable(7);
-        gown.setProductType(ProductType.GOWN);
-        products.put(gown.getId(), gown);
+        Product mask = new Product();
+        mask.setId("b1f3b1b4-1b1b-4b1b-8b1b-1b001b18cb1b");
+        mask.setName("IIR-100 Recon Gas Mask");
+        mask.setPrice(80.0);
+        mask.setDescription("Highest grade gas mask with 2 filters");
+        mask.setImageLink("https://parcilsafety.com/cdn/shop/files/IRRYOUTHHERO.jpg?v=1711344590");
+        mask.setAmountAvailable(7);
+        mask.setProductType(ProductType.GAS_MASK);
+        products.put(mask.getId(), mask);
 
-        Product decorations = new Product();
-        decorations.setId("cfd1601f-29a0-485d-8d21-7607ec0340c8");
-        decorations.setName("Decoration Set");
-        decorations.setPrice(500.0);
-        decorations.setDescription("Complete set of wedding decorations");
-        decorations.setImageLink("https://tableclothsfactory.com/cdn/shop/collections/Wedding_Ceremony_Decor.jpg?v=1675883334&width=1200");
-        decorations.setAmountAvailable(20);
-        decorations.setProductType(ProductType.DECORATION);
-        products.put(decorations.getId(), decorations);
+        Product gloves = new Product();
+        gloves.setId("c1aefy67-0100-3b1b-8xyc-3k001897qglo");
+        gloves.setName("Chemmax push-fit gloves");
+        gloves.setPrice(65.50);
+        gloves.setDescription("Durable chemical resistant gloves. Pack of 7 gloves (NOT PAIRS)");
+        gloves.setImageLink("https://www.vdp.com/resources/resized/800x522/387/439.jpg");
+        gloves.setAmountAvailable(60);
+        gloves.setProductType(ProductType.GLOVES);
+        products.put(gloves.getId(), gloves);
 
     }
 
