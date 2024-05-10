@@ -299,7 +299,9 @@ class DBController {
         // Create a map to hold the data for the new document
         Map<String, Object> data = new HashMap<>();
         data.put("name", "New Bundle");
+        data.put("description", "This is a new bundle");
         data.put("productIds", Arrays.asList(productIds));
+        data.put("price", "$XX");
 
         try{
 
