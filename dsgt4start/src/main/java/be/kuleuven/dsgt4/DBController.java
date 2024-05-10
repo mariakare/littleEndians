@@ -60,6 +60,7 @@ class DBController {
                 "  \"bundles\": [\n" +
                 "    {\n" +
                 "      \"name\": \"Bundle 1\",\n" +
+                "           \"id\": \"PouftutBHXagruaxVFwZ\", \n" +
                 "      \"description\": \"Bundle 1 description goes here.\",\n" +
                 "      \"products\": [\n" +
                 "        {\n" +
@@ -81,6 +82,7 @@ class DBController {
                 "    },\n" +
                 "    {\n" +
                 "      \"name\": \"Bundle 2\",\n" +
+                "      \"id\": \"91rqOvBeJnEPIdqw4l1Y\", \n" +
                 "      \"description\": \"Bundle 2 description goes here.\",\n" +
                 "      \"products\": [\n" +
                 "        {\n" +
@@ -121,16 +123,18 @@ class DBController {
         ApiFuture<DocumentSnapshot> bundleFuture = bundleRef.get();
         DocumentSnapshot bundleSnapshot = bundleFuture.get();
         if (bundleSnapshot.exists()) {
-            Map<String, Object> bundleData = bundleSnapshot.getData();
 
-            // Add the bundle document to the basket subcollection under the user's document
-            DocumentReference addedBundleRef = userRef.collection("basket").add(bundleData).get();
-            // Wait for the result
-            Map<String, Object> updatedBundleData = new HashMap<>();
-            updatedBundleData.put("cartBundleId", addedBundleRef.getId());
-            addedBundleRef.update(updatedBundleData);
-            // Return a response
-            return ResponseEntity.status(HttpStatus.CREATED).body("Bundle with ID: " + bundleId + " added to cart with ID: " + addedBundleRef.getId());
+            DocumentReference cartBundleRef = userRef.collection("basket").document();
+
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("bundleId", bundleId);
+
+            ApiFuture<WriteResult> writeResult = cartBundleRef.set(data);
+            // Wait for the operation to complete
+            writeResult.get();
+
+            return ResponseEntity.status(HttpStatus.CREATED).body("Bundle with ID: " + bundleId + " added to cart with ID: " + cartBundleRef.getId());
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bundle with ID: " + bundleId + " does not exist");
         }
