@@ -1,0 +1,11 @@
+be/kuleuven/divingrestservice/domain/ProductType.class
+be/kuleuven/divingrestservice/domain/ProductsRepository.class
+be/kuleuven/divingrestservice/domain/Product.class
+be/kuleuven/divingrestservice/DivingRestServiceApplication.class
+be/kuleuven/divingrestservice/exceptions/ProductNotFoundException.class
+be/kuleuven/divingrestservice/exceptions/ProductNotFoundAdvice.class
+be/kuleuven/divingrestservice/exceptions/ReservationAdvice.class
+be/kuleuven/divingrestservice/domain/Reservation$Status.class
+be/kuleuven/divingrestservice/exceptions/ReservationException.class
+be/kuleuven/divingrestservice/controllers/ProductsRestController.class
+be/kuleuven/divingrestservice/domain/Reservation.class
