@@ -392,6 +392,14 @@ function displayProducts(data){
     // Close container div for columns
     html += '</div>'; // End supplier-columns
 
+    // Add extra fields for bundle title and description
+    html += '<div class="bundle-fields">';
+    html += '<label for="bundleTitle">Bundle Title:</label>';
+    html += '<input type="text" id="bundleTitle" name="bundleTitle">';
+    html += '<label for="bundleDescription">Bundle Description:</label>';
+    html += '<textarea id="bundleDescription" name="bundleDescription"></textarea>';
+    html += '</div>'; // End bundle-fields
+
     // Add Complete button
     html += '<button id="completeButton">Add New Bundle To Stock</button>';
 
@@ -422,6 +430,7 @@ function checkValidBundle() {
     console.log('Checking the validity of the bundle...');
 
     let valid = true;
+    let selectedProductIds = [];
     //ADD CODE HERE TO CHECK VALID BUNDLE
     for (let i = 0; i < 3; i++) {
         const radioGroupName = 'supplier_' + i;
@@ -431,6 +440,7 @@ function checkValidBundle() {
         radioButtons.forEach(function(radioButton) {
             if (radioButton.checked) {
                 checked = true; // At least one radio button is checked
+                selectedProductIds.push(radioButton.value)
             }
         });
 
@@ -440,13 +450,18 @@ function checkValidBundle() {
         }
     }
 
+    const bundleTitle = document.getElementById('bundleTitle').value;
+    const bundleDescription = document.getElementById('bundleDescription').value;
+
+    if(bundleTitle === "" || bundleDescription === ""){valid = false}
+
 
     if(valid){
 
         // Display a confirmation dialog
         var confirmed = window.confirm('Are you sure you want to add this bundle?');
         if (confirmed) {
-            addBundle();
+            addBundle(selectedProductIds, bundleTitle, bundleDescription);
         }
 
 
@@ -456,7 +471,35 @@ function checkValidBundle() {
     }
 }
 
-function addBundle(){
-    //add code here to extract info from page and add new bundle to db
+function addBundle(selectedProductIds, bundleTitle, bundleDescription){
+    // Construct the request body
+    const body = new URLSearchParams();
+    body.append('productIds', JSON.stringify(selectedProductIds));
+    body.append('bundleTitle', bundleTitle); // Add bundle title to request body
+    body.append('bundleDescription', bundleDescription); // Add bundle description to request body
 
+    // Make the fetch request
+    fetch('/api/addBundle', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + tkn,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: body
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text();
+        })
+        .then((data) => {
+            // Handle the response data if needed
+            console.log('Bundle added successfully:', data);
+            return data;
+        })
+        .catch((error) => {
+            console.error('Error adding bundle:', error);
+            throw error; // Re-throw the error to propagate it further
+        });
 }

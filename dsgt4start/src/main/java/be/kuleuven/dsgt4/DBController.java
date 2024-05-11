@@ -262,4 +262,24 @@ class DBController {
 
         return json;
     }
+
+
+
+    @PostMapping("/api/addBundle")
+    public String addBundle(
+            @RequestParam("bundleTitle") String bundleTitle,
+            @RequestParam("bundleDescription") String bundleDescription,
+            @RequestParam("productIds") String productIds
+    ) {
+        // Process bundle data
+        StringBuilder response = new StringBuilder();
+        response.append("Bundle Title: ").append(bundleTitle).append("\n");
+        response.append("Bundle Description: ").append(bundleDescription).append("\n");
+        response.append("Selected Product Ids: ").append(productIds).append("\n");
+
+        System.out.println("Received bundle data:");
+        System.out.println(response.toString());
+
+        return "Bundle added successfully";
+    }
 }

@@ -357,3 +357,28 @@ input[type="password"] {
 #completeButton:hover {
     background-color: #0056b3; /* Darker blue on hover */
 }
+
+
+/* Style for bundle fields */
+.bundle-fields {
+    margin-top: 20px;
+}
+
+.bundle-fields label,
+.bundle-fields input,
+.bundle-fields textarea {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.bundle-fields input,
+.bundle-fields textarea {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+}
+
+.bundle-fields textarea {
+    resize: vertical; /* Allow vertical resizing */
+    min-height: 100px; /* Set a minimum height */
+}
