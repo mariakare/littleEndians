@@ -26,7 +26,7 @@ public class Reservation {
 
     //TODO: add a timeout/expiration for reservation???
     private Status status;
-    private Map<String, Integer> products; // Map of suitId to quantity
+    private Map<String, Integer> products; // Map of productId to quantity
 
     // Constructors
     public Reservation() {
@@ -73,12 +73,12 @@ public class Reservation {
     }
 
 
-    public void addSuit(String suitId, int quantity) {
-        products.put(suitId, quantity);
+    public void addProduct(String productId, int quantity) {
+        products.put(productId, quantity);
     }
 
-    public void removeSuit(String suitId) {
-        products.remove(suitId);
+    public void removeProduct(String productId) {
+        products.remove(productId);
     }
 
     // Equals and HashCode for object comparison

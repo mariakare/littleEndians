@@ -1,0 +1,10 @@
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-3/src/main/java/be/kuleuven/divingrestservice/exceptions/ProductNotFoundAdvice.java
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-3/src/main/java/be/kuleuven/divingrestservice/exceptions/ReservationAdvice.java
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-3/src/main/java/be/kuleuven/divingrestservice/exceptions/ProductNotFoundException.java
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-3/src/main/java/be/kuleuven/divingrestservice/exceptions/ReservationException.java
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-3/src/main/java/be/kuleuven/divingrestservice/domain/Reservation.java
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-3/src/main/java/be/kuleuven/divingrestservice/domain/ProductsRepository.java
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-3/src/main/java/be/kuleuven/divingrestservice/domain/ProductType.java
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-3/src/main/java/be/kuleuven/divingrestservice/controllers/ProductsRestController.java
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-3/src/main/java/be/kuleuven/divingrestservice/domain/Product.java
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-3/src/main/java/be/kuleuven/divingrestservice/DivingRestServiceApplication.java
