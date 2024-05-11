@@ -272,13 +272,12 @@ class DBController {
             @RequestParam("productIds") String productIds
     ) {
         // Process bundle data
-        StringBuilder response = new StringBuilder();
-        response.append("Bundle Title: ").append(bundleTitle).append("\n");
-        response.append("Bundle Description: ").append(bundleDescription).append("\n");
-        response.append("Selected Product Ids: ").append(productIds).append("\n");
+        String response = "Bundle Title: " + bundleTitle + "\n" +
+                "Bundle Description: " + bundleDescription + "\n" +
+                "Selected Product Ids: " + productIds + "\n";
 
         System.out.println("Received bundle data:");
-        System.out.println(response.toString());
+        System.out.println(response);
 
         return "Bundle added successfully";
     }
