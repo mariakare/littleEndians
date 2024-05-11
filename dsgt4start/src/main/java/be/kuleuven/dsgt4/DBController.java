@@ -1,8 +1,12 @@
 package be.kuleuven.dsgt4;
 
 import be.kuleuven.dsgt4.auth.WebSecurityConfig;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.cloud.firestore.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -79,32 +83,32 @@ class DBController {
         //required level: user
         var user = WebSecurityConfig.getUser();
 
-        WebClient webClient = webClientBuilder.build();
-        String responseBody = webClient.get()
-                .uri("http://localhost:8080/suits")
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-
-
-
-        // Return the list of product data for all bundles in the response
-        //return ResponseEntity.ok(allProductsData);
-//        String type="";
-//        String description="";
-        try {
-            // Convert JSON string to a Map or any other suitable data structure
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, Object> data = objectMapper.readValue(responseBody, new TypeReference<Map<String, Object>>() {});
-
-            // Add the data to Firestore
-            db.collection("data").document("suits").set(data);
-
-            //return ResponseEntity.ok("Data copied to Firestore successfully");
-        } catch (IOException e) {
-            e.printStackTrace();
-            //return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to copy data to Firestore");
-        }
+//        WebClient webClient = webClientBuilder.build();
+//        String responseBody = webClient.get()
+//                .uri("http://localhost:8080/suits")
+//                .retrieve()
+//                .bodyToMono(String.class)
+//                .block();
+//
+//
+//
+//        // Return the list of product data for all bundles in the response
+//        //return ResponseEntity.ok(allProductsData);
+////        String type="";
+////        String description="";
+//        try {
+//            // Convert JSON string to a Map or any other suitable data structure
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            Map<String, Object> data = objectMapper.readValue(responseBody, new TypeReference<Map<String, Object>>() {});
+//
+//            // Add the data to Firestore
+//            db.collection("data").document("suits").set(data);
+//
+//            //return ResponseEntity.ok("Data copied to Firestore successfully");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            //return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to copy data to Firestore");
+//        }
 
 
 
@@ -286,16 +290,75 @@ class DBController {
 
 
     @GetMapping("/api/getProducts")
-    public String getProducts() {
+    public String getProducts() throws JsonProcessingException {
         // Required level: user
         var user = WebSecurityConfig.getUser();
 
         WebClient webClient = webClientBuilder.build();
         String responseBody = webClient.get()
-                .uri("http://localhost:8080/suits")
+                .uri("http://localhost:8090/products")
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
+
+        // Modify the JSON response
+        //ObjectMapper objectMapper = new ObjectMapper();
+        StringBuilder jsonDataBuilder = new StringBuilder();
+        try {
+            // Parse the response JSON from the WebClient
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(responseBody);
+
+            // Extract productList from the _embedded object
+            JsonNode productListNode = rootNode.path("_embedded").path("productList");
+
+            // StringBuilder to construct the JSON string
+
+            jsonDataBuilder.append("{\n");
+            jsonDataBuilder.append("  \"suppliers\": [\n");
+            // Hardcode Supplier 1 details
+            jsonDataBuilder.append("    {\n");
+            jsonDataBuilder.append("      \"name\": \"Supplier 1\",\n");
+            jsonDataBuilder.append("      \"products\": [\n");
+            for (JsonNode productNode : productListNode) {
+                // Extract product details
+                String productName = productNode.path("name").asText();
+                double productPrice = productNode.path("price").asDouble();
+                String productDescription = productNode.path("description").asText();
+                String imageLink = productNode.path("imageLink").asText();
+
+                // Append product details to the JSON string
+                jsonDataBuilder.append("        {\n");
+                jsonDataBuilder.append("          \"id\": \"").append(productNode.path("id").asText()).append("\",\n");
+                jsonDataBuilder.append("          \"name\":  \"").append(productName).append("\",\n");
+                jsonDataBuilder.append("          \"price\": ").append(productPrice).append(",\n");
+                jsonDataBuilder.append("          \"description\": \"").append(productDescription).append("\",\n");
+                jsonDataBuilder.append("          \"imageLink\": \"").append(imageLink).append("\"\n");
+                jsonDataBuilder.append("        },\n");
+            }
+
+            // Remove the trailing comma from the last product object
+            if (productListNode.size() > 0) {
+                jsonDataBuilder.deleteCharAt(jsonDataBuilder.length() - 2); // Removes the last comma
+            }
+
+            // Close products array and supplier 1 object
+            jsonDataBuilder.append("      ]\n");
+            jsonDataBuilder.append("    },\n");
+
+            // Close suppliers array and JSON object
+//            jsonDataBuilder.append("  ]\n");
+//            jsonDataBuilder.append("}");
+
+            // Return the JSON string
+            //return jsonDataBuilder.toString();
+            responseBody=jsonDataBuilder.toString();
+
+        } catch (Exception e) {
+            // Handle exceptions appropriately
+            e.printStackTrace();
+            //return null; // or return an error response
+        }
 
 
         // Dummy data
@@ -382,6 +445,64 @@ class DBController {
                 "  ]\n" +
                 "}";
 
-        return json;
+        String json2="    {\n" +
+                "      \"name\": \"Supplier 2\",\n" +
+                "      \"products\": [\n" +
+                "        {\n" +
+                "          \"id\": 4,\n" +
+                "          \"name\": \"Product D\",\n" +
+                "          \"price\": 15.99,\n" +
+                "          \"description\": \"Description of Product D\",\n" +
+                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"id\": 5,\n" +
+                "          \"name\": \"Product E\",\n" +
+                "          \"price\": 25.99,\n" +
+                "          \"description\": \"Description of Product E\",\n" +
+                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"id\": 6,\n" +
+                "          \"name\": \"Product F\",\n" +
+                "          \"price\": 35.99,\n" +
+                "          \"description\": \"Description of Product F\",\n" +
+                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"name\": \"Supplier 3\",\n" +
+                "      \"products\": [\n" +
+                "        {\n" +
+                "          \"id\": 7,\n" +
+                "          \"name\": \"Product G\",\n" +
+                "          \"price\": 12.99,\n" +
+                "          \"description\": \"Description of Product G\",\n" +
+                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"id\": 8,\n" +
+                "          \"name\": \"Product H\",\n" +
+                "          \"price\": 22.99,\n" +
+                "          \"description\": \"Description of Product H\",\n" +
+                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"id\": 9,\n" +
+                "          \"name\": \"Product I\",\n" +
+                "          \"price\": 32.99,\n" +
+                "          \"description\": \"Description of Product I\",\n" +
+                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+
+        //return json;
+        jsonDataBuilder.append(json2);
+        System.out.println(jsonDataBuilder.toString());
+        return jsonDataBuilder.toString();
     }
 }

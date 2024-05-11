@@ -1,0 +1,10 @@
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-1/src/main/java/be/kuleuven/weddingrestservice/exceptions/ProductNotFoundAdvice.java
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-1/src/main/java/be/kuleuven/weddingrestservice/controllers/ProductsRestController.java
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-1/src/main/java/be/kuleuven/weddingrestservice/exceptions/ReservationException.java
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-1/src/main/java/be/kuleuven/weddingrestservice/domain/Product.java
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-1/src/main/java/be/kuleuven/weddingrestservice/exceptions/ProductNotFoundException.java
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-1/src/main/java/be/kuleuven/weddingrestservice/domain/ProductType.java
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-1/src/main/java/be/kuleuven/weddingrestservice/WeddingRestServiceApplication.java
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-1/src/main/java/be/kuleuven/weddingrestservice/exceptions/ReservationAdvice.java
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-1/src/main/java/be/kuleuven/weddingrestservice/domain/Reservation.java
+/home/maria/Documents/ds/littleEndians/dsgt-rest-company-1/src/main/java/be/kuleuven/weddingrestservice/domain/ProductsRepository.java
