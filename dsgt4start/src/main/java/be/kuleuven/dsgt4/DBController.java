@@ -288,40 +288,70 @@ class DBController {
     }
 
 
-
     @GetMapping("/api/getProducts")
     public String getProducts() throws JsonProcessingException {
-        // Required level: user
-        var user = WebSecurityConfig.getUser();
-
         WebClient webClient = webClientBuilder.build();
-        String responseBody1 = webClient.get()
-                .uri("http://localhost:8090/products")
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
 
-        // Modify the JSON response
-        //ObjectMapper objectMapper = new ObjectMapper();
         StringBuilder jsonDataBuilder = new StringBuilder();
-        try {
-            // Parse the response JSON from the WebClient
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode rootNode = objectMapper.readTree(responseBody1);
+        jsonDataBuilder.append("{\n");
+        jsonDataBuilder.append("  \"suppliers\": [\n");
 
-            // Extract productList from the _embedded object
+        // Array of endpoint URLs
+        String[] endpointURLs = {
+                "http://localhost:8090/products",
+                "http://localhost:8091/products",
+                "http://localhost:8093/products"
+        };
+
+        // Loop through each endpoint
+        for (String endpointURL : endpointURLs) {
+            String responseBody = webClient.get()
+                    .uri(endpointURL)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+
+            // Extract supplier name from endpoint URL
+            String supplierName = endpointURL.substring(endpointURL.lastIndexOf('/') + 1).toUpperCase();
+
+            // Append supplier details to JSON
+            jsonDataBuilder.append("    {\n");
+            jsonDataBuilder.append("      \"name\": \"").append(supplierName).append("\",\n");
+            jsonDataBuilder.append("      \"products\": [\n");
+
+            // Process products from the response
+            processProducts(responseBody, jsonDataBuilder);
+
+            // Close products array and supplier object
+            jsonDataBuilder.append("      ]\n");
+            jsonDataBuilder.append("    }");
+
+            // Add comma if there are more suppliers
+            if (!endpointURL.equals(endpointURLs[endpointURLs.length - 1])) {
+                jsonDataBuilder.append(",");
+            }
+            jsonDataBuilder.append("\n");
+        }
+
+        // Close suppliers array and JSON object
+        jsonDataBuilder.append("  ]\n");
+        jsonDataBuilder.append("}");
+
+        // Print and return the JSON string
+        String jsonString = jsonDataBuilder.toString();
+        System.out.println(jsonString);
+        return jsonString;
+    }
+
+    // Method to process products from the response and append to JSON
+    private void processProducts(String responseBody, StringBuilder jsonDataBuilder) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(responseBody);
             JsonNode productListNode = rootNode.path("_embedded").path("productList");
 
-            // StringBuilder to construct the JSON string
-
-            jsonDataBuilder.append("{\n");
-            jsonDataBuilder.append("  \"suppliers\": [\n");
-            // Hardcode Supplier 1 details
-            jsonDataBuilder.append("    {\n");
-            jsonDataBuilder.append("      \"name\": \"Supplier 1\",\n");
-            jsonDataBuilder.append("      \"products\": [\n");
+            // Iterate over products and append to JSON
             for (JsonNode productNode : productListNode) {
-                // Extract product details
                 String productName = productNode.path("name").asText();
                 double productPrice = productNode.path("price").asDouble();
                 String productDescription = productNode.path("description").asText();
@@ -341,276 +371,16 @@ class DBController {
             if (productListNode.size() > 0) {
                 jsonDataBuilder.deleteCharAt(jsonDataBuilder.length() - 2); // Removes the last comma
             }
-
-            // Close products array and supplier 1 object
-            jsonDataBuilder.append("      ]\n");
-            jsonDataBuilder.append("    },\n");
-
-            // Close suppliers array and JSON object
-//            jsonDataBuilder.append("  ]\n");
-//            jsonDataBuilder.append("}");
-
-            // Return the JSON string
-            //return jsonDataBuilder.toString();
-            responseBody1=jsonDataBuilder.toString();
-
         } catch (Exception e) {
-            // Handle exceptions appropriately
             e.printStackTrace();
-            //return null; // or return an error response
         }
-        String responseBody2 = webClient.get()
-                .uri("http://localhost:8091/products")
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-
-        // Modify the JSON response
-        //ObjectMapper objectMapper = new ObjectMapper();
-        StringBuilder jsonDataBuilder2 = new StringBuilder();
-        try {
-            // Parse the response JSON from the WebClient
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode rootNode = objectMapper.readTree(responseBody2);
-
-            // Extract productList from the _embedded object
-            JsonNode productListNode = rootNode.path("_embedded").path("productList");
-
-            // StringBuilder to construct the JSON string
-
-
-            // Hardcode Supplier 1 details
-            jsonDataBuilder2.append("    {\n");
-            jsonDataBuilder2.append("      \"name\": \"Supplier 2\",\n");
-            jsonDataBuilder2.append("      \"products\": [\n");
-            for (JsonNode productNode : productListNode) {
-                // Extract product details
-                String productName = productNode.path("name").asText();
-                double productPrice = productNode.path("price").asDouble();
-                String productDescription = productNode.path("description").asText();
-                String imageLink = productNode.path("imageLink").asText();
-
-                // Append product details to the JSON string
-                jsonDataBuilder2.append("        {\n");
-                jsonDataBuilder2.append("          \"id\": \"").append(productNode.path("id").asText()).append("\",\n");
-                jsonDataBuilder2.append("          \"name\":  \"").append(productName).append("\",\n");
-                jsonDataBuilder2.append("          \"price\": ").append(productPrice).append(",\n");
-                jsonDataBuilder2.append("          \"description\": \"").append(productDescription).append("\",\n");
-                jsonDataBuilder2.append("          \"imageLink\": \"").append(imageLink).append("\"\n");
-                jsonDataBuilder2.append("        },\n");
-            }
-
-            // Remove the trailing comma from the last product object
-            if (productListNode.size() > 0) {
-                jsonDataBuilder2.deleteCharAt(jsonDataBuilder2.length() - 2); // Removes the last comma
-            }
-
-            // Close products array and supplier 1 object
-            jsonDataBuilder2.append("      ]\n");
-            jsonDataBuilder2.append("    },\n");
-
-            // Close suppliers array and JSON object
-//            jsonDataBuilder.append("  ]\n");
-//            jsonDataBuilder.append("}");
-
-            // Return the JSON string
-            //return jsonDataBuilder.toString();
-            responseBody2=jsonDataBuilder2.toString();
-
-        } catch (Exception e) {
-            // Handle exceptions appropriately
-            e.printStackTrace();
-            //return null; // or return an error response
-        }
-
-
-
-
-        String responseBody3 = webClient.get()
-                .uri("http://localhost:8093/products")
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-
-        // Modify the JSON response
-        //ObjectMapper objectMapper = new ObjectMapper();
-        StringBuilder jsonDataBuilder3 = new StringBuilder();
-        try {
-            // Parse the response JSON from the WebClient
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode rootNode = objectMapper.readTree(responseBody3);
-
-            // Extract productList from the _embedded object
-            JsonNode productListNode = rootNode.path("_embedded").path("productList");
-
-            // StringBuilder to construct the JSON string
-
-
-            // Hardcode Supplier 1 details
-            jsonDataBuilder3.append("    {\n");
-            jsonDataBuilder3.append("      \"name\": \"Supplier 3\",\n");
-            jsonDataBuilder3.append("      \"products\": [\n");
-            for (JsonNode productNode : productListNode) {
-                // Extract product details
-                String productName = productNode.path("name").asText();
-                double productPrice = productNode.path("price").asDouble();
-                String productDescription = productNode.path("description").asText();
-                String imageLink = productNode.path("imageLink").asText();
-
-                // Append product details to the JSON string
-                jsonDataBuilder3.append("        {\n");
-                jsonDataBuilder3.append("          \"id\": \"").append(productNode.path("id").asText()).append("\",\n");
-                jsonDataBuilder3.append("          \"name\":  \"").append(productName).append("\",\n");
-                jsonDataBuilder3.append("          \"price\": ").append(productPrice).append(",\n");
-                jsonDataBuilder3.append("          \"description\": \"").append(productDescription).append("\",\n");
-                jsonDataBuilder3.append("          \"imageLink\": \"").append(imageLink).append("\"\n");
-                jsonDataBuilder3.append("        },\n");
-            }
-
-            // Remove the trailing comma from the last product object
-            if (productListNode.size() > 0) {
-                jsonDataBuilder3.deleteCharAt(jsonDataBuilder3.length() - 2); // Removes the last comma
-            }
-
-            // Close products array and supplier 1 object
-            jsonDataBuilder3.append("      ]\n");
-            jsonDataBuilder3.append("    }\n");
-            jsonDataBuilder3.append("  ]\n");
-            jsonDataBuilder3.append("}\n");
-
-            // Close suppliers array and JSON object
-//            jsonDataBuilder.append("  ]\n");
-//            jsonDataBuilder.append("}");
-
-            // Return the JSON string
-            //return jsonDataBuilder.toString();
-            responseBody3=jsonDataBuilder3.toString();
-
-        } catch (Exception e) {
-            // Handle exceptions appropriately
-            e.printStackTrace();
-            //return null; // or return an error response
-        }
-
-
-        // Dummy data
-        String json = "{\n" +
-                "  \"suppliers\": [\n" +
-                "    {\n" +
-                "      \"name\": \"Supplier 1\",\n" +
-                "      \"products\": [\n" +
-                "        {\n" +
-                "          \"id\": 1,\n" +
-                "          \"name\": \"Product A\",\n" +
-                "          \"price\": 10.99,\n" +
-                "          \"description\": \"Description of Product A\",\n" +
-                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"id\": 2,\n" +
-                "          \"name\": \"Product B\",\n" +
-                "          \"price\": 19.99,\n" +
-                "          \"description\": \"Description of Product B\",\n" +
-                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"id\": 3,\n" +
-                "          \"name\": \"Product C\",\n" +
-                "          \"price\": 29.99,\n" +
-                "          \"description\": \"Description of Product C\",\n" +
-                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
-                "        }\n" +
-                "      ]\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"name\": \"Supplier 2\",\n" +
-                "      \"products\": [\n" +
-                "        {\n" +
-                "          \"id\": 4,\n" +
-                "          \"name\": \"Product D\",\n" +
-                "          \"price\": 15.99,\n" +
-                "          \"description\": \"Description of Product D\",\n" +
-                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"id\": 5,\n" +
-                "          \"name\": \"Product E\",\n" +
-                "          \"price\": 25.99,\n" +
-                "          \"description\": \"Description of Product E\",\n" +
-                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"id\": 6,\n" +
-                "          \"name\": \"Product F\",\n" +
-                "          \"price\": 35.99,\n" +
-                "          \"description\": \"Description of Product F\",\n" +
-                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
-                "        }\n" +
-                "      ]\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"name\": \"Supplier 3\",\n" +
-                "      \"products\": [\n" +
-                "        {\n" +
-                "          \"id\": 7,\n" +
-                "          \"name\": \"Product G\",\n" +
-                "          \"price\": 12.99,\n" +
-                "          \"description\": \"Description of Product G\",\n" +
-                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"id\": 8,\n" +
-                "          \"name\": \"Product H\",\n" +
-                "          \"price\": 22.99,\n" +
-                "          \"description\": \"Description of Product H\",\n" +
-                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"id\": 9,\n" +
-                "          \"name\": \"Product I\",\n" +
-                "          \"price\": 32.99,\n" +
-                "          \"description\": \"Description of Product I\",\n" +
-                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
-                "        }\n" +
-                "      ]\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
-
-        String json2="    {\n" +
-                "      \"name\": \"Supplier 3\",\n" +
-                "      \"products\": [\n" +
-                "        {\n" +
-                "          \"id\": 7,\n" +
-                "          \"name\": \"Product G\",\n" +
-                "          \"price\": 12.99,\n" +
-                "          \"description\": \"Description of Product G\",\n" +
-                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"id\": 8,\n" +
-                "          \"name\": \"Product H\",\n" +
-                "          \"price\": 22.99,\n" +
-                "          \"description\": \"Description of Product H\",\n" +
-                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"id\": 9,\n" +
-                "          \"name\": \"Product I\",\n" +
-                "          \"price\": 32.99,\n" +
-                "          \"description\": \"Description of Product I\",\n" +
-                "          \"imageLink\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
-                "        }\n" +
-                "      ]\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
-
-        //return json;
-        jsonDataBuilder.append(jsonDataBuilder2);
-        jsonDataBuilder.append(jsonDataBuilder3);
-        //jsonDataBuilder.append(json2);
-        System.out.println(jsonDataBuilder.toString());
-        return jsonDataBuilder.toString();
     }
+
+
+
+
+
+
+
+
 }
