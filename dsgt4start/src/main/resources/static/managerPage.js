@@ -373,10 +373,6 @@ function setupEditForm(){
         editBundleModal.style.display = "none";
     });
 
-// Function to perform AJAX call to update the bundle
-    function updateBundle(bundleId, editedBundleTitle, editedBundleDescription) {
-        // Make your AJAX call here
-    }
 
 }
 
