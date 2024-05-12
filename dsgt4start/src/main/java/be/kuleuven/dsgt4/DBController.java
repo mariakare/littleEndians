@@ -48,6 +48,61 @@ class DBController {
 
     @GetMapping("/api/getBundles")
     public String getBundles() throws InterruptedException, ExecutionException {
+        // for now return constant since adding bundles doesn't work yet:
+        String jsonData = "{\n" +
+                "  \"bundles\": [\n" +
+                "    {\n" +
+                "      \"id\": \"bundle1\",\n" +
+                "      \"name\": \"Bundle 1\",\n" +
+                "      \"description\": \"Bundle 1 description goes here.\",\n" +
+                "      \"products\": [\n" +
+                "        {\n" +
+                "          \"name\": \"Product 1\",\n" +
+                "          \"description\": \"Short description for Product 1. Yes Yes Yes Yes Yes Yes Yes Yes Yes Yes\",\n" +
+                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"name\": \"Product 2\",\n" +
+                "          \"description\": \"Short description for Product 2.\",\n" +
+                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"name\": \"Product 3\",\n" +
+                "          \"description\": \"Short description for Product 3.\",\n" +
+                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"id\": \"bundle2\",\n" +
+                "      \"name\": \"Bundle 2\",\n" +
+                "      \"description\": \"Bundle 2 description goes here.\",\n" +
+                "      \"products\": [\n" +
+                "        {\n" +
+                "          \"name\": \"Product 4\",\n" +
+                "          \"description\": \"Short description for Product 4.\",\n" +
+                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"name\": \"Product 5\",\n" +
+                "          \"description\": \"Short description for Product 5.\",\n" +
+                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"name\": \"Product 6\",\n" +
+                "          \"description\": \"Short description for Product 6.\",\n" +
+                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+
+
+        return jsonData;
+
+        /*
+
         //required level: user
         var user = WebSecurityConfig.getUser();
 
@@ -160,6 +215,8 @@ class DBController {
             //return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
         return "";
+        */
+         //*/
     }
 
 
@@ -342,4 +399,26 @@ class DBController {
 
         return "Bundle added successfully";
     }
+
+
+    @PostMapping("/api/updateBundle")
+    public String updateBundle(
+            @RequestParam("bundleId") String bundleId,
+            @RequestParam("bundleTitle") String bundleTitle,
+            @RequestParam("bundleDescription") String bundleDescription
+    ) {
+        System.out.println("I am in updateBundle");
+        // Process updated bundle data
+        String response = "Bundle ID: " + bundleId + "\n" +
+                "Updated Bundle Title: " + bundleTitle + "\n" +
+                "Updated Bundle Description: " + bundleDescription + "\n";
+
+        System.out.println("Received updated bundle data:");
+        System.out.println(response);
+
+        return "Bundle updated successfully";
+    }
+
 }
+
+

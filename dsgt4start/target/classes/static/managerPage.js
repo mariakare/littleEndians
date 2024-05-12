@@ -1,6 +1,7 @@
 import {getBundles} from "./getContent.js";
 
 let tkn;
+let currentBundle;
 
 /**
  * Function used to setup the manager page. By default, opens the view bundles tab
@@ -66,7 +67,10 @@ function displayManagerBundles(data) {
         editButton.style.color = "#fff"; // Set text color to white
         editButton.addEventListener('click', () => {
             // Call a function to handle editing of the bundle
-            editBundle(bundle.id); // You need to implement this function
+            //editBundle(bundle.id); // You need to implement this function
+            currentBundle = bundle.id;
+            console.log(bundle.id);
+            //set global id var to current bundle id
         });
         bundleDiv.appendChild(editButton);
 
@@ -225,11 +229,44 @@ function attachEventListeners() {
 
         // Perform AJAX call to update the bundle with the new values
         // You need to implement this function
-        updateBundle(bundleId, editedBundleTitle, editedBundleDescription);
+        updateBundle(currentBundle, editedBundleTitle, editedBundleDescription);
 
         // Close the modal
         editBundleModal.style.display = "none";
     });
+}
+
+function updateBundle(bundleId, bundleTitle, bundleDescription){
+    // Construct the request body
+    const body = new URLSearchParams();
+    body.append('bundleId', bundleId); // Add bundle ID to request body
+    body.append('bundleTitle', bundleTitle); // Add updated bundle title to request body
+    body.append('bundleDescription', bundleDescription); // Add updated bundle description to request body
+
+    // Make the fetch request
+    fetch('/api/updateBundle', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + tkn,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: body
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text();
+        })
+        .then((data) => {
+            // Handle the response data if needed
+            console.log('Bundle updated successfully:', data);
+            return data;
+        })
+        .catch((error) => {
+            console.error('Error updating bundle:', error);
+            throw error; // Re-throw the error to propagate it further
+        });
 }
 
 
@@ -330,7 +367,7 @@ function setupEditForm(){
 
         // Perform AJAX call to update the bundle with the new values
         // You need to implement this function
-        updateBundle(bundleId, editedBundleTitle, editedBundleDescription);
+        updateBundle(currentBundle, editedBundleTitle, editedBundleDescription);
 
         // Close the modal
         editBundleModal.style.display = "none";
