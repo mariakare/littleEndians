@@ -244,7 +244,6 @@ class DBController {
     }
 
 
-
     @GetMapping("/api/getProducts")
     public String getProducts() throws JsonProcessingException {
         WebClient webClient = webClientBuilder.build();
@@ -334,47 +333,36 @@ class DBController {
     }
 
 
-
     @PostMapping("/api/addBundle")
-    public String addBundle(
+    public ResponseEntity<String> addBundle(
             @RequestParam("bundleTitle") String bundleTitle,
             @RequestParam("bundleDescription") String bundleDescription,
             @RequestParam("productIds") String productIds
     ) {
-        // Process bundle data
-        String response = "Bundle Title: " + bundleTitle + "\n" +
-                "Bundle Description: " + bundleDescription + "\n" +
-                "Selected Product Ids: " + productIds + "\n";
-
-        System.out.println("Received bundle data:");
-        System.out.println(response);
-
-        return "Bundle added successfully";
-    }
-
-    @PostMapping("/api/addBundle")
-    public ResponseEntity<String> addNewBundle(@RequestParam Map<String,String> bundleData) throws ExecutionException, InterruptedException {
-        // Get the current user's ID
         var user = WebSecurityConfig.getUser();
 
-        String productIdArrString = bundleData.get("productIds");
-        String productIdString = productIdArrString.substring(1, productIdArrString.length() - 1);
-        String[] productIds = productIdString.split(",");
+        String productIdString = productIds.substring(1, productIds.length() - 1);
+        String[] productIdSplit = productIdString.split(",");
 
 
-        for (int i = 0; i < productIds.length; i++) {
-            productIds[i] = productIds[i].replaceAll("\"", "");
+        for (int i = 0; i < productIdSplit.length; i++) {
+            productIdSplit[i] = productIdSplit[i].replaceAll("\"", "");
         }
 
 
         // Create a map to hold the data for the new document
         Map<String, Object> data = new HashMap<>();
-        data.put("name", "New Bundle");
-        data.put("description", "This is a new bundle");
+        data.put("name", bundleTitle);
+        data.put("description", bundleDescription);
         data.put("productIds", Arrays.asList(productIds));
         data.put("price", "$XX");
 
-        try{
+        // Process bundle data
+        String response = "Bundle Title: " + bundleTitle + "\n" +
+                "Bundle Description: " + bundleDescription + "\n" +
+                "Selected Product Ids: " + productIds + "\n";
+
+        try {
 
             DocumentReference bundleRef = db.collection("bundles").document();
 
