@@ -1,8 +1,8 @@
-/home/bmas/distributed-systems-lab/littleEndians/dsgt4start/src/main/java/be/kuleuven/dsgt4/auth/WebSecurityConfig.java
-/home/bmas/distributed-systems-lab/littleEndians/dsgt4start/src/main/java/be/kuleuven/dsgt4/HelloWorldController.java
-/home/bmas/distributed-systems-lab/littleEndians/dsgt4start/src/main/java/be/kuleuven/dsgt4/User.java
-/home/bmas/distributed-systems-lab/littleEndians/dsgt4start/src/main/java/be/kuleuven/dsgt4/Dsgt4Application.java
-/home/bmas/distributed-systems-lab/littleEndians/dsgt4start/src/main/java/be/kuleuven/dsgt4/UserMessage.java
-/home/bmas/distributed-systems-lab/littleEndians/dsgt4start/src/main/java/be/kuleuven/dsgt4/ViewController.java
-/home/bmas/distributed-systems-lab/littleEndians/dsgt4start/src/main/java/be/kuleuven/dsgt4/auth/SecurityFilter.java
-/home/bmas/distributed-systems-lab/littleEndians/dsgt4start/src/main/java/be/kuleuven/dsgt4/DBController.java
+/home/maria/Documents/ds/littleEndians/dsgt4start/src/main/java/be/kuleuven/dsgt4/Dsgt4Application.java
+/home/maria/Documents/ds/littleEndians/dsgt4start/src/main/java/be/kuleuven/dsgt4/HelloWorldController.java
+/home/maria/Documents/ds/littleEndians/dsgt4start/src/main/java/be/kuleuven/dsgt4/User.java
+/home/maria/Documents/ds/littleEndians/dsgt4start/src/main/java/be/kuleuven/dsgt4/ViewController.java
+/home/maria/Documents/ds/littleEndians/dsgt4start/src/main/java/be/kuleuven/dsgt4/UserMessage.java
+/home/maria/Documents/ds/littleEndians/dsgt4start/src/main/java/be/kuleuven/dsgt4/DBController.java
+/home/maria/Documents/ds/littleEndians/dsgt4start/src/main/java/be/kuleuven/dsgt4/auth/WebSecurityConfig.java
+/home/maria/Documents/ds/littleEndians/dsgt4start/src/main/java/be/kuleuven/dsgt4/auth/SecurityFilter.java
