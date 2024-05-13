@@ -384,20 +384,58 @@ class DBController {
 
 
     @PostMapping("/api/addBundle")
-    public String addBundle(
+    public ResponseEntity<String> addBundle(
             @RequestParam("bundleTitle") String bundleTitle,
             @RequestParam("bundleDescription") String bundleDescription,
             @RequestParam("productIds") String productIds
-    ) {
+    ) throws JsonProcessingException {
+        var user = WebSecurityConfig.getUser();
+
+
+        String productIdString = productIds.substring(1, productIds.length() - 1);
+        String[] productIdSplit = productIdString.split(",");
+
+
+
+        for (int i = 0; i < productIdSplit.length; i++) {
+            productIdSplit[i] = productIdSplit[i].replaceAll("\"", "");
+        }
+
+        System.out.println(productIdSplit);
+
+        // Create a map to hold the data for the new document
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", bundleTitle);
+        data.put("description", bundleDescription);
+        data.put("productIds", Arrays.asList(productIdSplit));
+        data.put("price", "$XX");
+
         // Process bundle data
         String response = "Bundle Title: " + bundleTitle + "\n" +
                 "Bundle Description: " + bundleDescription + "\n" +
                 "Selected Product Ids: " + productIds + "\n";
 
-        System.out.println("Received bundle data:");
-        System.out.println(response);
+        try {
 
-        return "Bundle added successfully";
+            DocumentReference bundleRef = db.collection("bundles").document();
+
+
+            // Set the data for the new document
+            ApiFuture<WriteResult> writeResult = bundleRef.set(data);
+            // Wait for the operation to complete
+            writeResult.get();
+
+            // Retrieve the Firestore-generated ID of the new document
+            String bundleId = bundleRef.getId();
+
+            // Return a success response with the ID of the newly created document
+            return ResponseEntity.status(HttpStatus.CREATED).body("Bundle created with ID: " + bundleId);
+        } catch (Exception e) {
+            // Handle any exceptions that might occur during the operation
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating document: " + e.getMessage());
+        }
+
     }
 
 
