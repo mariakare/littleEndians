@@ -444,7 +444,7 @@ class DBController {
             @RequestParam("bundleDescription") String bundleDescription
     ) {
         System.out.println("I am in updateBundle");
-        bundleId="p0fZJFqpH3SByUR9NwU2";
+        bundleId="mnLObSBKMBZGJ8UzHTrI";//TODO: This needs to be gone
         // Process updated bundle data
         String response = "Bundle ID: " + bundleId + "\n" +
                 "Updated Bundle Title: " + bundleTitle + "\n" +
@@ -478,6 +478,35 @@ class DBController {
         } catch (Exception e) {
             e.printStackTrace();
             return "Failed to update bundle";
+        }
+    }
+
+    @DeleteMapping("/api/deleteBundle/{bundleId}")
+    public String deleteBundle(@PathVariable String bundleId) {
+        System.out.println("I am in deleteBundle");
+        bundleId="tHpRkHWJp5zd0g8BfSf8";
+
+        try {
+            // Reference to the bundle document in Firestore
+            DocumentReference bundleRef = db.collection("bundles").document(bundleId);
+
+            // Fetch the bundle document
+            DocumentSnapshot bundleSnapshot = bundleRef.get().get();
+
+            if (bundleSnapshot.exists()) {
+                // Delete the bundle document
+                bundleRef.delete();
+
+                System.out.println("Bundle deleted successfully");
+
+                return "Bundle deleted successfully";
+            } else {
+                System.out.println("Bundle with ID " + bundleId + " does not exist");
+                return "Bundle with ID " + bundleId + " does not exist";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed to delete bundle";
         }
     }
 

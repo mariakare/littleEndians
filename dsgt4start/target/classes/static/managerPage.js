@@ -24,6 +24,35 @@ export function setupManagerPage(token){
 }
 
 /**
+ * Adapts the header for the manager page - adds 2 tabs. 1 for viewing all bundles and editing them
+ * and one for adding new bundles
+ */
+function adaptHeaderManager() {
+    // Create the tabs
+    const tab1 = createTab("Active bundles", "/page1");
+    const tab2 = createTab("Add new bunldes", "/page2");
+
+    // Append tabs to the header menu
+    const headerMenu = document.querySelector(".header-menu");
+    headerMenu.insertBefore(tab2, headerMenu.lastElementChild); // Insert Page 2 tab before logout button
+    headerMenu.insertBefore(tab1, tab2); // Insert Page 1 tab before Page 2 tab
+
+
+    //remove cart button
+    const viewCartButton = document.getElementById("btnShoppingBasket");
+    if (viewCartButton) {
+        viewCartButton.style.display = "none";
+    }
+
+    // Initially set the first tab as active
+    setActiveTab(tab1);
+}
+
+
+/// BELOW EVERYTHING FOR EDIT/DELETE BUNDLES PAGE
+
+
+/**
  * Given json of all bundles, displays each bundle along with a edit and delete button
  * @param data json containing all bundles
  */
@@ -99,24 +128,13 @@ function displayManagerBundles(data) {
 }
 
 
-/**
- * Adapts the header for the manager page - adds 2 tabs. 1 for viewing all bundles and editing them
- * and one for adding new bundles
- */
-function adaptHeaderManager(){
-    // Create the tabs
-    const tab1 = createTab("Active bundles", "/page1");
-    const tab2 = createTab("Add new bunldes", "/page2");
-
-    // Append tabs to the header menu
-    const headerMenu = document.querySelector(".header-menu");
-    headerMenu.insertBefore(tab2, headerMenu.lastElementChild); // Insert Page 2 tab before logout button
-    headerMenu.insertBefore(tab1, tab2); // Insert Page 1 tab before Page 2 tab
-
-    // Initially set the first tab as active
-    setActiveTab(tab1);
 
 
+// Function to set active tab
+function setActiveTab(tab) {
+    const tabs = document.querySelectorAll(".header-tab");
+    tabs.forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
 }
 
 
@@ -161,161 +179,6 @@ function createTab(label) {
     return tab;
 }
 
-function getProducts() {
-    return fetch('/api/getProducts', {
-        headers: { Authorization: 'Bearer ' + tkn}
-    })
-        .then((response) => {
-            return response.text();
-        })
-        .then((data) => {
-            return data;
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
-
-
-}
-
-
-// /**
-//  * Attaches event listeners to edit button and the close button of tttttthe modal window
-//  */
-// function attachEventListeners() {
-//     // Get the modal
-//     const editBundleModal = document.getElementById("editBundleModal");
-//
-//     // Get the button that opens the modal
-//     const editButtons = document.querySelectorAll(".edit-button");
-//
-//     // Get the <span> element that closes the modal
-//     const closeBtn = document.querySelector(".close");
-//
-//     // When the user clicks the button, open the modal
-//     editButtons.forEach(button => {
-//         button.addEventListener("click", () => {
-//             // Get the current values of bundle title and description
-//             const bundleTitle = button.parentNode.querySelector(".bundle-title").textContent;
-//             const bundleDescription = button.parentNode.querySelector(".bundle-description").textContent;
-//
-//             // Set the current values in the form
-//             document.getElementById("editBundleTitle").value = bundleTitle;
-//             document.getElementById("editBundleDescription").value = bundleDescription;
-//
-//             // Show the modal
-//             editBundleModal.style.display = "block";
-//         });
-//     });
-//
-//     // When the user clicks on <span> (x), close the modal
-//     closeBtn.addEventListener("click", () => {
-//         editBundleModal.style.display = "none";
-//     });
-//
-//     // When the user clicks anywhere outside of the modal, close it
-//     window.addEventListener("click", (event) => {
-//         if (event.target == editBundleModal) {
-//             editBundleModal.style.display = "none";
-//         }
-//     });
-//
-//     // Handle form submission
-//     const editBundleForm = document.getElementById("editBundleForm");
-//     editBundleForm.addEventListener("submit", (event) => {
-//         event.preventDefault(); // Prevent the form from submitting normally
-//
-//         // Get the edited values
-//         const editedBundleTitle = document.getElementById("editBundleTitle").value;
-//         const editedBundleDescription = document.getElementById("editBundleDescription").value;
-//
-//         // Perform AJAX call to update the bundle with the new values
-//         // You need to implement this function
-//         updateBundle(currentBundle, editedBundleTitle, editedBundleDescription);
-//
-//         // Close the modal
-//         editBundleModal.style.display = "none";
-//     });
-// }
-
-function updateBundle(bundleId, bundleTitle, bundleDescription){
-    // Construct the request body
-    const body = new URLSearchParams();
-    body.append('bundleId', bundleId); // Add bundle ID to request body
-    body.append('bundleTitle', bundleTitle); // Add updated bundle title to request body
-    body.append('bundleDescription', bundleDescription); // Add updated bundle description to request body
-
-    // Make the fetch request
-    fetch('/api/updateBundle', {
-        method: 'POST',
-        headers: {
-            'Authorization': 'Bearer ' + tkn,
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: body
-    })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text();
-        })
-        .then((data) => {
-            // Handle the response data if needed
-            console.log('Bundle updated successfully:', data);
-            return data;
-        })
-        .catch((error) => {
-            console.error('Error updating bundle:', error);
-            throw error; // Re-throw the error to propagate it further
-        });
-}
-
-
-// Function to set active tab
-function setActiveTab(tab) {
-    const tabs = document.querySelectorAll(".header-tab");
-    tabs.forEach(t => t.classList.remove("active"));
-    tab.classList.add("active");
-}
-
-function removeViewCartButton() {
-    const viewCartButton = document.getElementById("btnShoppingBasket");
-    if (viewCartButton) {
-        viewCartButton.style.display = "none";
-    }
-}
-
-
-/**
- * API call to delete a given bundle
- * @param bundleId
- */
-function deleteBundle(bundleId) {
-    fetch(`/api/deleteBundle/${bundleId}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${tkn}` // Include the token in the headers
-        },
-        // Add any other options if needed
-    })
-        .then(response => {
-            if (response.ok) {
-                // Bundle deleted successfully
-                console.log("Bundle deleted successfully");
-                displayManagerBundles(tkn);
-            } else {
-                // Error occurred while deleting the bundle
-                console.error("Error deleting bundle:", response.statusText);
-                // Optionally, you can display an error message to the user
-            }
-        })
-        .catch(error => {
-            console.error("Error deleting bundle:", error);
-            // Optionally, you can display an error message to the user
-        });
-}
 
 /**
  * Basic setup for modal window used to edit bundles
@@ -371,13 +234,18 @@ function setupEditForm(){
         // You need to implement this function
         updateBundle(currentBundle, editedBundleTitle, editedBundleDescription);
 
+
         // Close the modal
         editBundleModal.style.display = "none";
+
     });
 
 
 }
 
+
+
+/// EVERYTHING FOR NEW BUNDLE PAGE BELOW:
 
 
 function displayProducts(data){
@@ -441,24 +309,13 @@ function displayProducts(data){
     const contentDiv = document.getElementById('contentdiv');
     contentDiv.innerHTML = html;
 
-    setupEventListeners();
-}
 
-
-function     setupEventListeners(){
-
-
-    //// EVENT LISTENER FOR COMPLETE BUTTON
     const completeButton = document.getElementById('completeButton');
-
-
     if (completeButton) {
-        // Disable the button
-        //completeButton.disabled = true;
         completeButton.addEventListener('click', checkValidBundle);
     }
-
 }
+
 
 function checkValidBundle() {
     // Your code to check the validity of the bundle goes here
@@ -505,6 +362,15 @@ function checkValidBundle() {
     }
 }
 
+
+
+
+
+
+/// BELOW WE HAVE ALL CALLS TO THE SERVER
+
+
+
 function addBundle(selectedProductIds, bundleTitle, bundleDescription){
     // Construct the request body
     const body = new URLSearchParams();
@@ -538,3 +404,151 @@ function addBundle(selectedProductIds, bundleTitle, bundleDescription){
             throw error; // Re-throw the error to propagate it further
         });
 }
+
+
+/**
+ * API call to delete a given bundle
+ * @param bundleId
+ */
+function deleteBundle(bundleId) {
+    fetch(`/api/deleteBundle/${bundleId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${tkn}` // Include the token in the headers
+        },
+        // Add any other options if needed
+    })
+        .then(response => {
+            if (response.ok) {
+                // Bundle deleted successfully
+                console.log("Bundle deleted successfully");
+                displayManagerBundles(tkn);
+            } else {
+                // Error occurred while deleting the bundle
+                console.error("Error deleting bundle:", response.statusText);
+                // Optionally, you can display an error message to the user
+            }
+        })
+        .catch(error => {
+            console.error("Error deleting bundle:", error);
+            // Optionally, you can display an error message to the user
+        });
+}
+
+function updateBundle(bundleId, bundleTitle, bundleDescription){
+    // Construct the request body
+    const body = new URLSearchParams();
+    body.append('bundleId', bundleId); // Add bundle ID to request body
+    body.append('bundleTitle', bundleTitle); // Add updated bundle title to request body
+    body.append('bundleDescription', bundleDescription); // Add updated bundle description to request body
+
+    // Make the fetch request
+    fetch('/api/updateBundle', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + tkn,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: body
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text();
+        })
+        .then((data) => {
+            // Handle the response data if needed
+            console.log('Bundle updated successfully:', data);
+            displayManagerBundles(tkn);
+
+            return data;
+        })
+        .catch((error) => {
+            console.error('Error updating bundle:', error);
+            throw error; // Re-throw the error to propagate it further
+        });
+}
+
+function getProducts() {
+    return fetch('/api/getProducts', {
+        headers: { Authorization: 'Bearer ' + tkn}
+    })
+        .then((response) => {
+            return response.text();
+        })
+        .then((data) => {
+            return data;
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+
+
+}
+
+
+
+
+
+/// NO LONGER NEEDED BUT KEEPING JUST IN CASE:
+
+// /**
+//  * Attaches event listeners to edit button and the close button of tttttthe modal window
+//  */
+// function attachEventListeners() {
+//     // Get the modal
+//     const editBundleModal = document.getElementById("editBundleModal");
+//
+//     // Get the button that opens the modal
+//     const editButtons = document.querySelectorAll(".edit-button");
+//
+//     // Get the <span> element that closes the modal
+//     const closeBtn = document.querySelector(".close");
+//
+//     // When the user clicks the button, open the modal
+//     editButtons.forEach(button => {
+//         button.addEventListener("click", () => {
+//             // Get the current values of bundle title and description
+//             const bundleTitle = button.parentNode.querySelector(".bundle-title").textContent;
+//             const bundleDescription = button.parentNode.querySelector(".bundle-description").textContent;
+//
+//             // Set the current values in the form
+//             document.getElementById("editBundleTitle").value = bundleTitle;
+//             document.getElementById("editBundleDescription").value = bundleDescription;
+//
+//             // Show the modal
+//             editBundleModal.style.display = "block";
+//         });
+//     });
+//
+//     // When the user clicks on <span> (x), close the modal
+//     closeBtn.addEventListener("click", () => {
+//         editBundleModal.style.display = "none";
+//     });
+//
+//     // When the user clicks anywhere outside of the modal, close it
+//     window.addEventListener("click", (event) => {
+//         if (event.target == editBundleModal) {
+//             editBundleModal.style.display = "none";
+//         }
+//     });
+//
+//     // Handle form submission
+//     const editBundleForm = document.getElementById("editBundleForm");
+//     editBundleForm.addEventListener("submit", (event) => {
+//         event.preventDefault(); // Prevent the form from submitting normally
+//
+//         // Get the edited values
+//         const editedBundleTitle = document.getElementById("editBundleTitle").value;
+//         const editedBundleDescription = document.getElementById("editBundleDescription").value;
+//
+//         // Perform AJAX call to update the bundle with the new values
+//         // You need to implement this function
+//         updateBundle(currentBundle, editedBundleTitle, editedBundleDescription);
+//
+//         // Close the modal
+//         editBundleModal.style.display = "none";
+//     });
+// }

@@ -234,8 +234,10 @@ function setupEditForm(){
         // You need to implement this function
         updateBundle(currentBundle, editedBundleTitle, editedBundleDescription);
 
+
         // Close the modal
         editBundleModal.style.display = "none";
+
     });
 
 
@@ -459,6 +461,8 @@ function updateBundle(bundleId, bundleTitle, bundleDescription){
         .then((data) => {
             // Handle the response data if needed
             console.log('Bundle updated successfully:', data);
+            displayManagerBundles(tkn);
+
             return data;
         })
         .catch((error) => {
@@ -483,6 +487,10 @@ function getProducts() {
 
 
 }
+
+
+
+
 
 /// NO LONGER NEEDED BUT KEEPING JUST IN CASE:
 
