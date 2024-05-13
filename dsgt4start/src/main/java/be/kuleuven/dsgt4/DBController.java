@@ -322,35 +322,16 @@ class DBController {
         }
     }
 
-
-
-    @PostMapping("/api/addBundle")
-    public ResponseEntity<String> addBundle(
-            @RequestParam("bundleTitle") String bundleTitle,
-            @RequestParam("bundleDescription") String bundleDescription,
-            @RequestParam("productIds") String productIds
-    ) throws JsonProcessingException, ExecutionException, InterruptedException {
-        var user = WebSecurityConfig.getUser();
-        WebClient webClient = webClientBuilder.build();
-
-
-        String productIdString = productIds.substring(1, productIds.length() - 1);
-        String[] productIdSplit = productIdString.split(",");
-        String[] productIdFinal = new String[productIdSplit.length];
-
-
-
-        for (int i = 0; i < productIdSplit.length; i++) {
-            productIdSplit[i] = productIdSplit[i].replaceAll("\"", "");
-        }
-
+    private String[] addProduct(String[] productIds){
         //CollectionReference products = db.collection("products");
+        WebClient webClient = webClientBuilder.build();
         int i=0;
+        String[] productIdList = new String[productIds.length];
 
-        for (String id: productIdSplit){
+        for (String id: productIds){
 
             String[] idParts = id.split("@");
-            productIdFinal[i]=(idParts[1]);
+            productIdList[i]=(idParts[1]);
 
             DocumentReference docRef = db.collection("products").document(idParts[1]);
             //System.out.println("TESTINGGG");
@@ -404,6 +385,31 @@ class DBController {
 
             i++;
         }
+        return productIdList;
+    }
+
+
+
+    @PostMapping("/api/addBundle")
+    public ResponseEntity<String> addBundle(
+            @RequestParam("bundleTitle") String bundleTitle,
+            @RequestParam("bundleDescription") String bundleDescription,
+            @RequestParam("productIds") String productIds
+    ) throws JsonProcessingException, ExecutionException, InterruptedException {
+        var user = WebSecurityConfig.getUser();
+
+
+        String productIdString = productIds.substring(1, productIds.length() - 1);
+        String[] productIdSplit = productIdString.split(",");
+
+
+
+
+        for (int i = 0; i < productIdSplit.length; i++) {
+            productIdSplit[i] = productIdSplit[i].replaceAll("\"", "");
+        }
+
+        String[] productIdFinal = addProduct(productIdSplit);
 
         // Create a map to hold the data for the new document
         Map<String, Object> data = new HashMap<>();
