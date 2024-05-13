@@ -51,12 +51,6 @@ class DBController {
     @GetMapping("/api/getBundles")
     public String getBundles() throws InterruptedException, ExecutionException {
         var user = WebSecurityConfig.getUser();
-        WebClient webClient = webClientBuilder.build();
-        String[] endpointURLs = {
-                "http://sud.switzerlandnorth.cloudapp.azure.com:8080/products/",
-                "http://ivan.canadacentral.cloudapp.azure.com:8080/products/",
-                "http://sud.japaneast.cloudapp.azure.com:8080/products/"
-        };
 
         try {
             // Reference to the bundles collection in Firestore
