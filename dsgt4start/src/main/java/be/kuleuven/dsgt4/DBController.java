@@ -101,14 +101,14 @@ class DBController {
 
         return jsonData;
 
-        /*
 
+/*
         //required level: user
         var user = WebSecurityConfig.getUser();
 
         WebClient webClient = webClientBuilder.build();
         String responseBody = webClient.get()
-                .uri("http://localhost:8080/suits")
+                .uri("http://localhost:8090/products")
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
@@ -216,7 +216,9 @@ class DBController {
         }
         return "";
 
-         */
+
+ */
+
     }
 
 

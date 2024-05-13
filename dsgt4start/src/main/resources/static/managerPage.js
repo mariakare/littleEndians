@@ -136,8 +136,10 @@ function createTab(label) {
             getBundles(tkn)
                 .then((data) => {
                     displayManagerBundles(data);
-                    // Reattach event listeners after displaying bundles
-                    attachEventListeners();
+                    setupEditForm();
+                    // displayManagerBundles(data);
+                    // // Reattach event listeners after displaying bundles
+                    // attachEventListeners();
                 })
                 .catch((error) => {
                     console.error(error);
