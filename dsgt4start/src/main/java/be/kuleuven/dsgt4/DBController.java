@@ -160,6 +160,36 @@ class DBController {
         }
     }
 
+    @PostMapping("/api/addToCart")
+    public ResponseEntity<String> addToCart(@RequestBody String bundleId) throws ExecutionException, InterruptedException {
+        // Get the current user's ID
+        var user = WebSecurityConfig.getUser();
+
+        // Reference to the user's document
+        DocumentReference userRef = db.collection("user").document(user.getEmail());
+
+        // Reference to the bundle document
+        DocumentReference bundleRef = db.collection("bundles").document(bundleId);
+
+        // Get the bundle data
+        ApiFuture<DocumentSnapshot> bundleFuture = bundleRef.get();
+        DocumentSnapshot bundleSnapshot = bundleFuture.get();
+        if (bundleSnapshot.exists()) {
+            Map<String, Object> bundleData = bundleSnapshot.getData();
+
+            // Add the bundle document to the basket subcollection under the user's document
+            DocumentReference addedBundleRef = userRef.collection("basket").add(bundleData).get();
+            // Wait for the result
+            Map<String, Object> updatedBundleData = new HashMap<>();
+            updatedBundleData.put("cartBundleId", addedBundleRef.getId());
+            addedBundleRef.update(updatedBundleData);
+            // Return a response
+            return ResponseEntity.status(HttpStatus.CREATED).body("Bundle with ID: " + bundleId + " added to cart with ID: " + addedBundleRef.getId());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bundle with ID: " + bundleId + " does not exist");
+        }
+    }
+
     @GetMapping("/api/getCart")
     public List<Map<String, Object>> getCart() throws ExecutionException, InterruptedException {
         var user = WebSecurityConfig.getUser();
@@ -320,16 +350,38 @@ class DBController {
 
             String[] idParts = id.split("@");
             productIdFinal[i]=(idParts[1]);
-/*
-            DocumentReference docRef = db.collection("products").document(idParts[0]);
+
+            DocumentReference docRef = db.collection("products").document(idParts[1]);
+            //System.out.println("TESTINGGG");
 
             ApiFuture<DocumentSnapshot> future = docRef.get();
-            DocumentSnapshot document = future.get();
+            try {
+                // Get the document snapshot
+                DocumentSnapshot document = future.get();
 
-            if (!document.exists()){
-                //code to duplicate json?
+                // Check if the document exists
+                if (document.exists()) {
+                    // Document exists
+                    System.out.println("Document exists: " + document.getData());
+                } else {
+                    // Document doesn't exist, create it
+                    Map<String, Object> data = new HashMap<>();
+                    // Add data to the document as needed
+                    data.put("field1", "value1");
+                    data.put("field2", "value2");
+
+                    // Asynchronously set the data for the document
+                    ApiFuture<WriteResult> result = docRef.set(data);
+
+                    // Wait for the set operation to complete
+                    result.get();
+                    System.out.println("Document created!");
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                // Handle any errors that may occur
+                System.err.println("Error getting document: " + e.getMessage());
             }
-*/
+
             i++;
         }
 
