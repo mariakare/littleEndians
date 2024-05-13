@@ -1,7 +1,7 @@
 package be.kuleuven.weddingrestservice.domain;
 
 import be.kuleuven.weddingrestservice.exceptions.ReservationException;
-import be.kuleuven.weddingrestservice.exceptions.SuitNotFoundException;
+import be.kuleuven.weddingrestservice.exceptions.ProductNotFoundException;
 
 import org.springframework.stereotype.Component;
 
@@ -20,7 +20,7 @@ public class ProductsRepository {
     private final Map<String, Reservation> reservations = new HashMap<>();
 
     @PostConstruct
-    public void initializeSuits() {
+    public void initializeProducts() {
 
         Product suit = new Product();
         suit.setId("5268203c-de76-4921-a3e3-439db69c462a");
@@ -46,7 +46,7 @@ public class ProductsRepository {
         decorations.setId("cfd1601f-29a0-485d-8d21-7607ec0340c8");
         decorations.setName("Decoration Set");
         decorations.setPrice(500.0);
-        decorations.setDescription("Best suit for underwater diving");
+        decorations.setDescription("Complete set of wedding decorations");
         decorations.setImageLink("https://tableclothsfactory.com/cdn/shop/collections/Wedding_Ceremony_Decor.jpg?v=1675883334&width=1200");
         decorations.setAmountAvailable(20);
         decorations.setProductType(ProductType.DECORATION);
@@ -73,7 +73,7 @@ public class ProductsRepository {
 
     public Product updateProduct(String id, Product updatedProduct) {
         if (!products.containsKey(id)) {
-            throw new SuitNotFoundException(id);
+            throw new ProductNotFoundException(id);
         }
         updatedProduct.setId(id); // Ensure ID remains consistent
         products.put(id, updatedProduct);
@@ -82,27 +82,27 @@ public class ProductsRepository {
 
     public void deleteProduct(String id) {
         if (!products.containsKey(id)) {
-            throw new SuitNotFoundException(id);
+            throw new ProductNotFoundException(id);
         }
         products.remove(id);
     }
 
 
-    public synchronized Reservation reserveProducts(Map<String, Integer> suitsToReserve) {
+    public synchronized Reservation reserveProducts(Map<String, Integer> productsToReserve) {
 
         String reservationId = UUID.randomUUID().toString();
         Reservation reservation = new Reservation(reservationId, LocalDateTime.now());
 
-        for (Map.Entry<String, Integer> entry : suitsToReserve.entrySet()) {
-            String suitId = entry.getKey();
+        for (Map.Entry<String, Integer> entry : productsToReserve.entrySet()) {
+            String productId = entry.getKey();
             int quantity = entry.getValue();
-            Product product = getProductById(suitId).orElseThrow(() -> new SuitNotFoundException(suitId));
+            Product product = getProductById(productId).orElseThrow(() -> new ProductNotFoundException(productId));
             if (product.getAmountAvailable() < quantity) {
                 reservation = null;
-                throw new ReservationException("Not enough " + product.getName() + " suits available.");
+                throw new ReservationException("Not enough " + product.getName() + " " + product.getProductType() + " available.");
             }
-            // Add the suit to the reservation and update availability
-            reservation.addSuit(suitId, quantity);
+            // Add the product to the reservation and update availability
+            reservation.addProduct(productId, quantity);
             product.setAmountAvailable(product.getAmountAvailable() - quantity);
         }
 
@@ -123,22 +123,12 @@ public class ProductsRepository {
 
         Reservation reservation = getReservationById(reservationId);
 
-        // I have to update suit quantities by going through the reservation, getting suits, and updating the amount available
-        // Check if any suits in the reservation have become unavailable
         for (Map.Entry<String, Integer> entry : reservation.getProducts().entrySet()) {
-            String suitId = entry.getKey();
+            String productId = entry.getKey();
             int quantity = entry.getValue();
-            Product product = getProductById(suitId).orElseThrow(() -> new SuitNotFoundException(suitId));
-//            if (suit.getAmountAvailable() < quantity) {
-//                // Suit is no longer available, potentially reserved by someone else
-//                reservation.setStatus(Reservation.Status.CANCELLED);
-//                throw new ReservationException("Suit(s) in reservation are no longer available.");
-//            }
-//            else{
-                // Suit is available but I don't know...manager cancels reservation for instance
-                product.setAmountAvailable(product.getAmountAvailable() + quantity);
-                reservation.setStatus(Reservation.Status.CANCELLED);
-            //}
+            Product product = getProductById(productId).orElseThrow(() -> new ProductNotFoundException(productId));
+            product.setAmountAvailable(product.getAmountAvailable() + quantity);
+            reservation.setStatus(Reservation.Status.CANCELLED);
         }
 
     }

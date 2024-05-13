@@ -4,32 +4,7 @@ body {
     padding: 0;
 }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #333;
-    color: #fff;
-}
 
-.header-menu {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-.header-title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-right: 20px;
-    color: #fff;
-}
-
-.header-name {
-    margin-right: 20px;
-}
 
 .page {
     display: flex;
@@ -107,15 +82,7 @@ header {
     margin-top: auto;
 }
 
-.add-to-cart {
-    display: block;
-    margin-top: 10px;
-    padding: 5px 10px;
-    background-color: #007bff;
-    color: #fff;
-    text-align: center;
-    text-decoration: none;
-}
+
 
 footer {
     position: fixed;
@@ -128,32 +95,7 @@ footer {
     text-align: center;
 }
 
-.icon-buttons-container {
-    display: flex;
-    gap: 10px;
-}
 
-.icon-button, .header-icon {
-    background-color: #007bff;
-    color: #fff;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.icon-button:hover, .header-icon:hover {
-    background-color: #0056b3;
-}
-
-.icon-button i {
-    margin-right: 5px;
-}
-
-.header-icon {
-    background-color: #dc3545;
-}
 
 
 .login {
@@ -206,74 +148,13 @@ input[type="password"] {
 
 
 
-.header-tab {
-    cursor: pointer;
-    padding: 10px 15px;
-    border-radius: 4px;
-}
-
-.header-tab.active {
-    background-color: #007bff;
-    color: #fff;
-}
-
-.header-tab:hover {
-    background-color: #0056b3;
-}
 
 
 
 
 
-#editBundleModal.modal {
-    display: none; /* Hide the modal by default */
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.4);
-}
 
-#editBundleModal .modal-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-}
 
-#editBundleModal .close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-#editBundleModal .close:hover,
-#editBundleModal .close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-#editBundleForm button[type="submit"] {
-    background-color: blue;
-    color: white;
-    width: 100%;
-    padding: 10px 0;
-    border: none;
-    cursor: pointer;
-}
-
-#editBundleForm button[type="submit"]:hover {
-    background-color: darkblue;
-}
 
 .cart{
     display: flex;
@@ -312,48 +193,3 @@ input[type="password"] {
 
 
 
-/*THE NEXT PART IS FOR PRODUCT DISPLAY ON NEW BUNDLES PAGE*/
-
-/* Adjusted styles for supplier columns */
-.supplier-columns {
-    display: flex;
-    justify-content: space-between; /* Distribute columns evenly */
-    width: 100%; /* Ensure the columns span the full width */
-}
-
-.supplier-column {
-    flex: 1; /* Allow each column to grow and occupy equal space */
-    max-width: calc(33.33% - 20px); /* Set maximum width for each column */
-    margin: 0 10px;
-    padding: 10px;
-    border: 1px solid #ccc;
-}
-
-.new-product {
-    margin-bottom: 20px;
-}
-
-.new-product img {
-    max-width: 100%;
-    height: auto;
-}
-
-.new-details {
-    margin-top: 10px;
-}
-
-/* Style for the Complete button */
-#completeButton {
-    display: block;
-    width: 100%; /* Make button as wide as the screen */
-    padding: 10px;
-    background-color: #007bff; /* Blue background color */
-    color: #fff; /* White text color */
-    border: none;
-    cursor: pointer;
-}
-
-/* Hover effect */
-#completeButton:hover {
-    background-color: #0056b3; /* Darker blue on hover */
-}

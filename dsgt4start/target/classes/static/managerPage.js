@@ -392,6 +392,14 @@ function displayProducts(data){
     // Close container div for columns
     html += '</div>'; // End supplier-columns
 
+    // Add extra fields for bundle title and description
+    html += '<div class="bundle-fields">';
+    html += '<label for="bundleTitle">Bundle Title:</label>';
+    html += '<input type="text" id="bundleTitle" name="bundleTitle">';
+    html += '<label for="bundleDescription">Bundle Description:</label>';
+    html += '<textarea id="bundleDescription" name="bundleDescription"></textarea>';
+    html += '</div>'; // End bundle-fields
+
     // Add Complete button
     html += '<button id="completeButton">Add New Bundle To Stock</button>';
 
@@ -442,12 +450,17 @@ function checkValidBundle() {
         }
     }
 
+    const bundleTitle = document.getElementById('bundleTitle').value;
+    const bundleDescription = document.getElementById('bundleDescription').value;
+
+    if(bundleTitle === "" || bundleDescription === ""){valid = false}
+
 
     if(valid){
         // Display a confirmation dialog
         var confirmed = window.confirm('Are you sure you want to add this bundle?');
         if (confirmed) {
-            addBundle(selectedProductIds);
+            addBundle(selectedProductIds, bundleTitle, bundleDescription);
         }
 
 
@@ -457,36 +470,36 @@ function checkValidBundle() {
     }
 }
 
-function addBundle(selectedProductIds){
-        // Construct the request body
-        console.log("start addBundle");
-        //console.log(selectedProductIds);
-        const body = new URLSearchParams();
-        body.append('productIds', JSON.stringify(selectedProductIds));
-        console.log(body);
-        // Make the fetch request
-        fetch('/api/addBundle', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + tkn,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: body
+function addBundle(selectedProductIds, bundleTitle, bundleDescription){
+    // Construct the request body
+    const body = new URLSearchParams();
+    body.append('productIds', JSON.stringify(selectedProductIds));
+    body.append('bundleTitle', bundleTitle); // Add bundle title to request body
+    body.append('bundleDescription', bundleDescription); // Add bundle description to request body
+
+    // Make the fetch request
+    fetch('/api/addBundle', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + tkn,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: body
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text();
         })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.text();
-            })
-            .then((data) => {
-                // Handle the response data if needed
-                console.log('Bundle added successfully:', data);
-                window.alert('The bundle has been added successfully');
-                return data;
-            })
-            .catch((error) => {
-                console.error('Error adding bundle:', error);
-                throw error; // Re-throw the error to propagate it further
-            });
-    }
+        .then((data) => {
+            // Handle the response data if needed
+            console.log('Bundle added successfully:', data);
+            window.alert('The bundle has been added successfully');
+            return data;
+        })
+        .catch((error) => {
+            console.error('Error adding bundle:', error);
+            throw error; // Re-throw the error to propagate it further
+        });
+}

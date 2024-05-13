@@ -1,0 +1,11 @@
+be/kuleuven/weddingrestservice/domain/Reservation$Status.class
+be/kuleuven/weddingrestservice/domain/Product.class
+be/kuleuven/weddingrestservice/exceptions/ProductNotFoundAdvice.class
+be/kuleuven/weddingrestservice/controllers/ProductsRestController.class
+be/kuleuven/weddingrestservice/exceptions/ReservationException.class
+be/kuleuven/weddingrestservice/domain/ProductsRepository.class
+be/kuleuven/weddingrestservice/exceptions/ProductNotFoundException.class
+be/kuleuven/weddingrestservice/domain/Reservation.class
+be/kuleuven/weddingrestservice/WeddingRestServiceApplication.class
+be/kuleuven/weddingrestservice/exceptions/ReservationAdvice.class
+be/kuleuven/weddingrestservice/domain/ProductType.class
