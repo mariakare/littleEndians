@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.firestore.*;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.security.access.AuthorizationServiceException;
@@ -48,95 +49,17 @@ class DBController {
 
     @GetMapping("/api/getBundles")
     public String getBundles() throws InterruptedException, ExecutionException {
-        // for now return constant since adding bundles doesn't work yet:
-        String jsonData = "{\n" +
-                "  \"bundles\": [\n" +
-                "    {\n" +
-                "      \"id\": \"bundle1\",\n" +
-                "      \"name\": \"Bundle 1\",\n" +
-                "      \"description\": \"Bundle 1 description goes here.\",\n" +
-                "      \"products\": [\n" +
-                "        {\n" +
-                "          \"name\": \"Product 1\",\n" +
-                "          \"description\": \"Short description for Product 1. Yes Yes Yes Yes Yes Yes Yes Yes Yes Yes\",\n" +
-                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"name\": \"Product 2\",\n" +
-                "          \"description\": \"Short description for Product 2.\",\n" +
-                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"name\": \"Product 3\",\n" +
-                "          \"description\": \"Short description for Product 3.\",\n" +
-                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
-                "        }\n" +
-                "      ]\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"id\": \"bundle2\",\n" +
-                "      \"name\": \"Bundle 2\",\n" +
-                "      \"description\": \"Bundle 2 description goes here.\",\n" +
-                "      \"products\": [\n" +
-                "        {\n" +
-                "          \"name\": \"Product 4\",\n" +
-                "          \"description\": \"Short description for Product 4.\",\n" +
-                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"name\": \"Product 5\",\n" +
-                "          \"description\": \"Short description for Product 5.\",\n" +
-                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"name\": \"Product 6\",\n" +
-                "          \"description\": \"Short description for Product 6.\",\n" +
-                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
-                "        }\n" +
-                "      ]\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
-
-
-        return jsonData;
-
-
-/*
-        //required level: user
         var user = WebSecurityConfig.getUser();
-
         WebClient webClient = webClientBuilder.build();
-        String responseBody = webClient.get()
-                .uri("http://localhost:8090/products")
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-
-
-        // Return the list of product data for all bundles in the response
-        //return ResponseEntity.ok(allProductsData);
-//        String type="";
-//        String description="";
-        try {
-            // Convert JSON string to a Map or any other suitable data structure
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, Object> data = objectMapper.readValue(responseBody, new TypeReference<Map<String, Object>>() {
-            });
-
-            // Add the data to Firestore
-            db.collection("data").document("suits").set(data);
-
-            //return ResponseEntity.ok("Data copied to Firestore successfully");
-        } catch (IOException e) {
-            e.printStackTrace();
-            //return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to copy data to Firestore");
-        }
-
+        String[] endpointURLs = {
+                "http://sud.switzerlandnorth.cloudapp.azure.com:8080/products/",
+                "http://ivan.canadacentral.cloudapp.azure.com:8080/products/",
+                "http://sud.japaneast.cloudapp.azure.com:8080/products/"
+        };
 
         try {
             // Reference to the bundles collection in Firestore
-            CollectionReference bundlesRef = this.db.collection("bundle");
+            CollectionReference bundlesRef = this.db.collection("bundles");
 
             // Query to retrieve all documents in the bundles collection
             Query query = bundlesRef;
@@ -149,12 +72,12 @@ class DBController {
             jsonDataBuilder.append("{\n");
             jsonDataBuilder.append("  \"bundles\": [\n");
 
-
             // Iterate over each document in the query result
             for (QueryDocumentSnapshot document : querySnapshot) {
                 // Extract data from the document
                 String name = document.getString("name");
                 String description = document.getString("description");
+                String price = document.getString("price");
 
                 // Append bundle details to the JSON string
                 jsonDataBuilder.append("    {\n");
@@ -162,33 +85,48 @@ class DBController {
                 jsonDataBuilder.append("      \"description\": \"").append(description).append("\",\n");
                 jsonDataBuilder.append("      \"products\": [\n");
 
-                // Extract product references map from the document
-//                GenericTypeIndicator<Map<String, DocumentReference>> typeIndicator = new GenericTypeIndicator<Map<String, DocumentReference>>() {};
-//                Map<String, DocumentReference> productReferences = document.get("products", typeIndicator);
-                Map<String, Object> productReferences = (Map<String, Object>) document.get("products");
 
+                // Extract product IDs from the document
+                List<DocumentReference> productRefs = (List<DocumentReference>) document.get("productIds");
+                List<String> productIds = new ArrayList<>();
 
-                // Iterate over each product reference in the map
-                for (Map.Entry<String, Object> entry : productReferences.entrySet()) {
-                    // Retrieve product document reference
-                    DocumentReference productRef = (DocumentReference) entry.getValue();
-
+                for (DocumentReference productRef : productRefs) {
+                    productIds.add(productRef.getId());
+                }
+                int i=0;
+                for (String productId : productIds) {
                     // Fetch product document from Firestore
-                    DocumentSnapshot productSnapshot = productRef.get().get();
+                    String productType = null;
+                    String productDescription = null;
+                    Double productPrice = null;
+                    String imageLink = null;
 
-                    // Extract product data from the product document
-                    String productType = productSnapshot.getString("name");
-                    String productDescription = productSnapshot.getString("description");
+                    // Retrieve product data directly from Firestore
+                    DocumentReference productRef = this.db.collection("products").document(productId);
+                    DocumentSnapshot productSnapshot = productRef.get().get();
+                    if (productSnapshot.exists()) {
+                        // Extract product data from the product document
+                        productType = productSnapshot.getString("name");
+                        productDescription = productSnapshot.getString("description");
+                        productPrice = productSnapshot.getDouble("price");
+                        imageLink = productSnapshot.getString("imageLink");
+                    } else {
+                        System.out.println("product does not exist");
+                    }
 
                     // Append product details to the JSON string
                     jsonDataBuilder.append("        {\n");
                     jsonDataBuilder.append("          \"name\": \"").append(productType).append("\",\n");
-                    jsonDataBuilder.append("          \"description\": \"").append(productDescription).append("\"\n");
+                    jsonDataBuilder.append("          \"description\": \"").append(productDescription).append("\",\n");
+                    jsonDataBuilder.append("          \"price\": \"").append(productPrice).append("\",\n");
+                    jsonDataBuilder.append("          \"image\": \"").append(imageLink).append("\"\n");
                     jsonDataBuilder.append("        },\n");
+
                 }
+                //i=0;
 
                 // Remove the trailing comma from the last product object
-                if (!productReferences.isEmpty()) {
+                if (!productIds.isEmpty()) {
                     jsonDataBuilder.deleteCharAt(jsonDataBuilder.length() - 2); // Removes the last comma
                 }
 
@@ -207,48 +145,13 @@ class DBController {
             jsonDataBuilder.append("}");
 
             // Return the JSON string in the response
-            //return ResponseEntity.ok(jsonDataBuilder.toString());
+            System.out.println(jsonDataBuilder.toString());
             return jsonDataBuilder.toString();
         } catch (InterruptedException | ExecutionException e) {
             // Handle exceptions appropriately
             e.printStackTrace();
-            //return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-        return "";
-
-
- */
-
-    }
-
-
-    @PostMapping("/api/addToCart")
-    public ResponseEntity<String> addToCart(@RequestBody String bundleId) throws ExecutionException, InterruptedException {
-        // Get the current user's ID
-        var user = WebSecurityConfig.getUser();
-
-        // Reference to the user's document
-        DocumentReference userRef = db.collection("user").document(user.getEmail());
-
-        // Reference to the bundle document
-        DocumentReference bundleRef = db.collection("bundles").document(bundleId);
-
-        // Get the bundle data
-        ApiFuture<DocumentSnapshot> bundleFuture = bundleRef.get();
-        DocumentSnapshot bundleSnapshot = bundleFuture.get();
-        if (bundleSnapshot.exists()) {
-            Map<String, Object> bundleData = bundleSnapshot.getData();
-
-            // Add the bundle document to the basket subcollection under the user's document
-            DocumentReference addedBundleRef = userRef.collection("basket").add(bundleData).get();
-            // Wait for the result
-            Map<String, Object> updatedBundleData = new HashMap<>();
-            updatedBundleData.put("cartBundleId", addedBundleRef.getId());
-            addedBundleRef.update(updatedBundleData);
-            // Return a response
-            return ResponseEntity.status(HttpStatus.CREATED).body("Bundle with ID: " + bundleId + " added to cart with ID: " + addedBundleRef.getId());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bundle with ID: " + bundleId + " does not exist");
+            // Return an error response
+            return "{\"error\": \"Failed to retrieve bundles\"}";
         }
     }
 
@@ -305,9 +208,9 @@ class DBController {
 
         // Array of endpoint URLs
         String[] endpointURLs = {
-                "http://localhost:8090/products",
-                "http://localhost:8091/products",
-                "http://localhost:8093/products"
+                "http://sud.switzerlandnorth.cloudapp.azure.com:8080/products",
+                "http://ivan.canadacentral.cloudapp.azure.com:8080/products",
+                "http://sud.japaneast.cloudapp.azure.com:8080/products"
         };
 
         // Loop through each endpoint
