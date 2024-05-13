@@ -67,7 +67,7 @@ function displayShoppingCart(data) {
 
         // Display item name
         const itemName = document.createElement('span');
-        itemName.textContent = item.bundleId;
+        itemName.textContent = item.bundleName;
         itemDiv.appendChild(itemName);
 
         // Create a delete button for each item

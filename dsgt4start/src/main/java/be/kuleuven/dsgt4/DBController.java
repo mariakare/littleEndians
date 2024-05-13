@@ -151,6 +151,13 @@ class DBController {
         List<Map<String, Object>> shoppingCart = new ArrayList<>();
         for (QueryDocumentSnapshot document : querySnapshot.get().getDocuments()) {
             Map<String, Object> itemData = document.getData();
+            DocumentReference bundleRef = db.collection("bundles").document(document.getString("bundleId"));
+
+            ApiFuture<DocumentSnapshot> bundleSnapshot = bundleRef.get();
+            DocumentSnapshot bundleDocument = bundleSnapshot.get();
+
+            itemData.put("bundleName", bundleDocument.getString("name"));
+
             shoppingCart.add(itemData);
         }
         return shoppingCart;

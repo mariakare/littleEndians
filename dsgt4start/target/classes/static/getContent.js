@@ -81,7 +81,7 @@ function displayBundles(data) {
         // Attach event listener to the "Add to Cart" button
         addToCartButton.addEventListener('click', function() {
             // Get the bundle ID from the bundle object (assuming each bundle has an ID)
-            const bundleId = bundle.name; // Change this according to your bundle structure
+            const bundleId = bundle.id; // Change this according to your bundle structure
             console.log(bundleId)
             // Call a function to add the bundle to the cart
             cart.addToCart(bundleId);
