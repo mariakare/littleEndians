@@ -48,6 +48,61 @@ class DBController {
 
     @GetMapping("/api/getBundles")
     public String getBundles() throws InterruptedException, ExecutionException {
+        // for now return constant since adding bundles doesn't work yet:
+        String jsonData = "{\n" +
+                "  \"bundles\": [\n" +
+                "    {\n" +
+                "      \"id\": \"bundle1\",\n" +
+                "      \"name\": \"Bundle 1\",\n" +
+                "      \"description\": \"Bundle 1 description goes here.\",\n" +
+                "      \"products\": [\n" +
+                "        {\n" +
+                "          \"name\": \"Product 1\",\n" +
+                "          \"description\": \"Short description for Product 1. Yes Yes Yes Yes Yes Yes Yes Yes Yes Yes\",\n" +
+                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"name\": \"Product 2\",\n" +
+                "          \"description\": \"Short description for Product 2.\",\n" +
+                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"name\": \"Product 3\",\n" +
+                "          \"description\": \"Short description for Product 3.\",\n" +
+                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"id\": \"bundle2\",\n" +
+                "      \"name\": \"Bundle 2\",\n" +
+                "      \"description\": \"Bundle 2 description goes here.\",\n" +
+                "      \"products\": [\n" +
+                "        {\n" +
+                "          \"name\": \"Product 4\",\n" +
+                "          \"description\": \"Short description for Product 4.\",\n" +
+                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"name\": \"Product 5\",\n" +
+                "          \"description\": \"Short description for Product 5.\",\n" +
+                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"name\": \"Product 6\",\n" +
+                "          \"description\": \"Short description for Product 6.\",\n" +
+                "          \"image\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJqSUCfOuELtH0u5rBpf1Lnzy1Xp0lZgsblRa-mEM8_Q&s\"\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+
+
+        return jsonData;
+
+        /*
+
         //required level: user
         var user = WebSecurityConfig.getUser();
 
@@ -160,6 +215,8 @@ class DBController {
             //return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
         return "";
+
+         */
     }
 
 
@@ -178,18 +235,16 @@ class DBController {
         ApiFuture<DocumentSnapshot> bundleFuture = bundleRef.get();
         DocumentSnapshot bundleSnapshot = bundleFuture.get();
         if (bundleSnapshot.exists()) {
+            Map<String, Object> bundleData = bundleSnapshot.getData();
 
-            DocumentReference cartBundleRef = userRef.collection("basket").document();
-
-
-            Map<String, Object> data = new HashMap<>();
-            data.put("bundleId", bundleId);
-
-            ApiFuture<WriteResult> writeResult = cartBundleRef.set(data);
-            // Wait for the operation to complete
-            writeResult.get();
-
-            return ResponseEntity.status(HttpStatus.CREATED).body("Bundle with ID: " + bundleId + " added to cart with ID: " + cartBundleRef.getId());
+            // Add the bundle document to the basket subcollection under the user's document
+            DocumentReference addedBundleRef = userRef.collection("basket").add(bundleData).get();
+            // Wait for the result
+            Map<String, Object> updatedBundleData = new HashMap<>();
+            updatedBundleData.put("cartBundleId", addedBundleRef.getId());
+            addedBundleRef.update(updatedBundleData);
+            // Return a response
+            return ResponseEntity.status(HttpStatus.CREATED).body("Bundle with ID: " + bundleId + " added to cart with ID: " + addedBundleRef.getId());
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bundle with ID: " + bundleId + " does not exist");
         }
@@ -206,13 +261,6 @@ class DBController {
         List<Map<String, Object>> shoppingCart = new ArrayList<>();
         for (QueryDocumentSnapshot document : querySnapshot.get().getDocuments()) {
             Map<String, Object> itemData = document.getData();
-            DocumentReference bundleRef = db.collection("bundles").document(document.getString("bundleId"));
-
-            ApiFuture<DocumentSnapshot> bundleSnapshot = bundleRef.get();
-            DocumentSnapshot bundleDocument = bundleSnapshot.get();
-
-            itemData.put("bundleName", bundleDocument.getString("name"));
-
             shoppingCart.add(itemData);
         }
         return shoppingCart;
@@ -242,6 +290,7 @@ class DBController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bundle with ID: " + bundleId + " does not exist");
         }
     }
+
 
 
     @GetMapping("/api/getProducts")
@@ -333,59 +382,42 @@ class DBController {
     }
 
 
+
     @PostMapping("/api/addBundle")
-    public ResponseEntity<String> addBundle(
+    public String addBundle(
             @RequestParam("bundleTitle") String bundleTitle,
             @RequestParam("bundleDescription") String bundleDescription,
             @RequestParam("productIds") String productIds
-    ) throws JsonProcessingException {
-        var user = WebSecurityConfig.getUser();
-
-
-        String productIdString = productIds.substring(1, productIds.length() - 1);
-        String[] productIdSplit = productIdString.split(",");
-
-
-
-        for (int i = 0; i < productIdSplit.length; i++) {
-            productIdSplit[i] = productIdSplit[i].replaceAll("\"", "");
-        }
-
-        System.out.println(productIdSplit);
-
-        // Create a map to hold the data for the new document
-        Map<String, Object> data = new HashMap<>();
-        data.put("name", bundleTitle);
-        data.put("description", bundleDescription);
-        data.put("productIds", Arrays.asList(productIdSplit));
-        data.put("price", "$XX");
-
+    ) {
         // Process bundle data
         String response = "Bundle Title: " + bundleTitle + "\n" +
                 "Bundle Description: " + bundleDescription + "\n" +
                 "Selected Product Ids: " + productIds + "\n";
 
-        try {
+        System.out.println("Received bundle data:");
+        System.out.println(response);
 
-            DocumentReference bundleRef = db.collection("bundles").document();
-
-
-            // Set the data for the new document
-            ApiFuture<WriteResult> writeResult = bundleRef.set(data);
-            // Wait for the operation to complete
-            writeResult.get();
-
-            // Retrieve the Firestore-generated ID of the new document
-            String bundleId = bundleRef.getId();
-
-            // Return a success response with the ID of the newly created document
-            return ResponseEntity.status(HttpStatus.CREATED).body("Bundle created with ID: " + bundleId);
-        } catch (Exception e) {
-            // Handle any exceptions that might occur during the operation
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating document: " + e.getMessage());
-        }
-
+        return "Bundle added successfully";
     }
+
+
+    @PostMapping("/api/updateBundle")
+    public String updateBundle(
+            @RequestParam("bundleId") String bundleId,
+            @RequestParam("bundleTitle") String bundleTitle,
+            @RequestParam("bundleDescription") String bundleDescription
+    ) {
+        System.out.println("I am in updateBundle");
+        // Process updated bundle data
+        String response = "Bundle ID: " + bundleId + "\n" +
+                "Updated Bundle Title: " + bundleTitle + "\n" +
+                "Updated Bundle Description: " + bundleDescription + "\n";
+
+        System.out.println("Received updated bundle data:");
+        System.out.println(response);
+
+        return "Bundle updated successfully";
+    }
+
 
 }
