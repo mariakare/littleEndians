@@ -87,47 +87,43 @@ class DBController {
 
 
                 // Extract product IDs from the document
-                List<String> productIds = (List<String>) document.get("productIds");
+                List<DocumentReference> productRefs = (List<DocumentReference>) document.get("productIds");
+                List<String> productIds = new ArrayList<>();
 
+                for (DocumentReference productRef : productRefs) {
+                    productIds.add(productRef.getId());
+                }
                 int i=0;
                 for (String productId : productIds) {
-                    String endpointURL=endpointURLs[i]+productId;
-                    System.out.println(endpointURL);
-                    i++;
-                    String responseBody = webClient.get()
-                            .uri(endpointURL)
-                            .retrieve()
-                            .bodyToMono(String.class)
-                            .block();
+                    // Fetch product document from Firestore
+                    String productType = null;
+                    String productDescription = null;
+                    Double productPrice = null;
+                    String imageLink = null;
 
-
-                    try{
-
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        JsonNode rootNode = objectMapper.readTree(responseBody);
-
-                        String productName = rootNode.path("name").asText();
-                        //double productPrice = rootNode.path("price").asDouble();
-                        String productDescription = rootNode.path("description").asText();
-                        String imageLink = rootNode.path("imageLink").asText();
-                        System.out.println(productName);
-
-                        // Append product details to the JSON string
-                        jsonDataBuilder.append("        {\n");
-                        jsonDataBuilder.append("          \"name\": \"").append(productName).append("\",\n");
-                        jsonDataBuilder.append("          \"description\": \"").append(productDescription).append("\",\n");
-                        jsonDataBuilder.append("          \"image\": \"").append(imageLink).append("\"\n");
-                        jsonDataBuilder.append("        },\n");
-
-                    }catch(Exception e) {
-                        // Handle any exceptions that might occur during the operation
-                        e.printStackTrace();
-                        //return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating document: " + e.getMessage());
+                    // Retrieve product data directly from Firestore
+                    DocumentReference productRef = this.db.collection("products").document(productId);
+                    DocumentSnapshot productSnapshot = productRef.get().get();
+                    if (productSnapshot.exists()) {
+                        // Extract product data from the product document
+                        productType = productSnapshot.getString("name");
+                        productDescription = productSnapshot.getString("description");
+                        productPrice = productSnapshot.getDouble("price");
+                        imageLink = productSnapshot.getString("imageLink");
+                    } else {
+                        System.out.println("product does not exist");
                     }
 
+                    // Append product details to the JSON string
+                    jsonDataBuilder.append("        {\n");
+                    jsonDataBuilder.append("          \"name\": \"").append(productType).append("\",\n");
+                    jsonDataBuilder.append("          \"description\": \"").append(productDescription).append("\",\n");
+                    jsonDataBuilder.append("          \"price\": \"").append(productPrice).append("\",\n");
+                    jsonDataBuilder.append("          \"image\": \"").append(imageLink).append("\"\n");
+                    jsonDataBuilder.append("        },\n");
 
                 }
-                i=0;
+                //i=0;
 
                 // Remove the trailing comma from the last product object
                 if (!productIds.isEmpty()) {
