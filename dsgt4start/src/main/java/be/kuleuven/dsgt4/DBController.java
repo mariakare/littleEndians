@@ -32,6 +32,7 @@ class DBController {
     Firestore db;
 
 
+
     @PostMapping("/api/newUser")
     @ResponseBody
     public User newuser() {
@@ -212,10 +213,11 @@ class DBController {
 
         // Array of endpoint URLs
         String[] endpointURLs = {
-                "http://sud.switzerlandnorth.cloudapp.azure.com:8080/products",
-                "http://ivan.canadacentral.cloudapp.azure.com:8080/products",
-                "http://sud.japaneast.cloudapp.azure.com:8080/products"
+                "http://sud.switzerlandnorth.cloudapp.azure.com:8080/products/",
+                "http://ivan.canadacentral.cloudapp.azure.com:8080/products/",
+                "http://sud.japaneast.cloudapp.azure.com:8080/products/"
         };
+
 
         // Loop through each endpoint
         for (String endpointURL : endpointURLs) {
@@ -226,7 +228,7 @@ class DBController {
                     .block();
 
             // Extract supplier name from endpoint URL
-            String supplierName = endpointURL.substring(endpointURL.lastIndexOf('/') + 1).toUpperCase();
+            String supplierName = endpointURL.substring(0,endpointURL.lastIndexOf('/') + 1);
 
             // Append supplier details to JSON
             jsonDataBuilder.append("    {\n");
@@ -297,12 +299,13 @@ class DBController {
             @RequestParam("bundleTitle") String bundleTitle,
             @RequestParam("bundleDescription") String bundleDescription,
             @RequestParam("productIds") String productIds
-    ) throws JsonProcessingException {
+    ) throws JsonProcessingException, ExecutionException, InterruptedException {
         var user = WebSecurityConfig.getUser();
 
 
         String productIdString = productIds.substring(1, productIds.length() - 1);
         String[] productIdSplit = productIdString.split(",");
+        String[] productIdFinal = new String[productIdSplit.length];
 
 
 
@@ -310,13 +313,31 @@ class DBController {
             productIdSplit[i] = productIdSplit[i].replaceAll("\"", "");
         }
 
-        System.out.println(productIdSplit);
+        //CollectionReference products = db.collection("products");
+        int i=0;
+
+        for (String id: productIdSplit){
+
+            String[] idParts = id.split("@");
+            productIdFinal[i]=(idParts[1]);
+/*
+            DocumentReference docRef = db.collection("products").document(idParts[0]);
+
+            ApiFuture<DocumentSnapshot> future = docRef.get();
+            DocumentSnapshot document = future.get();
+
+            if (!document.exists()){
+                //code to duplicate json?
+            }
+*/
+            i++;
+        }
 
         // Create a map to hold the data for the new document
         Map<String, Object> data = new HashMap<>();
         data.put("name", bundleTitle);
         data.put("description", bundleDescription);
-        data.put("productIds", Arrays.asList(productIdSplit));
+        data.put("productIds", Arrays.asList(productIdFinal));
         data.put("price", "$XX");
 
         // Process bundle data

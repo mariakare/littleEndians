@@ -406,7 +406,7 @@ function displayProducts(data){
             for (var j = 0; j < products.length; j++) {
                 var product = products[j];
                 html += '<div class="new-product">';
-                html += '<input type="radio" name="supplier_' + i + '" value="' + product.id + '">'; // Radio button for product
+                html += '<input type="radio" name="supplier_' + i + '" value="' + supplier.name + "@" +  product.id + '">'; // Radio button for product
                 html += '<img src="' + product.imageLink + '" alt="' + product.name + '">'; // Product image
                 html += '<div class="new-details">';
                 html += '<h3>' + product.name + '</h3>'; // Product name
