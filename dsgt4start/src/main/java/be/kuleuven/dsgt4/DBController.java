@@ -60,6 +60,7 @@ class DBController {
                 "  \"bundles\": [\n" +
                 "    {\n" +
                 "      \"name\": \"Bundle 1\",\n" +
+                "           \"id\": \"PouftutBHXagruaxVFwZ\", \n" +
                 "      \"description\": \"Bundle 1 description goes here.\",\n" +
                 "      \"products\": [\n" +
                 "        {\n" +
@@ -81,6 +82,7 @@ class DBController {
                 "    },\n" +
                 "    {\n" +
                 "      \"name\": \"Bundle 2\",\n" +
+                "      \"id\": \"91rqOvBeJnEPIdqw4l1Y\", \n" +
                 "      \"description\": \"Bundle 2 description goes here.\",\n" +
                 "      \"products\": [\n" +
                 "        {\n" +
@@ -121,14 +123,18 @@ class DBController {
         ApiFuture<DocumentSnapshot> bundleFuture = bundleRef.get();
         DocumentSnapshot bundleSnapshot = bundleFuture.get();
         if (bundleSnapshot.exists()) {
-            Map<String, Object> bundleData = new HashMap<>();
-            bundleData.put("BundleId",bundleRef.getId());
 
-            // Add the bundle document to the basket subcollection under the user's document
-            DocumentReference addedBundleRef = userRef.collection("basket").add(bundleData).get();
+            DocumentReference cartBundleRef = userRef.collection("basket").document();
 
-            // Return a response
-            return ResponseEntity.status(HttpStatus.CREATED).body("Bundle with ID: " + bundleId + " added to cart with ID: " + addedBundleRef.getId());
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("bundleId", bundleId);
+
+            ApiFuture<WriteResult> writeResult = cartBundleRef.set(data);
+            // Wait for the operation to complete
+            writeResult.get();
+
+            return ResponseEntity.status(HttpStatus.CREATED).body("Bundle with ID: " + bundleId + " added to cart with ID: " + cartBundleRef.getId());
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bundle with ID: " + bundleId + " does not exist");
         }
@@ -145,6 +151,13 @@ class DBController {
         List<Map<String, Object>> shoppingCart = new ArrayList<>();
         for (QueryDocumentSnapshot document : querySnapshot.get().getDocuments()) {
             Map<String, Object> itemData = document.getData();
+            DocumentReference bundleRef = db.collection("bundles").document(document.getString("bundleId"));
+
+            ApiFuture<DocumentSnapshot> bundleSnapshot = bundleRef.get();
+            DocumentSnapshot bundleDocument = bundleSnapshot.get();
+
+            itemData.put("bundleName", bundleDocument.getString("name"));
+
             shoppingCart.add(itemData);
         }
         return shoppingCart;
