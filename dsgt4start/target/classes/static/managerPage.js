@@ -179,64 +179,64 @@ function getProducts() {
 }
 
 
-/**
- * Attaches event listeners to edit button and the close button of tttttthe modal window
- */
-function attachEventListeners() {
-    // Get the modal
-    const editBundleModal = document.getElementById("editBundleModal");
-
-    // Get the button that opens the modal
-    const editButtons = document.querySelectorAll(".edit-button");
-
-    // Get the <span> element that closes the modal
-    const closeBtn = document.querySelector(".close");
-
-    // When the user clicks the button, open the modal
-    editButtons.forEach(button => {
-        button.addEventListener("click", () => {
-            // Get the current values of bundle title and description
-            const bundleTitle = button.parentNode.querySelector(".bundle-title").textContent;
-            const bundleDescription = button.parentNode.querySelector(".bundle-description").textContent;
-
-            // Set the current values in the form
-            document.getElementById("editBundleTitle").value = bundleTitle;
-            document.getElementById("editBundleDescription").value = bundleDescription;
-
-            // Show the modal
-            editBundleModal.style.display = "block";
-        });
-    });
-
-    // When the user clicks on <span> (x), close the modal
-    closeBtn.addEventListener("click", () => {
-        editBundleModal.style.display = "none";
-    });
-
-    // When the user clicks anywhere outside of the modal, close it
-    window.addEventListener("click", (event) => {
-        if (event.target == editBundleModal) {
-            editBundleModal.style.display = "none";
-        }
-    });
-
-    // Handle form submission
-    const editBundleForm = document.getElementById("editBundleForm");
-    editBundleForm.addEventListener("submit", (event) => {
-        event.preventDefault(); // Prevent the form from submitting normally
-
-        // Get the edited values
-        const editedBundleTitle = document.getElementById("editBundleTitle").value;
-        const editedBundleDescription = document.getElementById("editBundleDescription").value;
-
-        // Perform AJAX call to update the bundle with the new values
-        // You need to implement this function
-        updateBundle(currentBundle, editedBundleTitle, editedBundleDescription);
-
-        // Close the modal
-        editBundleModal.style.display = "none";
-    });
-}
+// /**
+//  * Attaches event listeners to edit button and the close button of tttttthe modal window
+//  */
+// function attachEventListeners() {
+//     // Get the modal
+//     const editBundleModal = document.getElementById("editBundleModal");
+//
+//     // Get the button that opens the modal
+//     const editButtons = document.querySelectorAll(".edit-button");
+//
+//     // Get the <span> element that closes the modal
+//     const closeBtn = document.querySelector(".close");
+//
+//     // When the user clicks the button, open the modal
+//     editButtons.forEach(button => {
+//         button.addEventListener("click", () => {
+//             // Get the current values of bundle title and description
+//             const bundleTitle = button.parentNode.querySelector(".bundle-title").textContent;
+//             const bundleDescription = button.parentNode.querySelector(".bundle-description").textContent;
+//
+//             // Set the current values in the form
+//             document.getElementById("editBundleTitle").value = bundleTitle;
+//             document.getElementById("editBundleDescription").value = bundleDescription;
+//
+//             // Show the modal
+//             editBundleModal.style.display = "block";
+//         });
+//     });
+//
+//     // When the user clicks on <span> (x), close the modal
+//     closeBtn.addEventListener("click", () => {
+//         editBundleModal.style.display = "none";
+//     });
+//
+//     // When the user clicks anywhere outside of the modal, close it
+//     window.addEventListener("click", (event) => {
+//         if (event.target == editBundleModal) {
+//             editBundleModal.style.display = "none";
+//         }
+//     });
+//
+//     // Handle form submission
+//     const editBundleForm = document.getElementById("editBundleForm");
+//     editBundleForm.addEventListener("submit", (event) => {
+//         event.preventDefault(); // Prevent the form from submitting normally
+//
+//         // Get the edited values
+//         const editedBundleTitle = document.getElementById("editBundleTitle").value;
+//         const editedBundleDescription = document.getElementById("editBundleDescription").value;
+//
+//         // Perform AJAX call to update the bundle with the new values
+//         // You need to implement this function
+//         updateBundle(currentBundle, editedBundleTitle, editedBundleDescription);
+//
+//         // Close the modal
+//         editBundleModal.style.display = "none";
+//     });
+// }
 
 function updateBundle(bundleId, bundleTitle, bundleDescription){
     // Construct the request body
