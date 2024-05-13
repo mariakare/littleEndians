@@ -32,6 +32,7 @@ class DBController {
     Firestore db;
 
 
+
     @PostMapping("/api/newUser")
     @ResponseBody
     public User newuser() {
@@ -155,6 +156,36 @@ class DBController {
         }
     }
 
+    @PostMapping("/api/addToCart")
+    public ResponseEntity<String> addToCart(@RequestBody String bundleId) throws ExecutionException, InterruptedException {
+        // Get the current user's ID
+        var user = WebSecurityConfig.getUser();
+
+        // Reference to the user's document
+        DocumentReference userRef = db.collection("user").document(user.getEmail());
+
+        // Reference to the bundle document
+        DocumentReference bundleRef = db.collection("bundles").document(bundleId);
+
+        // Get the bundle data
+        ApiFuture<DocumentSnapshot> bundleFuture = bundleRef.get();
+        DocumentSnapshot bundleSnapshot = bundleFuture.get();
+        if (bundleSnapshot.exists()) {
+            Map<String, Object> bundleData = bundleSnapshot.getData();
+
+            // Add the bundle document to the basket subcollection under the user's document
+            DocumentReference addedBundleRef = userRef.collection("basket").add(bundleData).get();
+            // Wait for the result
+            Map<String, Object> updatedBundleData = new HashMap<>();
+            updatedBundleData.put("cartBundleId", addedBundleRef.getId());
+            addedBundleRef.update(updatedBundleData);
+            // Return a response
+            return ResponseEntity.status(HttpStatus.CREATED).body("Bundle with ID: " + bundleId + " added to cart with ID: " + addedBundleRef.getId());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bundle with ID: " + bundleId + " does not exist");
+        }
+    }
+
     @GetMapping("/api/getCart")
     public List<Map<String, Object>> getCart() throws ExecutionException, InterruptedException {
         var user = WebSecurityConfig.getUser();
@@ -208,10 +239,11 @@ class DBController {
 
         // Array of endpoint URLs
         String[] endpointURLs = {
-                "http://sud.switzerlandnorth.cloudapp.azure.com:8080/products",
-                "http://ivan.canadacentral.cloudapp.azure.com:8080/products",
-                "http://sud.japaneast.cloudapp.azure.com:8080/products"
+                "http://sud.switzerlandnorth.cloudapp.azure.com:8080/products/",
+                "http://ivan.canadacentral.cloudapp.azure.com:8080/products/",
+                "http://sud.japaneast.cloudapp.azure.com:8080/products/"
         };
+
 
         // Loop through each endpoint
         for (String endpointURL : endpointURLs) {
@@ -222,7 +254,7 @@ class DBController {
                     .block();
 
             // Extract supplier name from endpoint URL
-            String supplierName = endpointURL.substring(endpointURL.lastIndexOf('/') + 1).toUpperCase();
+            String supplierName = endpointURL.substring(0,endpointURL.lastIndexOf('/') + 1);
 
             // Append supplier details to JSON
             jsonDataBuilder.append("    {\n");
@@ -286,6 +318,72 @@ class DBController {
         }
     }
 
+    private String[] addProduct(String[] productIds){
+        //CollectionReference products = db.collection("products");
+        WebClient webClient = webClientBuilder.build();
+        int i=0;
+        String[] productIdList = new String[productIds.length];
+
+        for (String id: productIds){
+
+            String[] idParts = id.split("@");
+            productIdList[i]=(idParts[1]);
+
+            DocumentReference docRef = db.collection("products").document(idParts[1]);
+            //System.out.println("TESTINGGG");
+
+            ApiFuture<DocumentSnapshot> future = docRef.get();
+            try {
+                // Get the document snapshot
+                DocumentSnapshot document = future.get();
+
+                // Check if the document exists
+                if (!document.exists()) {
+
+                    String endpointURL=idParts[0]+idParts[1];
+                    System.out.println(endpointURL);
+
+                    String responseBody = webClient.get()
+                            .uri(endpointURL)
+                            .retrieve()
+                            .bodyToMono(String.class)
+                            .block();
+
+
+                    try{
+
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        JsonNode rootNode = objectMapper.readTree(responseBody);
+
+                        Map<String, Object> data = new HashMap<>();
+                        // Add data to the document as needed
+                        data.put("name", rootNode.path("name").asText());
+                        data.put("description", rootNode.path("description").asText());
+                        data.put("image", rootNode.path("imageLink").asText());
+
+                        ApiFuture<WriteResult> result = docRef.set(data);
+
+                        // Wait for the set operation to complete
+                        result.get();
+                        System.out.println("Document created!");
+
+                    }catch(Exception e) {
+                        // Handle any exceptions that might occur during the operation
+                        e.printStackTrace();
+                        //return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating document: " + e.getMessage());
+                    }
+                }
+
+            } catch (InterruptedException | ExecutionException e) {
+                // Handle any errors that may occur
+                System.err.println("Error getting document: " + e.getMessage());
+            }
+
+            i++;
+        }
+        return productIdList;
+    }
+
 
 
     @PostMapping("/api/addBundle")
@@ -293,7 +391,7 @@ class DBController {
             @RequestParam("bundleTitle") String bundleTitle,
             @RequestParam("bundleDescription") String bundleDescription,
             @RequestParam("productIds") String productIds
-    ) throws JsonProcessingException {
+    ) throws JsonProcessingException, ExecutionException, InterruptedException {
         var user = WebSecurityConfig.getUser();
 
 
@@ -302,17 +400,18 @@ class DBController {
 
 
 
+
         for (int i = 0; i < productIdSplit.length; i++) {
             productIdSplit[i] = productIdSplit[i].replaceAll("\"", "");
         }
 
-        System.out.println(productIdSplit);
+        String[] productIdFinal = addProduct(productIdSplit);
 
         // Create a map to hold the data for the new document
         Map<String, Object> data = new HashMap<>();
         data.put("name", bundleTitle);
         data.put("description", bundleDescription);
-        data.put("productIds", Arrays.asList(productIdSplit));
+        data.put("productIds", Arrays.asList(productIdFinal));
         data.put("price", "$XX");
 
         // Process bundle data
