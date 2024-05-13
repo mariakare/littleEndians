@@ -351,6 +351,7 @@ class DBController {
             @RequestParam("bundleDescription") String bundleDescription
     ) {
         System.out.println("I am in updateBundle");
+        bundleId="p0fZJFqpH3SByUR9NwU2";
         // Process updated bundle data
         String response = "Bundle ID: " + bundleId + "\n" +
                 "Updated Bundle Title: " + bundleTitle + "\n" +
@@ -359,7 +360,32 @@ class DBController {
         System.out.println("Received updated bundle data:");
         System.out.println(response);
 
-        return "Bundle updated successfully";
+        try {
+            // Reference to the bundle document in Firestore
+            DocumentReference bundleRef = db.collection("bundles").document(bundleId);
+
+            // Fetch the bundle document
+            DocumentSnapshot bundleSnapshot = bundleRef.get().get();
+
+            if (bundleSnapshot.exists()) {
+                // Update the bundle variables
+                bundleRef.update(
+                        "name", bundleTitle,
+                        "description", bundleDescription
+                );
+
+                System.out.println("yes");
+
+                return "Bundle updated successfully";
+            } else {
+
+                System.out.println("no");
+                return "Bundle with ID " + bundleId + " does not exist";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed to update bundle";
+        }
     }
 
 
