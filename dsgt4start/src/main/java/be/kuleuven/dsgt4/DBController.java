@@ -360,11 +360,7 @@ class DBController {
                 DocumentSnapshot document = future.get();
 
                 // Check if the document exists
-                if (document.exists()) {
-                    // Document exists
-                    System.out.println("Document exists: " + document.getData());
-                } else {
-                    // Document doesn't exist, create it
+                if (!document.exists()) {
                     Map<String, Object> data = new HashMap<>();
                     // Add data to the document as needed
                     data.put("field1", "value1");
@@ -377,6 +373,7 @@ class DBController {
                     result.get();
                     System.out.println("Document created!");
                 }
+
             } catch (InterruptedException | ExecutionException e) {
                 // Handle any errors that may occur
                 System.err.println("Error getting document: " + e.getMessage());
