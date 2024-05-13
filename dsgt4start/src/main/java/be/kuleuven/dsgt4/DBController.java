@@ -331,6 +331,7 @@ class DBController {
             @RequestParam("productIds") String productIds
     ) throws JsonProcessingException, ExecutionException, InterruptedException {
         var user = WebSecurityConfig.getUser();
+        WebClient webClient = webClientBuilder.build();
 
 
         String productIdString = productIds.substring(1, productIds.length() - 1);
@@ -361,17 +362,39 @@ class DBController {
 
                 // Check if the document exists
                 if (!document.exists()) {
-                    Map<String, Object> data = new HashMap<>();
-                    // Add data to the document as needed
-                    data.put("field1", "value1");
-                    data.put("field2", "value2");
 
-                    // Asynchronously set the data for the document
-                    ApiFuture<WriteResult> result = docRef.set(data);
+                    String endpointURL=idParts[0]+idParts[1];
+                    System.out.println(endpointURL);
 
-                    // Wait for the set operation to complete
-                    result.get();
-                    System.out.println("Document created!");
+                    String responseBody = webClient.get()
+                            .uri(endpointURL)
+                            .retrieve()
+                            .bodyToMono(String.class)
+                            .block();
+
+
+                    try{
+
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        JsonNode rootNode = objectMapper.readTree(responseBody);
+
+                        Map<String, Object> data = new HashMap<>();
+                        // Add data to the document as needed
+                        data.put("name", rootNode.path("name").asText());
+                        data.put("description", rootNode.path("description").asText());
+                        data.put("image", rootNode.path("imageLink").asText());
+
+                        ApiFuture<WriteResult> result = docRef.set(data);
+
+                        // Wait for the set operation to complete
+                        result.get();
+                        System.out.println("Document created!");
+
+                    }catch(Exception e) {
+                        // Handle any exceptions that might occur during the operation
+                        e.printStackTrace();
+                        //return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating document: " + e.getMessage());
+                    }
                 }
 
             } catch (InterruptedException | ExecutionException e) {
