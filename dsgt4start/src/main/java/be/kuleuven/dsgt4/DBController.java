@@ -338,23 +338,26 @@ class DBController {
             @RequestParam("bundleTitle") String bundleTitle,
             @RequestParam("bundleDescription") String bundleDescription,
             @RequestParam("productIds") String productIds
-    ) {
+    ) throws JsonProcessingException {
         var user = WebSecurityConfig.getUser();
+
 
         String productIdString = productIds.substring(1, productIds.length() - 1);
         String[] productIdSplit = productIdString.split(",");
+
 
 
         for (int i = 0; i < productIdSplit.length; i++) {
             productIdSplit[i] = productIdSplit[i].replaceAll("\"", "");
         }
 
+        System.out.println(productIdSplit);
 
         // Create a map to hold the data for the new document
         Map<String, Object> data = new HashMap<>();
         data.put("name", bundleTitle);
         data.put("description", bundleDescription);
-        data.put("productIds", Arrays.asList(productIds));
+        data.put("productIds", Arrays.asList(productIdSplit));
         data.put("price", "$XX");
 
         // Process bundle data
