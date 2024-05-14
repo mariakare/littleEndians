@@ -484,7 +484,7 @@ class DBController {
     @DeleteMapping("/api/deleteBundle/{bundleId}")
     public String deleteBundle(@PathVariable String bundleId) {
         System.out.println("I am in deleteBundle");
-        bundleId="LiDCBl5WCUpLyg6mYz9J";
+        bundleId="3eWJgwFYXJYh8P8caPtO";
 
         try {
             // Reference to the bundle document in Firestore
@@ -495,27 +495,29 @@ class DBController {
 
             if (bundleSnapshot.exists()) {
                 // Get the list of product references in the bundle
-                List<DocumentReference> productRefs = (List<DocumentReference>) bundleSnapshot.get("productRefs");
+                List<DocumentReference> productRefs = (List<DocumentReference>) bundleSnapshot.get("productIds");
+                List<String> productIds = new ArrayList<>();
+
+                // Extract product IDs from product references
+                for (DocumentReference productRef : productRefs) {
+                    productIds.add(productRef.getId());
+                }
 
                 bundleRef.delete();
 
 
-                for (DocumentReference productRef : productRefs) {
-                    // Get the product ID
-                    String productId = productRef.getId();
-
-                    // Query all bundles to check for references
-                    Query query = db.collection("bundles").whereArrayContains("productIds", productId);
+                // Loop through product IDs
+                for (String productId : productIds) {
+                    // Query all bundles except the current one to check for references to the product
+                    Query query = db.collection("bundles").whereArrayContains("productIds", db.document("products/" + productId));
                     ApiFuture<QuerySnapshot> querySnapshot = query.get();
 
-                    // If no other bundle references the product, delete it
-                    if (querySnapshot.get().getDocuments().isEmpty()) {
+                    // If no other bundle except the current one references the product, delete it
+                    if (querySnapshot.get().isEmpty()) {
                         db.collection("products").document(productId).delete();
+                        System.out.println("Product with ID " + productId + " deleted successfully");
                     }
                 }
-
-
-                // Delete the bundle document
 
                 System.out.println("Bundle deleted successfully");
 
