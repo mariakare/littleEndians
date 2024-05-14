@@ -484,7 +484,7 @@ class DBController {
     @DeleteMapping("/api/deleteBundle/{bundleId}")
     public String deleteBundle(@PathVariable String bundleId) {
         System.out.println("I am in deleteBundle");
-        bundleId="tHpRkHWJp5zd0g8BfSf8";
+        bundleId="LiDCBl5WCUpLyg6mYz9J";
 
         try {
             // Reference to the bundle document in Firestore
@@ -494,8 +494,28 @@ class DBController {
             DocumentSnapshot bundleSnapshot = bundleRef.get().get();
 
             if (bundleSnapshot.exists()) {
-                // Delete the bundle document
+                // Get the list of product references in the bundle
+                List<DocumentReference> productRefs = (List<DocumentReference>) bundleSnapshot.get("productRefs");
+
                 bundleRef.delete();
+
+
+                for (DocumentReference productRef : productRefs) {
+                    // Get the product ID
+                    String productId = productRef.getId();
+
+                    // Query all bundles to check for references
+                    Query query = db.collection("bundles").whereArrayContains("productIds", productId);
+                    ApiFuture<QuerySnapshot> querySnapshot = query.get();
+
+                    // If no other bundle references the product, delete it
+                    if (querySnapshot.get().getDocuments().isEmpty()) {
+                        db.collection("products").document(productId).delete();
+                    }
+                }
+
+
+                // Delete the bundle document
 
                 System.out.println("Bundle deleted successfully");
 
