@@ -83,6 +83,7 @@ class DBController {
                 jsonDataBuilder.append("      \"products\": [\n");
 
 
+
                 // Extract product IDs from the document
                 List<DocumentReference> productRefs = (List<DocumentReference>) document.get("productIds");
                 List<String> productIds = new ArrayList<>();
