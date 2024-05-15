@@ -312,16 +312,15 @@ class DBController {
         }
     }
 
-    private String[] addProduct(String[] productIds){
+    private List<DocumentReference> addProduct(String[] productIds){
         //CollectionReference products = db.collection("products");
         WebClient webClient = webClientBuilder.build();
         int i=0;
-        String[] productIdList = new String[productIds.length];
+        List<DocumentReference> documentReferences = new ArrayList<>();
 
         for (String id: productIds){
 
             String[] idParts = id.split("@");
-            productIdList[i]=(idParts[1]);
 
             DocumentReference docRef = db.collection("products").document(idParts[1]);
             //System.out.println("TESTINGGG");
@@ -367,6 +366,7 @@ class DBController {
                         //return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating document: " + e.getMessage());
                     }
                 }
+                documentReferences.add(docRef);
 
             } catch (InterruptedException | ExecutionException e) {
                 // Handle any errors that may occur
@@ -375,7 +375,7 @@ class DBController {
 
             i++;
         }
-        return productIdList;
+        return documentReferences;
     }
 
 
@@ -399,13 +399,13 @@ class DBController {
             productIdSplit[i] = productIdSplit[i].replaceAll("\"", "");
         }
 
-        String[] productIdFinal = addProduct(productIdSplit);
+        List<DocumentReference> productIdFinal = addProduct(productIdSplit);
 
         // Create a map to hold the data for the new document
         Map<String, Object> data = new HashMap<>();
         data.put("name", bundleTitle);
         data.put("description", bundleDescription);
-        data.put("productIds", Arrays.asList(productIdFinal));
+        data.put("productIds", productIdFinal);
         data.put("price", "$XX");
 
         // Process bundle data
@@ -484,7 +484,7 @@ class DBController {
     @DeleteMapping("/api/deleteBundle/{bundleId}")
     public String deleteBundle(@PathVariable String bundleId) {
         System.out.println("I am in deleteBundle");
-        bundleId="3eWJgwFYXJYh8P8caPtO";
+        //bundleId="3eWJgwFYXJYh8P8caPtO";
 
         try {
             // Reference to the bundle document in Firestore
