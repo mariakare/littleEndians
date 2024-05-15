@@ -117,7 +117,7 @@ class DBController {
                     jsonDataBuilder.append("          \"name\": \"").append(productType).append("\",\n");
                     jsonDataBuilder.append("          \"description\": \"").append(productDescription).append("\",\n");
                     jsonDataBuilder.append("          \"price\": \"").append(productPrice).append("\",\n");
-                    jsonDataBuilder.append("          \"image\": \"").append(imageLink).append("\"\n");
+                    jsonDataBuilder.append("          \"imageLink\": \"").append(imageLink).append("\"\n");
                     jsonDataBuilder.append("        },\n");
 
                 }
@@ -414,7 +414,7 @@ class DBController {
                         // Add data to the document as needed
                         data.put("name", rootNode.path("name").asText());
                         data.put("description", rootNode.path("description").asText());
-                        data.put("image", rootNode.path("imageLink").asText());
+                        data.put("imageLink", rootNode.path("imageLink").asText());
 
                         ApiFuture<WriteResult> result = docRef.set(data);
 

@@ -63,7 +63,7 @@ function displayBundles(data) {
             productItemDiv.classList.add('product-item');
 
             productItemDiv.innerHTML = `
-        <img src="${product.image}" alt="Product Image">
+        <img src="${product.imageLink}" alt="Product Image">
         <h3 class="product-title">${product.name}</h3>
         <p class="product-description">${product.description}</p>
       `;
