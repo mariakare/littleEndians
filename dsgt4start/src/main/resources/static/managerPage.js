@@ -63,6 +63,7 @@ function displayManagerBundles(data) {
     contentDiv.innerHTML = '';
     // Loop through each bundle
     bundles.forEach(bundle => {
+        console.log(bundle);
         // Create a div element for the bundle
         const bundleDiv = document.createElement('div');
         bundleDiv.classList.add('product');
@@ -98,6 +99,7 @@ function displayManagerBundles(data) {
             // Call a function to handle editing of the bundle
             //editBundle(bundle.id); // You need to implement this function
             currentBundle = bundle.id;
+            console.log("Displaying: " + currentBundle);
             console.log(bundle.id);
             //set global id var to current bundle id
         });
@@ -232,6 +234,7 @@ function setupEditForm(){
 
         // Perform AJAX call to update the bundle with the new values
         // You need to implement this function
+        console.log(currentBundle);
         updateBundle(currentBundle, editedBundleTitle, editedBundleDescription);
 
 
@@ -423,7 +426,19 @@ function deleteBundle(bundleId) {
             if (response.ok) {
                 // Bundle deleted successfully
                 console.log("Bundle deleted successfully");
-                displayManagerBundles(tkn);
+                getBundles(tkn)
+                    .then((bundledata) => {
+                        displayManagerBundles(bundledata);
+                        setupEditForm();
+                        // displayManagerBundles(data);
+                        // // Reattach event listeners after displaying bundles
+                        // attachEventListeners();
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+                //createTab("Active bundles");
+                //displayManagerBundles(tkn);
             } else {
                 // Error occurred while deleting the bundle
                 console.error("Error deleting bundle:", response.statusText);
@@ -461,7 +476,19 @@ function updateBundle(bundleId, bundleTitle, bundleDescription){
         .then((data) => {
             // Handle the response data if needed
             console.log('Bundle updated successfully:', data);
-            displayManagerBundles(tkn);
+            getBundles(tkn)
+                .then((bundledata) => {
+                    displayManagerBundles(bundledata);
+                    setupEditForm();
+                    // displayManagerBundles(data);
+                    // // Reattach event listeners after displaying bundles
+                    // attachEventListeners();
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+            //createTab("Active bundles");
+            //displayManagerBundles(tkn);
 
             return data;
         })

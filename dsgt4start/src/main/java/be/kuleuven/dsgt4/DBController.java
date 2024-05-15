@@ -73,11 +73,13 @@ class DBController {
                 String name = document.getString("name");
                 String description = document.getString("description");
                 String price = document.getString("price");
+                String id = document.getString("id");
 
                 // Append bundle details to the JSON string
                 jsonDataBuilder.append("    {\n");
                 jsonDataBuilder.append("      \"name\": \"").append(name).append("\",\n");
                 jsonDataBuilder.append("      \"description\": \"").append(description).append("\",\n");
+                jsonDataBuilder.append("      \"id\": \"").append(id).append("\",\n");
                 jsonDataBuilder.append("      \"products\": [\n");
 
 
@@ -403,6 +405,7 @@ class DBController {
 
         // Create a map to hold the data for the new document
         Map<String, Object> data = new HashMap<>();
+        data.put("id", "");
         data.put("name", bundleTitle);
         data.put("description", bundleDescription);
         data.put("productIds", productIdFinal);
@@ -420,13 +423,15 @@ class DBController {
 
             // Set the data for the new document
             ApiFuture<WriteResult> writeResult = bundleRef.set(data);
-            // Wait for the operation to complete
             writeResult.get();
 
             // Retrieve the Firestore-generated ID of the new document
             String bundleId = bundleRef.getId();
 
-            // Return a success response with the ID of the newly created document
+            ApiFuture<WriteResult> updateFuture = bundleRef.update("id", bundleId);
+            updateFuture.get();
+
+                        // Return a success response with the ID of the newly created document
             return ResponseEntity.status(HttpStatus.CREATED).body("Bundle created with ID: " + bundleId);
         } catch (Exception e) {
             // Handle any exceptions that might occur during the operation
@@ -444,7 +449,7 @@ class DBController {
             @RequestParam("bundleDescription") String bundleDescription
     ) {
         System.out.println("I am in updateBundle");
-        bundleId="mnLObSBKMBZGJ8UzHTrI";//TODO: This needs to be gone
+        //bundleId="mnLObSBKMBZGJ8UzHTrI";//TODO: This needs to be gone
         // Process updated bundle data
         String response = "Bundle ID: " + bundleId + "\n" +
                 "Updated Bundle Title: " + bundleTitle + "\n" +
