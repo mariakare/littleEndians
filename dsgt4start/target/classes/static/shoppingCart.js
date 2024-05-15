@@ -112,9 +112,12 @@ function deleteCartBundle(bundleId) {
 
 export function wireupCartButton(token){
     tkn = token;
-    document.getElementById('btnShoppingBasket').addEventListener('click', function() {
+    const viewCartButton = document.getElementById("btnShoppingBasket");
+    if (viewCartButton.style.display === "none") {
+        viewCartButton.style.display = "block";
+    }
+    viewCartButton.addEventListener('click', function() {
         getCart(tkn);
     });
-
 
 }
