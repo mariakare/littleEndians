@@ -60,14 +60,14 @@ function displayShoppingCart(data) {
     // Append heading to containerDiv
     cartDiv.appendChild(heading);
 
-    data.forEach(item => {
+    data.cart.forEach(item => {
         // Create a div for each item
         const itemDiv = document.createElement('div');
         itemDiv.classList.add('cart-item');
 
         // Display item name
         const itemName = document.createElement('span');
-        itemName.textContent = item.bundleName;
+        itemName.textContent = item.name;
         itemDiv.appendChild(itemName);
 
         // Create a delete button for each item
