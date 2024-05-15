@@ -83,16 +83,16 @@ class DBController {
                 jsonDataBuilder.append("      \"products\": [\n");
 
 
-
                 // Extract product IDs from the document
                 List<DocumentReference> productRefs = (List<DocumentReference>) document.get("productIds");
-                List<String> productIds = new ArrayList<>();
-
+                //List<DocumentReference> productIds = new ArrayList<>();
+                /*
                 for (DocumentReference productRef : productRefs) {
                     productIds.add(productRef.getId());
                 }
-                int i=0;
-                for (String productId : productIds) {
+                */
+                //int i=0;
+                for (DocumentReference productRef : productRefs) {
                     // Fetch product document from Firestore
                     String productType = null;
                     String productDescription = null;
@@ -100,7 +100,7 @@ class DBController {
                     String imageLink = null;
 
                     // Retrieve product data directly from Firestore
-                    DocumentReference productRef = this.db.collection("products").document(productId);
+                    //DocumentReference productRef = this.db.collection("products").document(productId);
                     DocumentSnapshot productSnapshot = productRef.get().get();
                     if (productSnapshot.exists()) {
                         // Extract product data from the product document
@@ -124,7 +124,7 @@ class DBController {
                 //i=0;
 
                 // Remove the trailing comma from the last product object
-                if (!productIds.isEmpty()) {
+                if (!productRefs.isEmpty()) {
                     jsonDataBuilder.deleteCharAt(jsonDataBuilder.length() - 2); // Removes the last comma
                 }
 
@@ -168,16 +168,41 @@ class DBController {
         ApiFuture<DocumentSnapshot> bundleFuture = bundleRef.get();
         DocumentSnapshot bundleSnapshot = bundleFuture.get();
         if (bundleSnapshot.exists()) {
-            Map<String, Object> bundleData = bundleSnapshot.getData();
+//            String fieldValue = bundleSnapshot.getString("id");
+            Map<String, Object> data = new HashMap<>();
+            data.put("bundleRef", bundleRef);
+            data.put("id", "");
+//
+//            // Add the bundle document to the basket subcollection under the user's document
+//            DocumentReference addedBundleRef = userRef.collection("basket").add(bundleData).get();
+//            // Wait for the result
+//            Map<String, Object> updatedBundleData = new HashMap<>();
+//            updatedBundleData.put("cartBundleId", addedBundleRef.getId());
+//            addedBundleRef.update(updatedBundleData);
+//            // Return a response
+            try {
 
-            // Add the bundle document to the basket subcollection under the user's document
-            DocumentReference addedBundleRef = userRef.collection("basket").add(bundleData).get();
-            // Wait for the result
-            Map<String, Object> updatedBundleData = new HashMap<>();
-            updatedBundleData.put("cartBundleId", addedBundleRef.getId());
-            addedBundleRef.update(updatedBundleData);
-            // Return a response
-            return ResponseEntity.status(HttpStatus.CREATED).body("Bundle with ID: " + bundleId + " added to cart with ID: " + addedBundleRef.getId());
+                DocumentReference cartBundleRef = userRef.collection("basket").document();
+
+
+                // Set the data for the new document
+                ApiFuture<WriteResult> writeResult = cartBundleRef.set(data);
+                writeResult.get();
+
+                // Retrieve the Firestore-generated ID of the new document
+                String cartId = cartBundleRef.getId();
+
+                ApiFuture<WriteResult> updateFuture = cartBundleRef.update("id", cartId);
+                updateFuture.get();
+
+                // Return a success response with the ID of the newly created document
+                return ResponseEntity.status(HttpStatus.CREATED).body("Bundle created with ID: " + cartId);
+            } catch (Exception e) {
+                // Handle any exceptions that might occur during the operation
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating document: " + e.getMessage());
+            }
+            //return ResponseEntity.status(HttpStatus.CREATED).body("Bundle with ID: " + bundleId + " added to cart with ID: " + BundleRef.getId());
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bundle with ID: " + bundleId + " does not exist");
         }
