@@ -76,7 +76,7 @@ function displayShoppingCart(data) {
         deleteButton.addEventListener('click', function() {
             // Handle delete action
             console.log(item);
-            deleteCartBundle(item.cartBundleId);
+            deleteCartBundle(item.id);
         });
         itemDiv.appendChild(deleteButton);
 

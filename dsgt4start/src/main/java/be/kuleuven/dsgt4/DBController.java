@@ -209,7 +209,7 @@ class DBController {
     }
 
     @GetMapping("/api/getCart")
-    public List<Map<String, Object>> getCart() throws ExecutionException, InterruptedException {
+    public String getCart() throws ExecutionException, InterruptedException {
         var user = WebSecurityConfig.getUser();
 
         // Reference to the user's document
@@ -217,12 +217,46 @@ class DBController {
 
         ApiFuture<QuerySnapshot> querySnapshot = basketRef.get();
         List<Map<String, Object>> shoppingCart = new ArrayList<>();
-        for (QueryDocumentSnapshot document : querySnapshot.get().getDocuments()) {
-            Map<String, Object> itemData = document.getData();
-            shoppingCart.add(itemData);
-        }
-        return shoppingCart;
 
+        StringBuilder jsonDataBuilder = new StringBuilder();
+        jsonDataBuilder.append("{\n");
+        jsonDataBuilder.append("  \"cart\": [\n");
+
+        for (QueryDocumentSnapshot document : querySnapshot.get().getDocuments()) {
+
+            String id = document.getString("id");
+            jsonDataBuilder.append("    {\n");
+            jsonDataBuilder.append("    \"id\": \"").append(id).append("\",\n");
+
+            DocumentReference bundleRef = (DocumentReference) document.get("bundleRef");
+            String bundleName = "";
+            String bundleId = "";
+
+
+            DocumentSnapshot bundleSnapshot = bundleRef.get().get();
+            if (bundleSnapshot.exists()) {
+                // Extract product data from the product document
+                bundleName = bundleSnapshot.getString("name");
+                bundleId = bundleSnapshot.getString("id");
+            } else {
+                System.out.println("bundle does not exist");
+            }
+
+            jsonDataBuilder.append("    \"name\": \"").append(bundleName).append("\",\n");
+            jsonDataBuilder.append("    \"bundleId\": \"").append(bundleId).append("\"\n");
+            jsonDataBuilder.append("    },\n");
+
+        }
+
+        if (!querySnapshot.get().getDocuments().isEmpty()) {
+            jsonDataBuilder.deleteCharAt(jsonDataBuilder.length() - 2); // Removes the last comma
+        }
+
+        jsonDataBuilder.append("]\n");
+        jsonDataBuilder.append("}\n");
+
+        System.out.println(jsonDataBuilder.toString());
+        return jsonDataBuilder.toString();
     }
 
     @DeleteMapping("/api/removeFromCart")
