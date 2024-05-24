@@ -284,6 +284,15 @@ class DBController {
     }
 
 
+    @PostMapping("/api/buyBundle")
+    public ResponseEntity<String> buyBundle(@RequestBody String bundleId) throws ExecutionException, InterruptedException {
+        // Print out the bundleId
+        System.out.println("Buying bundle with ID: " + bundleId);
+        // Return a success response
+        return ResponseEntity.status(HttpStatus.OK).body("Bundle with ID: " + bundleId);
+    }
+
+
 
     @GetMapping("/api/getProducts")
     public String getProducts() throws JsonProcessingException {
