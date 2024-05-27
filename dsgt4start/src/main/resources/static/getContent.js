@@ -12,11 +12,40 @@ export function setupUserPage(token)    {
         .then((data) => {
             displayBundles(data);
             cart.wireupCartButton(tkn);
+            wireupBundlesButton(tkn);
 
         })
         .catch((error) => {
             console.error(error);
         });
+}
+
+function wireupBundlesButton(tkn){
+    const headerButtonsContainer = document.getElementById("divHeaderButtons"); // Assuming the header element has an ID of "header"
+
+    // Create a new button element
+    const bundlesButton = document.createElement("button");
+    bundlesButton.id = "btnBundles"; // Set an ID for the new button
+    bundlesButton.textContent = "Explore Bundles"; // Set the button text
+    bundlesButton.style.display = "block"; // Ensure the button is visible
+
+    // Append the button to the header
+    const firstButton = headerButtonsContainer.firstChild;
+    headerButtonsContainer.insertBefore(bundlesButton, firstButton);
+
+    // Add an event listener to call the display() function when clicked
+    bundlesButton.addEventListener('click', function() {
+        getBundles(tkn)
+            .then((data) => {
+                // wireupBundlesButton(tkn);
+                displayBundles(data);
+                // cart.wireupCartButton(tkn);
+
+            })
+            .catch((error) => {
+                console.error(error);
+            });// Assuming display function might need the token as a parameter
+    });
 }
 
 /**
