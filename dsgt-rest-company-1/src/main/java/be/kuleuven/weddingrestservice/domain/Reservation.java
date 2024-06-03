@@ -6,6 +6,9 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class Reservation {
 
@@ -14,7 +17,8 @@ public class Reservation {
     public enum Status {
         PENDING,
         CONFIRMED,
-        CANCELLED
+        CANCELLED,
+        DELIVERED
     }
 
     private String reservationId;
@@ -27,7 +31,7 @@ public class Reservation {
     //TODO: add a timeout/expiration for reservation???
     private Status status;
     private Map<String, Integer> products; // Map of productId to quantity
-
+    private ScheduledExecutorService scheduler;
     // Constructors
     public Reservation() {
     }
@@ -37,6 +41,23 @@ public class Reservation {
         this.timestamp = timestamp;
         this.status = Status.PENDING;
         this.products = new HashMap<>();
+    }
+
+    public synchronized void confirmReservation(){
+        this.scheduler = Executors.newSingleThreadScheduledExecutor();
+        this.status = Status.CONFIRMED;
+
+        // Schedule the status change to DELIVERED after a random delay
+        int delay = (int) (Math.random() * 21) + 10; // Random delay between 10 and 30 seconds
+        scheduler.schedule(() -> {
+            this.status = Status.DELIVERED;
+        }, delay, TimeUnit.SECONDS);
+        this.shutdownScheduler();
+    }
+
+    // Add a method to shut down the scheduler when the reservation is no longer needed
+    public void shutdownScheduler() {
+        scheduler.shutdown();
     }
 
     // Getters and Setters

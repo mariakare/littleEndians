@@ -164,13 +164,12 @@ input[type="password"] {
 
 
 
-.cart{
+.cart {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
 }
-
 
 .cart-item {
     display: flex;
@@ -183,19 +182,47 @@ input[type="password"] {
 }
 
 .cart-item span {
-    margin-right: 10px; /* Add spacing between item name and delete button */
+    flex-grow: 1; /* Make the span take up remaining space */
 }
 
 .cart-item button {
-    background-color: #dc3545; /* Coral color */
     color: white;
     border: none;
     padding: 5px 10px;
     cursor: pointer;
+    margin-left: 10px; /* Add margin between buttons */
 }
 
-.cart-item button:hover {
-    background-color: #ff5733; /* Darker coral color on hover */
+.cart-item .delete-button {
+    background-color: #dc3545; /* Coral color for delete button */
+}
+
+.cart-item .delete-button:hover {
+    background-color: #ff5733; /* Darker coral color on hover for delete button */
+}
+
+.cart-item .buy-button {
+    background-color: #007bff; /* Blue color for individual buy button */
+}
+
+.cart-item .buy-button:hover {
+    background-color: #0056b3; /* Darker blue color on hover for individual buy button */
+}
+
+/* Style for the buy cart button */
+#buy-cart {
+    background-color: #007bff; /* Blue color */
+    color: white;
+    border: none;
+    padding: 10px 0; /* Add vertical padding */
+    width: 100%; /* Make the button as wide as the screen */
+    cursor: pointer;
+    text-align: center;
+    font-size: 16px; /* Increase font size for better visibility */
+}
+
+#buy-cart:hover {
+    background-color: #0056b3; /* Darker blue color on hover */
 }
 
 
