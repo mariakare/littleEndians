@@ -255,7 +255,7 @@ class DBController {
         jsonDataBuilder.append("]\n");
         jsonDataBuilder.append("}\n");
 
-        System.out.println(jsonDataBuilder.toString());
+        //System.out.println(jsonDataBuilder.toString());
         return jsonDataBuilder.toString();
     }
 
@@ -611,7 +611,7 @@ class DBController {
     public String sendReservation(@RequestBody String bundleId) throws InterruptedException, ExecutionException {
         var user = WebSecurityConfig.getUser();
 
-        System.out.println("Bundle ID: " + bundleId);
+        //System.out.println("Bundle ID: " + bundleId);
 
         // Array of endpoint URLs
         WebClient webClient = webClientBuilder.build();
@@ -622,11 +622,22 @@ class DBController {
         };
 
         DocumentReference orderRef = db.collection("user").document(user.getEmail()).collection("basket").document(bundleId);
-        DocumentSnapshot orderSnapshot = orderRef.get().get();
 
-        if (orderSnapshot.exists()) {
+        ApiFuture<DocumentSnapshot> future = orderRef.get();
+        DocumentSnapshot orderSnap;
+        try {
+            orderSnap = future.get();
+            //System.out.println(orderSnap.getData());
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return "Bundle Does not Exist!";
+        }
+
+        if (orderSnap.exists()) {
+
+            //System.out.println("WTF is going on???");
             // Get the DocumentReference from the "bundleRef" field
-            DocumentReference bundleRef = (DocumentReference) orderSnapshot.get("bundleRef");
+            DocumentReference bundleRef = (DocumentReference) orderSnap.get("bundleRef");
 
             DocumentSnapshot bundleSnapshot = bundleRef.get().get();
             List<DocumentReference> productRefs = (List<DocumentReference>) bundleSnapshot.get("productIds");
@@ -649,19 +660,29 @@ class DBController {
                             break;
                         }
 
-                    String responseBody = webClient.get()
-                            .uri(endpointURL)
-                            .retrieve()
-                            .bodyToMono(String.class)
-                            .block();
-
-                    System.out.println(responseBody);
-
+                    /** UNCOMMENT AFTER ENDPOINT FIXED **/
+//                    String responseBody = webClient.get()
+//                            .uri(endpointURL)
+//                            .retrieve()
+//                            .bodyToMono(String.class)
+//                            .block();
+//
+//                    System.out.println(responseBody);
 
                 } else {
                     System.out.println("product does not exist");
                 }
             }
+
+            /** UNCOMMENT AFTER ENDPOINT FIXED **/
+//            if (responseBody == "XXX"){
+//                System.out.println("Bundle reserved successfully");
+                moveBundle(bundleId, "basket", "processing");
+//            }
+//            else{
+//
+//            }
+
         }
 
 
@@ -673,5 +694,29 @@ class DBController {
 
     }
 
+    public String moveBundle(String bundleId, String initCollection, String finalCollection) throws ExecutionException, InterruptedException {
+        var user = WebSecurityConfig.getUser();
+
+        System.out.println("Moving bundle now...");
+
+        String result = "";
+
+        DocumentReference sourceRef = db.collection("user").document(user.getEmail()).collection(initCollection).document(bundleId);
+        DocumentReference destinationRef = db.collection("user").document(user.getEmail()).collection(finalCollection).document(bundleId);
+
+        ApiFuture<DocumentSnapshot> future = sourceRef.get();
+        DocumentSnapshot document = future.get();
+
+        if (document.exists()) {
+            destinationRef.set(document.getData());
+            sourceRef.delete();
+            result = ("Document " + bundleId + " moved from " + initCollection + " to " + finalCollection);
+        } else {
+            result = ("No document found with ID " + bundleId + " in collection " + initCollection);
+        }
+
+        System.out.println(result);
+        return result;
+    }
 
 }

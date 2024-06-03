@@ -144,7 +144,7 @@ function buyBundle(bundleId){
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + tkn
         },
-        body: JSON.stringify({ bundleId: bundleId })
+        body: bundleId
     })
         .then(response => {
             if (!response.ok) {
