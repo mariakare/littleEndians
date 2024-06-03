@@ -415,6 +415,7 @@ class DBController {
                         data.put("name", rootNode.path("name").asText());
                         data.put("description", rootNode.path("description").asText());
                         data.put("imageLink", rootNode.path("imageLink").asText());
+                        data.put("supplier", idParts[0].substring(0, idParts[0].length() - "products/".length()));
 
                         ApiFuture<WriteResult> result = docRef.set(data);
 
