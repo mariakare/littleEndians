@@ -607,5 +607,71 @@ class DBController {
         }
     }
 
+    @PostMapping("/api/sendReservation")
+    public String sendReservation(@RequestBody String bundleId) throws InterruptedException, ExecutionException {
+        var user = WebSecurityConfig.getUser();
+
+        System.out.println("Bundle ID: " + bundleId);
+
+        // Array of endpoint URLs
+        WebClient webClient = webClientBuilder.build();
+        String[] endpointURLs = {
+                "http://sud.switzerlandnorth.cloudapp.azure.com:8080/reservations/",
+                "http://ivan.canadacentral.cloudapp.azure.com:8080/reservations/",
+                "http://sud.japaneast.cloudapp.azure.com:8080/reservations/"
+        };
+
+        DocumentReference orderRef = db.collection("user").document(user.getEmail()).collection("basket").document(bundleId);
+        DocumentSnapshot orderSnapshot = orderRef.get().get();
+
+        if (orderSnapshot.exists()) {
+            // Get the DocumentReference from the "bundleRef" field
+            DocumentReference bundleRef = (DocumentReference) orderSnapshot.get("bundleRef");
+
+            DocumentSnapshot bundleSnapshot = bundleRef.get().get();
+            List<DocumentReference> productRefs = (List<DocumentReference>) bundleSnapshot.get("productIds");
+
+            for (DocumentReference productRef : productRefs) {
+                // Fetch product document from Firestore
+                String productId = null;
+
+                // Retrieve product data directly from Firestore
+                //DocumentReference productRef = this.db.collection("products").document(productId);
+                DocumentSnapshot productSnapshot = productRef.get().get();
+                if (productSnapshot.exists()) {
+                    // Extract product data from the product document
+                    productId = productSnapshot.getId();
+                    String supplier = (String) productSnapshot.get("supplier");
+                    String endpointURL = "";
+                    for (String endpoint : endpointURLs)
+                        if (endpoint.contains(supplier)) {
+                            endpointURL = endpoint;
+                            break;
+                        }
+
+                    String responseBody = webClient.get()
+                            .uri(endpointURL)
+                            .retrieve()
+                            .bodyToMono(String.class)
+                            .block();
+
+                    System.out.println(responseBody);
+
+
+                } else {
+                    System.out.println("product does not exist");
+                }
+            }
+        }
+
+
+        // send reservation per bundle
+        // [add supplier field to product later]
+        // return bundle reference
+
+        return "nice";
+
+    }
+
 
 }

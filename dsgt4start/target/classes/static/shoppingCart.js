@@ -137,7 +137,8 @@ function deleteCartBundle(bundleId) {
 
 
 function buyBundle(bundleId){
-    fetch('/api/buyBundle', {
+    console.log("Bundle ID:", bundleId);
+    fetch('/api/sendReservation', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
