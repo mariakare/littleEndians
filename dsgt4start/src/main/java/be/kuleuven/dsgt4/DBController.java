@@ -613,6 +613,7 @@ class DBController {
         System.out.println("i am in reserve");
         var user = WebSecurityConfig.getUser();
         boolean isSuccesful=true;
+        Map<String, String> reservations = new HashMap<>();
 
         //System.out.println("Bundle ID: " + bundleId);
 
@@ -652,7 +653,7 @@ class DBController {
 
                 String supplierUrl = (String) productSnapshot.get("supplier");
 
-                String finalUrl = supplierUrl + "/products/reserve";
+                String finalUrl = supplierUrl + "products/reserve";
                 System.out.println(finalUrl);
 
                 Map<String, Integer> productsToReserve = new HashMap<>();
@@ -669,6 +670,8 @@ class DBController {
                     System.out.println(responseBody.toString());
 
                     boolean isSuccessful = responseBody.get("status").equals("PENDING");
+                    String reservationId = (String) responseBody.get("reservationId");
+                    reservations.put(reservationId, supplierUrl);
                     if(!isSuccessful){
                         isSuccesful=false;
 
@@ -710,10 +713,11 @@ class DBController {
             }
 //            }
 
-            /** UNCOMMENT AFTER ENDPOINT FIXED **/
+
             if (isSuccesful){
                 System.out.println("Bundle reserved successfully");
                 moveBundle(bundleId, "basket", "processing");
+                buyBundle(reservations);
             }
             else{
                 System.out.println("Bundle was not reserved successfully:(((((");
@@ -757,30 +761,28 @@ class DBController {
     }
 
 
-    public String buyBundle(String bundleId){
+    public String buyBundle(Map<String, String> reservations){
 
 
         WebClient webClient = webClientBuilder.build();
 
         try {
-            DocumentReference bundleRef = db.collection("bundles").document(bundleId);
-            DocumentSnapshot bundleSnapshot = bundleRef.get().get();
+//            DocumentReference bundleRef = db.collection("bundles").document(bundleId);
+//            DocumentSnapshot bundleSnapshot = bundleRef.get().get();
 
-            if (bundleSnapshot.exists()) {
-                List<DocumentReference> productRefs = (List<DocumentReference>) bundleSnapshot.get("productIds");
+            if (!reservations.isEmpty()) {
+                //List<DocumentReference> productRefs = (List<DocumentReference>) bundleSnapshot.get("productIds");
 
 
 
                 List<Thread> threads = new ArrayList<>();
-                for (DocumentReference productRef : productRefs) {
-                    String productId = productRef.getId();
+                for (Map.Entry<String, String> entry : reservations.entrySet())  {
+                    String reservationId = entry.getKey();
+                    String url = entry.getValue();
 
-                    DocumentReference productDocRef = db.collection("products").document(productId);
-                    DocumentSnapshot productSnapshot = productDocRef.get().get();
 
-                    String supplierUrl = (String) productSnapshot.get("supplier");
-
-                    String finalUrl = supplierUrl + "/reservations/" + productId + "/confirm";//this is still wrong //TODO
+                    String finalUrl = url + "reservations/" + reservationId + "/confirm";
+                    System.out.println(finalUrl);
 
                     Thread thread = new Thread(() -> {
                         boolean confirmed = false;
@@ -793,10 +795,13 @@ class DBController {
                                         .bodyToMono(String.class)
                                         .block();
 
+                                System.out.println(responseBody);
+                                confirmed=true;
+
                                 // Check response for confirmation (modify this condition based on your supplier's response format)
-                                if (responseBody == "sth??") {//TODO
-                                    confirmed = true;
-                                }
+//                                if (responseBody == "sth??") {//TODO
+//                                    confirmed = true;
+//                                }
                             } catch (Exception e) {
 
                             }
@@ -814,7 +819,7 @@ class DBController {
                     try {
                         thread.join();
                     } catch (InterruptedException e) {
-                        // Handle interruption TODO
+                        System.out.println("uh oh D:");
                     }
 
                 }
