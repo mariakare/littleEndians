@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.google.api.core.ApiFuture;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
@@ -501,7 +502,7 @@ class DBController {
             ApiFuture<WriteResult> updateFuture = bundleRef.update("id", bundleId);
             updateFuture.get();
 
-                        // Return a success response with the ID of the newly created document
+            // Return a success response with the ID of the newly created document
             return ResponseEntity.status(HttpStatus.CREATED).body("Bundle created with ID: " + bundleId);
         } catch (Exception e) {
             // Handle any exceptions that might occur during the operation
@@ -609,17 +610,19 @@ class DBController {
 
     @PostMapping("/api/sendReservation")
     public String sendReservation(@RequestBody String bundleId) throws InterruptedException, ExecutionException {
+        System.out.println("i am in reserve");
         var user = WebSecurityConfig.getUser();
+        boolean isSuccesful=true;
 
         //System.out.println("Bundle ID: " + bundleId);
 
         // Array of endpoint URLs
         WebClient webClient = webClientBuilder.build();
-        String[] endpointURLs = {
-                "http://sud.switzerlandnorth.cloudapp.azure.com:8080/reservations/",
-                "http://ivan.canadacentral.cloudapp.azure.com:8080/reservations/",
-                "http://sud.japaneast.cloudapp.azure.com:8080/reservations/"
-        };
+//        String[] endpointURLs = {
+//                "http://sud.switzerlandnorth.cloudapp.azure.com:8080/reservations/",
+//                "http://ivan.canadacentral.cloudapp.azure.com:8080/reservations/",
+//                "http://sud.japaneast.cloudapp.azure.com:8080/reservations/"
+//        };
 
         DocumentReference orderRef = db.collection("user").document(user.getEmail()).collection("basket").document(bundleId);
 
@@ -643,45 +646,79 @@ class DBController {
             List<DocumentReference> productRefs = (List<DocumentReference>) bundleSnapshot.get("productIds");
 
             for (DocumentReference productRef : productRefs) {
-                // Fetch product document from Firestore
-                String productId = null;
+                String productId = productRef.getId();
+                DocumentReference productDocRef = db.collection("products").document(productId);
+                DocumentSnapshot productSnapshot = productDocRef.get().get();
+
+                String supplierUrl = (String) productSnapshot.get("supplier");
+
+                String finalUrl = supplierUrl + "/products/reserve";
+                System.out.println(finalUrl);
+
+                Map<String, Integer> productsToReserve = new HashMap<>();
+                productsToReserve.put(productId, 1);
+                try {
+                    Map responseBody = webClient.post()
+                            .uri(finalUrl)
+                            .body(BodyInserters.fromObject(productsToReserve))
+                            .retrieve()
+                            .bodyToMono(Map.class)
+                            .block();
+                    // ... (process successful response - optional)
+
+                    System.out.println(responseBody.toString());
+
+                    boolean isSuccessful = responseBody.get("status").equals("PENDING");
+                    if(!isSuccessful){
+                        isSuccesful=false;
+
+                    }
+                } catch (Exception e) {
+                    // Handle exception within the thread (e.g., log the error)
+                    System.out.println("error in reservation of"+ productId);
+                    isSuccesful=false;
+
+                }
+
+
 
                 // Retrieve product data directly from Firestore
                 //DocumentReference productRef = this.db.collection("products").document(productId);
-                DocumentSnapshot productSnapshot = productRef.get().get();
-                if (productSnapshot.exists()) {
-                    // Extract product data from the product document
-                    productId = productSnapshot.getId();
-                    String supplier = (String) productSnapshot.get("supplier");
-                    String endpointURL = "";
-                    for (String endpoint : endpointURLs)
-                        if (endpoint.contains(supplier)) {
-                            endpointURL = endpoint;
-                            break;
-                        }
-
-                    /** UNCOMMENT AFTER ENDPOINT FIXED **/
-//                    String responseBody = webClient.get()
-//                            .uri(endpointURL)
-//                            .retrieve()
-//                            .bodyToMono(String.class)
-//                            .block();
+//                DocumentSnapshot productSnapshot = productRef.get().get();
+//                if (productSnapshot.exists()) {
+//                    // Extract product data from the product document
+//                    productId = productSnapshot.getId();
+//                    String supplier = (String) productSnapshot.get("supplier");
+//                    String endpointURL = "";
+//                    for (String endpoint : endpointURLs)
+//                        if (endpoint.contains(supplier)) {
+//                            endpointURL = endpoint;
+//                            break;
+//                        }
 //
-//                    System.out.println(responseBody);
-
-                } else {
-                    System.out.println("product does not exist");
-                }
+//                    /** UNCOMMENT AFTER ENDPOINT FIXED **/
+////                    String responseBody = webClient.get()
+////                            .uri(endpointURL)
+////                            .retrieve()
+////                            .bodyToMono(String.class)
+////                            .block();
+////
+////                    System.out.println(responseBody);
+//
+//                } else {
+//                    System.out.println("product does not exist");
             }
+//            }
 
             /** UNCOMMENT AFTER ENDPOINT FIXED **/
-//            if (responseBody == "XXX"){
-//                System.out.println("Bundle reserved successfully");
+            if (isSuccesful){
+                System.out.println("Bundle reserved successfully");
                 moveBundle(bundleId, "basket", "processing");
-//            }
-//            else{
-//
-//            }
+            }
+            else{
+                System.out.println("Bundle was not reserved successfully:(((((");
+
+            }
 
         }
 
@@ -718,13 +755,10 @@ class DBController {
         System.out.println(result);
         return result;
     }
+
+
     public String buyBundle(String bundleId){
 
-        String[] endpointURLs = {
-                "http://sud.switzerlandnorth.cloudapp.azure.com:8080/products/reserve",
-                "http://ivan.canadacentral.cloudapp.azure.com:8080/products/reserve",
-                "http://sud.japaneast.cloudapp.azure.com:8080/products/reserve"
-        };
 
         WebClient webClient = webClientBuilder.build();
 
@@ -738,29 +772,62 @@ class DBController {
 
 
                 List<Thread> threads = new ArrayList<>();
-                // Create threads outside the loop
-                for (String finalUrl : endpointURLs) {
+                for (DocumentReference productRef : productRefs) {
+                    String productId = productRef.getId();
+
+                    DocumentReference productDocRef = db.collection("products").document(productId);
+                    DocumentSnapshot productSnapshot = productDocRef.get().get();
+
+                    String supplierUrl = (String) productSnapshot.get("supplier");
+
+                    String finalUrl = supplierUrl + "/reservations/" + productId + "/confirm";//this is still wrong //TODO
+
                     Thread thread = new Thread(() -> {
-                        String responseBody = webClient.get()
-                                .uri(finalUrl)
-                                .retrieve()
-                                .bodyToMono(String.class)
-                                .block();
+                        boolean confirmed = false;
 
+                        while (!confirmed) {
+                            try {
+                                String responseBody = webClient.post()
+                                        .uri(finalUrl)
+                                        .retrieve()
+                                        .bodyToMono(String.class)
+                                        .block();
 
-                        if (true) {
+                                // Check response for confirmation (modify this condition based on your supplier's response format)
+                                if (responseBody == "sth??") {//TODO
+                                    confirmed = true;
+                                }
+                            } catch (Exception e) {
 
-                            return;
-                        } else {
-                            // Retry logic here (e.g., sleep and call again)
+                            }
                         }
+
                     });
                     threads.add(thread);
                 }
 
+                for (Thread thread : threads) {
+                    thread.start();
+                }
+
+                for (Thread thread : threads) {
+                    try {
+                        thread.join();
+                    } catch (InterruptedException e) {
+                        // Handle interruption TODO
+                    }
+
+                }
+
+
             } else {
                 // bruh it doesn't exist
+
             }
+
+
+
+
         } catch (Exception e) {
             // Handle any exceptions that might occur
         }
