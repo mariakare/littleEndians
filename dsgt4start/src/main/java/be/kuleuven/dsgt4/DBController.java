@@ -718,13 +718,10 @@ class DBController {
         System.out.println(result);
         return result;
     }
+
+
     public String buyBundle(String bundleId){
 
-        String[] endpointURLs = {
-                "http://sud.switzerlandnorth.cloudapp.azure.com:8080/products/reserve",
-                "http://ivan.canadacentral.cloudapp.azure.com:8080/products/reserve",
-                "http://sud.japaneast.cloudapp.azure.com:8080/products/reserve"
-        };
 
         WebClient webClient = webClientBuilder.build();
 
@@ -738,29 +735,62 @@ class DBController {
 
 
                 List<Thread> threads = new ArrayList<>();
-                // Create threads outside the loop
-                for (String finalUrl : endpointURLs) {
+                for (DocumentReference productRef : productRefs) {
+                    String productId = productRef.getId();
+
+                    DocumentReference productDocRef = db.collection("products").document(productId);
+                    DocumentSnapshot productSnapshot = productDocRef.get().get();
+
+                    String supplierUrl = (String) productSnapshot.get("supplier");
+
+                    String finalUrl = supplierUrl + "/reservations/" + productId + "/confirm";//this is still wrong //TODO
+
                     Thread thread = new Thread(() -> {
-                        String responseBody = webClient.get()
-                                .uri(finalUrl)
-                                .retrieve()
-                                .bodyToMono(String.class)
-                                .block();
+                        boolean confirmed = false;
 
+                        while (!confirmed) {
+                            try {
+                                String responseBody = webClient.post()
+                                        .uri(finalUrl)
+                                        .retrieve()
+                                        .bodyToMono(String.class)
+                                        .block();
 
-                        if (true) {
+                                // Check response for confirmation (modify this condition based on your supplier's response format)
+                                if (responseBody == "sth??") {//TODO
+                                    confirmed = true;
+                                }
+                            } catch (Exception e) {
 
-                            return;
-                        } else {
-                            // Retry logic here (e.g., sleep and call again)
+                            }
                         }
+
                     });
                     threads.add(thread);
                 }
 
+                for (Thread thread : threads) {
+                    thread.start();
+                }
+
+                for (Thread thread : threads) {
+                    try {
+                        thread.join();
+                    } catch (InterruptedException e) {
+                        // Handle interruption TODO
+                    }
+
+                }
+
+
             } else {
                 // bruh it doesn't exist
+
             }
+
+
+
+
         } catch (Exception e) {
             // Handle any exceptions that might occur
         }
