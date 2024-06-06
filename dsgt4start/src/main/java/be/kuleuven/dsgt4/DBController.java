@@ -597,5 +597,60 @@ class DBController {
         }
     }
 
+    public String buyBundle(String bundleId){
+
+        String[] endpointURLs = {
+                "http://sud.switzerlandnorth.cloudapp.azure.com:8080/products/reserve",
+                "http://ivan.canadacentral.cloudapp.azure.com:8080/products/reserve",
+                "http://sud.japaneast.cloudapp.azure.com:8080/products/reserve"
+        };
+
+        WebClient webClient = webClientBuilder.build();
+
+        try {
+            DocumentReference bundleRef = db.collection("bundles").document(bundleId);
+            DocumentSnapshot bundleSnapshot = bundleRef.get().get();
+
+            if (bundleSnapshot.exists()) {
+                List<DocumentReference> productRefs = (List<DocumentReference>) bundleSnapshot.get("productIds");
+
+
+                
+                List<Thread> threads = new ArrayList<>();
+                // Create threads outside the loop
+                for (String finalUrl : endpointURLs) {
+                    Thread thread = new Thread(() -> {
+                        String responseBody = webClient.get()
+                                .uri(finalUrl)
+                                .retrieve()
+                                .bodyToMono(String.class)
+                                .block();
+
+
+                        if (true) {
+
+                            return;
+                        } else {
+                            // Retry logic here (e.g., sleep and call again)
+                        }
+                    });
+                    threads.add(thread);
+                }
+
+            } else {
+                // bruh it doesn't exist
+            }
+        } catch (Exception e) {
+            // Handle any exceptions that might occur
+        }
+
+
+
+
+
+        return "";
+
+    }
+
 
 }
