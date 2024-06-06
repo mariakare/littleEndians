@@ -135,7 +135,8 @@ public class ProductsRepository {
     //confirm reservation
     public synchronized void confirmReservation(String reservationId) {
         Reservation reservation = getReservationById(reservationId);
-        reservation.setStatus(Reservation.Status.CONFIRMED);
+        reservation.confirmReservation();
+        //reservation.setStatus(Reservation.Status.CONFIRMED);
     }
 
 

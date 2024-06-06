@@ -255,7 +255,7 @@ class DBController {
         jsonDataBuilder.append("]\n");
         jsonDataBuilder.append("}\n");
 
-        System.out.println(jsonDataBuilder.toString());
+        //System.out.println(jsonDataBuilder.toString());
         return jsonDataBuilder.toString();
     }
 
@@ -282,6 +282,15 @@ class DBController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bundle with ID: " + bundleId + " does not exist");
         }
     }
+
+
+//    @PostMapping("/api/buyBundle")
+//    public ResponseEntity<String> buyBundle(@RequestBody String bundleId) throws ExecutionException, InterruptedException {
+//        // Print out the bundleId
+//        System.out.println("Buying bundle with ID: " + bundleId);
+//        // Return a success response
+//        return ResponseEntity.status(HttpStatus.OK).body("Bundle with ID: " + bundleId);
+//    }
 
 
 
@@ -415,6 +424,7 @@ class DBController {
                         data.put("name", rootNode.path("name").asText());
                         data.put("description", rootNode.path("description").asText());
                         data.put("imageLink", rootNode.path("imageLink").asText());
+                        data.put("supplier", idParts[0].substring(0, idParts[0].length() - "products/".length()));
 
                         ApiFuture<WriteResult> result = docRef.set(data);
 
@@ -597,6 +607,117 @@ class DBController {
         }
     }
 
+    @PostMapping("/api/sendReservation")
+    public String sendReservation(@RequestBody String bundleId) throws InterruptedException, ExecutionException {
+        var user = WebSecurityConfig.getUser();
+
+        //System.out.println("Bundle ID: " + bundleId);
+
+        // Array of endpoint URLs
+        WebClient webClient = webClientBuilder.build();
+        String[] endpointURLs = {
+                "http://sud.switzerlandnorth.cloudapp.azure.com:8080/reservations/",
+                "http://ivan.canadacentral.cloudapp.azure.com:8080/reservations/",
+                "http://sud.japaneast.cloudapp.azure.com:8080/reservations/"
+        };
+
+        DocumentReference orderRef = db.collection("user").document(user.getEmail()).collection("basket").document(bundleId);
+
+        ApiFuture<DocumentSnapshot> future = orderRef.get();
+        DocumentSnapshot orderSnap;
+        try {
+            orderSnap = future.get();
+            //System.out.println(orderSnap.getData());
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return "Bundle Does not Exist!";
+        }
+
+        if (orderSnap.exists()) {
+
+            //System.out.println("WTF is going on???");
+            // Get the DocumentReference from the "bundleRef" field
+            DocumentReference bundleRef = (DocumentReference) orderSnap.get("bundleRef");
+
+            DocumentSnapshot bundleSnapshot = bundleRef.get().get();
+            List<DocumentReference> productRefs = (List<DocumentReference>) bundleSnapshot.get("productIds");
+
+            for (DocumentReference productRef : productRefs) {
+                // Fetch product document from Firestore
+                String productId = null;
+
+                // Retrieve product data directly from Firestore
+                //DocumentReference productRef = this.db.collection("products").document(productId);
+                DocumentSnapshot productSnapshot = productRef.get().get();
+                if (productSnapshot.exists()) {
+                    // Extract product data from the product document
+                    productId = productSnapshot.getId();
+                    String supplier = (String) productSnapshot.get("supplier");
+                    String endpointURL = "";
+                    for (String endpoint : endpointURLs)
+                        if (endpoint.contains(supplier)) {
+                            endpointURL = endpoint;
+                            break;
+                        }
+
+                    /** UNCOMMENT AFTER ENDPOINT FIXED **/
+//                    String responseBody = webClient.get()
+//                            .uri(endpointURL)
+//                            .retrieve()
+//                            .bodyToMono(String.class)
+//                            .block();
+//
+//                    System.out.println(responseBody);
+
+                } else {
+                    System.out.println("product does not exist");
+                }
+            }
+
+            /** UNCOMMENT AFTER ENDPOINT FIXED **/
+//            if (responseBody == "XXX"){
+//                System.out.println("Bundle reserved successfully");
+                moveBundle(bundleId, "basket", "processing");
+//            }
+//            else{
+//
+//            }
+
+        }
+
+
+        // send reservation per bundle
+        // [add supplier field to product later]
+        // return bundle reference
+
+        return "nice";
+
+    }
+
+    public String moveBundle(String bundleId, String initCollection, String finalCollection) throws ExecutionException, InterruptedException {
+        var user = WebSecurityConfig.getUser();
+
+        System.out.println("Moving bundle now...");
+
+        String result = "";
+
+        DocumentReference sourceRef = db.collection("user").document(user.getEmail()).collection(initCollection).document(bundleId);
+        DocumentReference destinationRef = db.collection("user").document(user.getEmail()).collection(finalCollection).document(bundleId);
+
+        ApiFuture<DocumentSnapshot> future = sourceRef.get();
+        DocumentSnapshot document = future.get();
+
+        if (document.exists()) {
+            destinationRef.set(document.getData());
+            sourceRef.delete();
+            result = ("Document " + bundleId + " moved from " + initCollection + " to " + finalCollection);
+        } else {
+            result = ("No document found with ID " + bundleId + " in collection " + initCollection);
+        }
+
+        System.out.println(result);
+        return result;
+    }
     public String buyBundle(String bundleId){
 
         String[] endpointURLs = {
@@ -615,7 +736,7 @@ class DBController {
                 List<DocumentReference> productRefs = (List<DocumentReference>) bundleSnapshot.get("productIds");
 
 
-                
+
                 List<Thread> threads = new ArrayList<>();
                 // Create threads outside the loop
                 for (String finalUrl : endpointURLs) {

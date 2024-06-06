@@ -70,9 +70,21 @@ function displayShoppingCart(data) {
         itemName.textContent = item.name;
         itemDiv.appendChild(itemName);
 
+        // Create a buy button for each item
+        const buyButton = document.createElement('button');
+        buyButton.textContent = 'Buy';
+        buyButton.classList.add('buy-button');
+        buyButton.addEventListener('click', function() {
+            // Handle delete action
+            console.log(item);
+            buyBundle(item.id);
+        });
+        itemDiv.appendChild(buyButton);
+
         // Create a delete button for each item
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Delete';
+        deleteButton.classList.add('delete-button');
         deleteButton.addEventListener('click', function() {
             // Handle delete action
             console.log(item);
@@ -83,6 +95,20 @@ function displayShoppingCart(data) {
         cartDiv.appendChild(itemDiv);
     });
 
+    // Create the buy button
+    const buyButton = document.createElement('button');
+    buyButton.textContent = 'Buy';
+    buyButton.id = 'buy-cart';
+    buyButton.addEventListener('click', function() {
+        // Handle buy action
+        console.log('Buy button clicked');
+        // You can add your buy functionality here
+    });
+
+    // Append the buy button to the cartDiv
+    cartDiv.appendChild(buyButton);
+
+    // Append the cartDiv to the contentDiv
     contentDiv.appendChild(cartDiv);
 }
 
@@ -105,6 +131,31 @@ function deleteCartBundle(bundleId) {
         .catch(error => {
             console.error('Error deleting item:', error);
             getCart();
+        });
+}
+
+
+
+function buyBundle(bundleId){
+    console.log("Bundle ID:", bundleId);
+    fetch('/api/sendReservation', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + tkn
+        },
+        body: bundleId
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to buy item');
+            }
+            console.log('Item bought successfully');
+            getCart(); // Refresh the cart after buying an item
+        })
+        .catch(error => {
+            console.error('Error buying item:', error);
+            getCart(); // Refresh the cart even if there's an error
         });
 }
 
