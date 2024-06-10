@@ -107,34 +107,34 @@ function getCart() {
 
 
 function displayCartPage(data){
-    data = {
-        "items": [
-            {
-                "category": "cart",
-                "bundles": [
-                    { "id": "N1Sm1vAxv6zCPBuzlr6V", "name": "broooooooo", "bundleId": "vKnOKRwG09xeSbEZzvRc" },
-                    { "id": "T56uTvFi9LUODMEhchBI", "name": "broooooooo", "bundleId": "vKnOKRwG09xeSbEZzvRc" },
-                    { "id": "tmYLPoteOw3q1ZOz3Lzr", "name": "broooooooo", "bundleId": "vKnOKRwG09xeSbEZzvRc" }
-                ]
-            },
-            {
-                "category": "shipping",
-                "bundles": [
-                    { "id": "N1Sm1vAxv6zCPBuzlr6V", "name": "broooooooo", "bundleId": "vKnOKRwG09xeSbEZzvRc" },
-                    { "id": "T56uTvFi9LUODMEhchBI", "name": "broooooooo", "bundleId": "vKnOKRwG09xeSbEZzvRc" },
-                    { "id": "tmYLPoteOw3q1ZOz3Lzr", "name": "broooooooo", "bundleId": "vKnOKRwG09xeSbEZzvRc" }
-                ]
-            },
-            {
-                "category": "past",
-                "bundles": [
-                    { "id": "N1Sm1vAxv6zCPBuzlr6V", "name": "broooooooo", "bundleId": "vKnOKRwG09xeSbEZzvRc" },
-                    { "id": "T56uTvFi9LUODMEhchBI", "name": "broooooooo", "bundleId": "vKnOKRwG09xeSbEZzvRc" },
-                    { "id": "tmYLPoteOw3q1ZOz3Lzr", "name": "broooooooo", "bundleId": "vKnOKRwG09xeSbEZzvRc" }
-                ]
-            }
-        ]
-    };
+    // data = {
+    //     "items": [
+    //         {
+    //             "category": "cart",
+    //             "bundles": [
+    //                 { "id": "N1Sm1vAxv6zCPBuzlr6V", "name": "broooooooo", "bundleId": "vKnOKRwG09xeSbEZzvRc" },
+    //                 { "id": "T56uTvFi9LUODMEhchBI", "name": "broooooooo", "bundleId": "vKnOKRwG09xeSbEZzvRc" },
+    //                 { "id": "tmYLPoteOw3q1ZOz3Lzr", "name": "broooooooo", "bundleId": "vKnOKRwG09xeSbEZzvRc" }
+    //             ]
+    //         },
+    //         {
+    //             "category": "shipping",
+    //             "bundles": [
+    //                 { "id": "N1Sm1vAxv6zCPBuzlr6V", "name": "broooooooo", "bundleId": "vKnOKRwG09xeSbEZzvRc" },
+    //                 { "id": "T56uTvFi9LUODMEhchBI", "name": "broooooooo", "bundleId": "vKnOKRwG09xeSbEZzvRc" },
+    //                 { "id": "tmYLPoteOw3q1ZOz3Lzr", "name": "broooooooo", "bundleId": "vKnOKRwG09xeSbEZzvRc" }
+    //             ]
+    //         },
+    //         {
+    //             "category": "past",
+    //             "bundles": [
+    //                 { "id": "N1Sm1vAxv6zCPBuzlr6V", "name": "broooooooo", "bundleId": "vKnOKRwG09xeSbEZzvRc" },
+    //                 { "id": "T56uTvFi9LUODMEhchBI", "name": "broooooooo", "bundleId": "vKnOKRwG09xeSbEZzvRc" },
+    //                 { "id": "tmYLPoteOw3q1ZOz3Lzr", "name": "broooooooo", "bundleId": "vKnOKRwG09xeSbEZzvRc" }
+    //             ]
+    //         }
+    //     ]
+    // };
 
 
     displaySec(findCategory("cart", data), "Cart", true, true);
