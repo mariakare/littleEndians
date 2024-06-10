@@ -167,6 +167,8 @@ function createTab(label) {
                 });
         } else {
             // Call function to display new bundles page
+            getUsers(tkn);
+
             getProducts(tkn)
                 .then((data) => {
                     displayProducts(data);
@@ -515,6 +517,25 @@ function getProducts() {
 
 
 }
+
+
+function getUsers() {
+    return fetch('/api/getAllUsers', {
+        headers: { Authorization: 'Bearer ' + tkn}
+    })
+        .then((response) => {
+            return response.text();
+        })
+        .then((data) => {
+            return data;
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+
+
+}
+
 
 
 

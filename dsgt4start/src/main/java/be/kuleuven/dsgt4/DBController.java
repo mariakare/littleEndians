@@ -846,4 +846,42 @@ class DBController {
     }
 
 
+    @GetMapping("/api/getAllUsers")
+    public String getAllUsers() throws ExecutionException, InterruptedException {
+        // Get a reference to the users collection
+        System.out.println("in getAllUsers");
+        CollectionReference usersRef = db.collection("user");
+
+        // Get all user documents
+        ApiFuture<QuerySnapshot> querySnapshot = usersRef.get();
+
+        // Create an empty list to store user data
+        List<Object> users = new ArrayList<>();
+
+        // Loop through each user document
+        for (QueryDocumentSnapshot document : querySnapshot.get().getDocuments()) {
+            // Get user data (assuming your user documents have relevant fields)
+            String id = document.getId();
+            String email = document.getString("user");
+            String role = document.getString("role");
+
+            // Create a map to store user data (adjust fields based on your user document structure)
+            Map<String, Object> user = new HashMap<>();
+            user.put("email", email);
+            user.put("role", role);
+
+            // Add user data to the list
+            users.add(user);
+        }
+
+        // Convert user data to JSON string using a JSON library (e.g., Gson)
+        Gson gson = new Gson();
+        String json = gson.toJson(users);
+
+        System.out.println("json:"+json);
+
+        return json;
+    }
+
+
 }
