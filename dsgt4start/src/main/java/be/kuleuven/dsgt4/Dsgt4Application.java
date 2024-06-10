@@ -36,7 +36,7 @@ public class Dsgt4Application {
 	@Bean
 	public String projectId() {
 		if (this.isProduction()) {
-			return "TODO level 2";
+			return "dsgt-little-endian";
 		} else {
 			return "demo-distributed-systems-kul";
 		}

@@ -30,9 +30,9 @@ function setupAuth() {
     firebaseConfig = {
       //for level 2, paste your config here
       apiKey: "AIzaSyBPMUlZYq-zfFi4xV2jR6DQeb9tpbdJf4Q",
-      authDomain: "dsgt-little-endian.firebaseapp.com",
+      // authDomain: "dsgt-little-endian.firebaseapp.com",
       projectId: "dsgt-little-endian",
-      storageBucket: "dsgt-little-endian.appspot.com",
+      // storageBucket: "dsgt-little-endian.appspot.com",
       messagingSenderId: "400359968693",
       appId: "1:400359968693:web:191a321f34a131d726d3fc",
       measurementId: "G-LS6BH541L1"
@@ -152,7 +152,9 @@ function wireUpAuthChange() {
       const logoutButton = document.getElementById("btnLogout");
       logoutButton.style.display = "";
 
-
+      console.log("bro this is a new version");
+      console.log("Here is the token:");
+      console.log(token);
       setupToken(token);
       setupUserPage(token);
     });
