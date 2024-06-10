@@ -133,6 +133,7 @@ function displayBundles(data) {
     // Clear the contentdiv before adding new bundles
     contentDiv.innerHTML = '';
     // Loop through each bundle
+    console.log(bundles);
     bundles.forEach(bundle => {
         // Create a div element for the bundle
         const bundleDiv = document.createElement('div');
@@ -157,7 +158,11 @@ function displayBundles(data) {
         });
 
         bundleDiv.appendChild(productBundleDiv);
-        bundleDiv.innerHTML += `<p class="bundle-description">${bundle.description}</p>`;
+        // Add the bundle description and price
+        bundleDiv.innerHTML += `
+            <p class="bundle-description">${bundle.description}</p>
+            <p class="bundle-price">$${bundle.price}</p>
+        `;
 
         // Create the "Add to Cart" button
         const addToCartButton = document.createElement('a');
