@@ -213,6 +213,8 @@ class DBController {
     public String getCart() throws ExecutionException, InterruptedException {
         var user = WebSecurityConfig.getUser();
 
+        System.out.println("User:"+user);
+
         // Reference to the user's document
         CollectionReference basketRef = db.collection("user").document(user.getEmail()).collection("basket");
 
@@ -256,7 +258,7 @@ class DBController {
         jsonDataBuilder.append("]\n");
         jsonDataBuilder.append("}\n");
 
-        //System.out.println(jsonDataBuilder.toString());
+        System.out.println(jsonDataBuilder.toString());
         return jsonDataBuilder.toString();
     }
 
