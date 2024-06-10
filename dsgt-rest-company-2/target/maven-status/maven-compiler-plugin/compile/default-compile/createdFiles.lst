@@ -1,5 +1,5 @@
-be/kuleuven/safetyrestservice/exceptions/ProductNotFoundAdvice.class
 be/kuleuven/safetyrestservice/SafetyRestServiceApplication.class
+be/kuleuven/safetyrestservice/exceptions/ProductNotFoundAdvice.class
 be/kuleuven/safetyrestservice/domain/Reservation.class
 be/kuleuven/safetyrestservice/controllers/ProductsRestController.class
 be/kuleuven/safetyrestservice/domain/ProductsRepository.class
