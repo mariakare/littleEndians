@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.google.api.core.ApiFuture;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
@@ -255,7 +256,7 @@ class DBController {
         jsonDataBuilder.append("]\n");
         jsonDataBuilder.append("}\n");
 
-        System.out.println(jsonDataBuilder.toString());
+        //System.out.println(jsonDataBuilder.toString());
         return jsonDataBuilder.toString();
     }
 
@@ -284,13 +285,13 @@ class DBController {
     }
 
 
-    @PostMapping("/api/buyBundle")
-    public ResponseEntity<String> buyBundle(@RequestBody String bundleId) throws ExecutionException, InterruptedException {
-        // Print out the bundleId
-        System.out.println("Buying bundle with ID: " + bundleId);
-        // Return a success response
-        return ResponseEntity.status(HttpStatus.OK).body("Bundle with ID: " + bundleId);
-    }
+//    @PostMapping("/api/buyBundle")
+//    public ResponseEntity<String> buyBundle(@RequestBody String bundleId) throws ExecutionException, InterruptedException {
+//        // Print out the bundleId
+//        System.out.println("Buying bundle with ID: " + bundleId);
+//        // Return a success response
+//        return ResponseEntity.status(HttpStatus.OK).body("Bundle with ID: " + bundleId);
+//    }
 
 
 
@@ -424,6 +425,7 @@ class DBController {
                         data.put("name", rootNode.path("name").asText());
                         data.put("description", rootNode.path("description").asText());
                         data.put("imageLink", rootNode.path("imageLink").asText());
+                        data.put("supplier", idParts[0].substring(0, idParts[0].length() - "products/".length()));
 
                         ApiFuture<WriteResult> result = docRef.set(data);
 
@@ -500,7 +502,7 @@ class DBController {
             ApiFuture<WriteResult> updateFuture = bundleRef.update("id", bundleId);
             updateFuture.get();
 
-                        // Return a success response with the ID of the newly created document
+            // Return a success response with the ID of the newly created document
             return ResponseEntity.status(HttpStatus.CREATED).body("Bundle created with ID: " + bundleId);
         } catch (Exception e) {
             // Handle any exceptions that might occur during the operation
@@ -604,6 +606,243 @@ class DBController {
             e.printStackTrace();
             return "Failed to delete bundle";
         }
+    }
+
+    @PostMapping("/api/sendReservation")
+    public String sendReservation(@RequestBody String bundleId) throws InterruptedException, ExecutionException {
+        System.out.println("i am in reserve");
+        var user = WebSecurityConfig.getUser();
+        boolean isSuccesful=true;
+        Map<String, String> reservations = new HashMap<>();
+
+        //System.out.println("Bundle ID: " + bundleId);
+
+        // Array of endpoint URLs
+        WebClient webClient = webClientBuilder.build();
+//        String[] endpointURLs = {
+//                "http://sud.switzerlandnorth.cloudapp.azure.com:8080/reservations/",
+//                "http://ivan.canadacentral.cloudapp.azure.com:8080/reservations/",
+//                "http://sud.japaneast.cloudapp.azure.com:8080/reservations/"
+//        };
+
+        DocumentReference orderRef = db.collection("user").document(user.getEmail()).collection("basket").document(bundleId);
+
+        ApiFuture<DocumentSnapshot> future = orderRef.get();
+        DocumentSnapshot orderSnap;
+        try {
+            orderSnap = future.get();
+            //System.out.println(orderSnap.getData());
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return "Bundle Does not Exist!";
+        }
+
+        if (orderSnap.exists()) {
+
+            //System.out.println("WTF is going on???");
+            // Get the DocumentReference from the "bundleRef" field
+            DocumentReference bundleRef = (DocumentReference) orderSnap.get("bundleRef");
+
+            DocumentSnapshot bundleSnapshot = bundleRef.get().get();
+            List<DocumentReference> productRefs = (List<DocumentReference>) bundleSnapshot.get("productIds");
+
+            for (DocumentReference productRef : productRefs) {
+                String productId = productRef.getId();
+                DocumentReference productDocRef = db.collection("products").document(productId);
+                DocumentSnapshot productSnapshot = productDocRef.get().get();
+
+                String supplierUrl = (String) productSnapshot.get("supplier");
+
+                String finalUrl = supplierUrl + "products/reserve";
+                System.out.println(finalUrl);
+
+                Map<String, Integer> productsToReserve = new HashMap<>();
+                productsToReserve.put(productId, 1);
+                try {
+                    Map responseBody = webClient.post()
+                            .uri(finalUrl)
+                            .body(BodyInserters.fromObject(productsToReserve))
+                            .retrieve()
+                            .bodyToMono(Map.class)
+                            .block();
+                    // ... (process successful response - optional)
+
+                    System.out.println(responseBody.toString());
+
+                    boolean isSuccessful = responseBody.get("status").equals("PENDING");
+                    String reservationId = (String) responseBody.get("reservationId");
+                    reservations.put(reservationId, supplierUrl);
+                    if(!isSuccessful){
+                        isSuccesful=false;
+
+                    }
+                } catch (Exception e) {
+                    // Handle exception within the thread (e.g., log the error)
+                    System.out.println("error in reservation of"+ productId);
+                    isSuccesful=false;
+
+                }
+
+
+
+                // Retrieve product data directly from Firestore
+                //DocumentReference productRef = this.db.collection("products").document(productId);
+//                DocumentSnapshot productSnapshot = productRef.get().get();
+//                if (productSnapshot.exists()) {
+//                    // Extract product data from the product document
+//                    productId = productSnapshot.getId();
+//                    String supplier = (String) productSnapshot.get("supplier");
+//                    String endpointURL = "";
+//                    for (String endpoint : endpointURLs)
+//                        if (endpoint.contains(supplier)) {
+//                            endpointURL = endpoint;
+//                            break;
+//                        }
+//
+//                    /** UNCOMMENT AFTER ENDPOINT FIXED **/
+////                    String responseBody = webClient.get()
+////                            .uri(endpointURL)
+////                            .retrieve()
+////                            .bodyToMono(String.class)
+////                            .block();
+////
+////                    System.out.println(responseBody);
+//
+//                } else {
+//                    System.out.println("product does not exist");
+            }
+//            }
+
+
+            if (isSuccesful){
+                System.out.println("Bundle reserved successfully");
+                moveBundle(bundleId, "basket", "processing");
+                buyBundle(reservations);
+            }
+            else{
+                System.out.println("Bundle was not reserved successfully:(((((");
+
+            }
+
+        }
+
+
+        // send reservation per bundle
+        // [add supplier field to product later]
+        // return bundle reference
+
+        return "nice";
+
+    }
+
+    public String moveBundle(String bundleId, String initCollection, String finalCollection) throws ExecutionException, InterruptedException {
+        var user = WebSecurityConfig.getUser();
+
+        System.out.println("Moving bundle now...");
+
+        String result = "";
+
+        DocumentReference sourceRef = db.collection("user").document(user.getEmail()).collection(initCollection).document(bundleId);
+        DocumentReference destinationRef = db.collection("user").document(user.getEmail()).collection(finalCollection).document(bundleId);
+
+        ApiFuture<DocumentSnapshot> future = sourceRef.get();
+        DocumentSnapshot document = future.get();
+
+        if (document.exists()) {
+            destinationRef.set(document.getData());
+            sourceRef.delete();
+            result = ("Document " + bundleId + " moved from " + initCollection + " to " + finalCollection);
+        } else {
+            result = ("No document found with ID " + bundleId + " in collection " + initCollection);
+        }
+
+        System.out.println(result);
+        return result;
+    }
+
+
+    public String buyBundle(Map<String, String> reservations){
+
+
+        WebClient webClient = webClientBuilder.build();
+
+        try {
+//            DocumentReference bundleRef = db.collection("bundles").document(bundleId);
+//            DocumentSnapshot bundleSnapshot = bundleRef.get().get();
+
+            if (!reservations.isEmpty()) {
+                //List<DocumentReference> productRefs = (List<DocumentReference>) bundleSnapshot.get("productIds");
+
+
+
+                List<Thread> threads = new ArrayList<>();
+                for (Map.Entry<String, String> entry : reservations.entrySet())  {
+                    String reservationId = entry.getKey();
+                    String url = entry.getValue();
+
+
+                    String finalUrl = url + "reservations/" + reservationId + "/confirm";
+                    System.out.println(finalUrl);
+
+                    Thread thread = new Thread(() -> {
+                        boolean confirmed = false;
+
+                        while (!confirmed) {
+                            try {
+                                String responseBody = webClient.post()
+                                        .uri(finalUrl)
+                                        .retrieve()
+                                        .bodyToMono(String.class)
+                                        .block();
+
+                                System.out.println(responseBody);
+                                confirmed=true;
+
+                                // Check response for confirmation (modify this condition based on your supplier's response format)
+//                                if (responseBody == "sth??") {//TODO
+//                                    confirmed = true;
+//                                }
+                            } catch (Exception e) {
+
+                            }
+                        }
+
+                    });
+                    threads.add(thread);
+                }
+
+                for (Thread thread : threads) {
+                    thread.start();
+                }
+
+                for (Thread thread : threads) {
+                    try {
+                        thread.join();
+                    } catch (InterruptedException e) {
+                        System.out.println("uh oh D:");
+                    }
+
+                }
+
+
+            } else {
+                // bruh it doesn't exist
+
+            }
+
+
+
+
+        } catch (Exception e) {
+            // Handle any exceptions that might occur
+        }
+
+
+
+
+
+        return "";
+
     }
 
 
