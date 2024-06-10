@@ -81,6 +81,7 @@ class DBController {
                 jsonDataBuilder.append("      \"name\": \"").append(name).append("\",\n");
                 jsonDataBuilder.append("      \"description\": \"").append(description).append("\",\n");
                 jsonDataBuilder.append("      \"id\": \"").append(id).append("\",\n");
+                jsonDataBuilder.append("      \"price\": \"").append(price).append("\",\n");
                 jsonDataBuilder.append("      \"products\": [\n");
 
 
@@ -480,7 +481,7 @@ class DBController {
         data.put("name", bundleTitle);
         data.put("description", bundleDescription);
         data.put("productIds", productIdFinal);
-        data.put("price", "$XX");
+        data.put("price", "20000000");
 
         // Process bundle data
         String response = "Bundle Title: " + bundleTitle + "\n" +

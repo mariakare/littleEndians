@@ -131,7 +131,12 @@ function displayManagerBundles(data) {
         });
 
         bundleDiv.appendChild(productBundleDiv);
-        bundleDiv.innerHTML += `<p class="bundle-description">${bundle.description}</p>`;
+        bundleDiv.appendChild(productBundleDiv);
+        // Add the bundle description and price
+        bundleDiv.innerHTML += `
+            <p class="bundle-description">${bundle.description}</p>
+            <p class="bundle-price">$${bundle.price}</p>
+        `;
 
         // Add an "Edit Bundle" button
         const editButton = document.createElement('button');
