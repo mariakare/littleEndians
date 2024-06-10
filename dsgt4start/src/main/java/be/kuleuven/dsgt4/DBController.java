@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.firestore.*;
 import com.google.gson.Gson;
+import net.minidev.json.JSONObject;
+import org.eclipse.jetty.util.ajax.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.security.access.AuthorizationServiceException;
@@ -73,7 +75,7 @@ class DBController {
                 // Extract data from the document
                 String name = document.getString("name");
                 String description = document.getString("description");
-                String price = document.getString("price");
+                String price = document.getDouble("price").toString();
                 String id = document.getString("id");
 
                 // Append bundle details to the JSON string
@@ -627,9 +629,19 @@ class DBController {
         }
     }
 
-    @PostMapping("/api/sendReservation")
-    public String sendReservation(@RequestBody String bundleId) throws InterruptedException, ExecutionException {
+    @PostMapping("/api/buyBundle")
+    public String sendReservation(@RequestBody String jsonString) throws InterruptedException, ExecutionException {
         System.out.println("i am in reserve");
+
+        int startIndex = jsonString.indexOf(':') + 2;
+
+// Find the ending index of the value (assuming the string is well-formed JSON)
+        int endIndex = jsonString.length() - 2; // Subtract 1 to exclude the closing curly brace
+
+// Extract the value as a substring
+        String bundleId = jsonString.substring(startIndex, endIndex).trim(); // Trim leading/trailing spaces
+
+        System.out.println("Bundle ID: " + bundleId);
         var user = WebSecurityConfig.getUser();
         boolean isSuccesful=true;
         Map<String, String> reservations = new HashMap<>();
@@ -643,20 +655,27 @@ class DBController {
 //                "http://ivan.canadacentral.cloudapp.azure.com:8080/reservations/",
 //                "http://sud.japaneast.cloudapp.azure.com:8080/reservations/"
 //        };
-
+        System.out.println("before");
         DocumentReference orderRef = db.collection("user").document(user.getEmail()).collection("basket").document(bundleId);
-
+        System.out.println("after");
         ApiFuture<DocumentSnapshot> future = orderRef.get();
         DocumentSnapshot orderSnap;
         try {
+            System.out.println("yes");
+
             orderSnap = future.get();
+            System.out.println("yesyes");
             //System.out.println(orderSnap.getData());
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
+            System.out.println("bundle doesn't exist");
             return "Bundle Does not Exist!";
         }
+        System.out.println("yesyesyes");
 
         if (orderSnap.exists()) {
+
+            System.out.println("we are going well");
 
             //System.out.println("WTF is going on???");
             // Get the DocumentReference from the "bundleRef" field
@@ -694,6 +713,7 @@ class DBController {
                     if(!isSuccessful){
                         isSuccesful=false;
 
+
                     }
                 } catch (Exception e) {
                     // Handle exception within the thread (e.g., log the error)
@@ -703,34 +723,8 @@ class DBController {
                 }
 
 
-
-                // Retrieve product data directly from Firestore
-                //DocumentReference productRef = this.db.collection("products").document(productId);
-//                DocumentSnapshot productSnapshot = productRef.get().get();
-//                if (productSnapshot.exists()) {
-//                    // Extract product data from the product document
-//                    productId = productSnapshot.getId();
-//                    String supplier = (String) productSnapshot.get("supplier");
-//                    String endpointURL = "";
-//                    for (String endpoint : endpointURLs)
-//                        if (endpoint.contains(supplier)) {
-//                            endpointURL = endpoint;
-//                            break;
-//                        }
-//
-//                    /** UNCOMMENT AFTER ENDPOINT FIXED **/
-////                    String responseBody = webClient.get()
-////                            .uri(endpointURL)
-////                            .retrieve()
-////                            .bodyToMono(String.class)
-////                            .block();
-////
-////                    System.out.println(responseBody);
-//
-//                } else {
-//                    System.out.println("product does not exist");
             }
-//            }
+
 
 
             if (isSuccesful){
@@ -743,6 +737,9 @@ class DBController {
 
             }
 
+        }
+        else{
+            System.out.println("wtf why doens't it exist");
         }
 
 
@@ -781,6 +778,7 @@ class DBController {
 
 
     public String buyBundle(Map<String, String> reservations){
+        System.out.println("i'm in buy");
 
 
         WebClient webClient = webClientBuilder.build();
@@ -816,11 +814,15 @@ class DBController {
 
 
                                 boolean isSuccessful = responseBody.get("status").equals("CONFIRMED");
+                                System.out.println(isSuccessful);
                                 confirmed=true;
 
 
                                 if (isSuccessful) {//TODO: Test this when cart works again
                                     System.out.println("is confirmed");
+                                }
+                                else{
+                                    System.out.println("is not confirmed");
                                 }
                             } catch (Exception e) {
 
@@ -833,6 +835,7 @@ class DBController {
 
                 for (Thread thread : threads) {
                     thread.start();
+
                 }
 
                 for (Thread thread : threads) {
@@ -847,6 +850,7 @@ class DBController {
 
             } else {
                 // bruh it doesn't exist
+                System.out.println("bruh it doens't exist");
 
             }
 
