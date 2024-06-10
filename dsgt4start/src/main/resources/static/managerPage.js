@@ -1,5 +1,5 @@
 import {getBundles, setupUserPage} from "./getContent.js";
-
+import {adaptHeaderManager} from "./header.js"
 let tkn;
 let currentBundle;
 
@@ -24,74 +24,11 @@ export function setupManagerPage(token){
 
 }
 
-/**
- * Adapts the header for the manager page - adds 2 tabs. 1 for viewing all bundles and editing them
- * and one for adding new bundles
- */
-function adaptHeaderManager() {
-    // remove buttons
-    removeExtraButtons();
-    addExitManagerButton();
-
-    // Create the tabs
-    const tab1 = createTab("Active bundles");
-    const tab2 = createTab("Add new bundles");
-    const tab3 = createTab("Customers");
-    const tab4 = createTab("Orders");
-
-    // Append tabs to the header menu
-    const headerMenu = document.querySelector(".header-menu");
-    headerMenu.insertBefore(tab4, headerMenu.lastElementChild); // Insert Page 2 tab before logout button
-    headerMenu.insertBefore(tab3, tab4); // Insert Page 1 tab before Page 2 tab
-    headerMenu.insertBefore(tab2, tab3);
-    headerMenu.insertBefore(tab1, tab2);
 
 
-    //remove cart button
-    const viewCartButton = document.getElementById("btnShoppingBasket");
-    if (viewCartButton) {
-        viewCartButton.style.display = "none";
-    }
 
-    // Initially set the first tab as active
-    setActiveTab(tab1);
-}
 
-function addExitManagerButton(){
-    const headerButtonsContainer = document.getElementById("divHeaderButtons"); // Assuming the header element has an ID of "header"
 
-    // Create a new button element
-    const returnButton = document.createElement("button");
-    returnButton.id = "btnReturn"; // Set an ID for the new button
-    returnButton.textContent = "User Page"; // Set the button text
-    returnButton.style.display = "block"; // Ensure the button is visible
-
-    // Append the button to the header
-    const firstButton = headerButtonsContainer.firstChild;
-    headerButtonsContainer.insertBefore(returnButton, firstButton);
-
-    // Add an event listener to call the display() function when clicked
-    returnButton.addEventListener('click', function() {
-        setupUserPage(tkn);
-    });
-}
-
-function removeExtraButtons() {
-    const headerButtonsContainer = document.getElementById("divHeaderButtons");
-    const originalButtons = ["btnShoppingBasket", "btnLogout"];
-
-    // Get all buttons inside the container
-    const buttons = headerButtonsContainer.getElementsByTagName("button");
-
-    // Convert HTMLCollection to an array to safely iterate and remove elements
-    const buttonsArray = Array.from(buttons);
-
-    buttonsArray.forEach(button => {
-        if (!originalButtons.includes(button.id)) {
-            headerButtonsContainer.removeChild(button);
-        }
-    });
-}
 
 /// BELOW EVERYTHING FOR EDIT/DELETE BUNDLES PAGE
 
@@ -180,7 +117,6 @@ function displayManagerBundles(data) {
 
 
 
-
 // Function to set active tab
 function setActiveTab(tab) {
     const tabs = document.querySelectorAll(".header-tab");
@@ -189,12 +125,13 @@ function setActiveTab(tab) {
 }
 
 
+
 /**
  * Function to create tab for the page
  * @param label label for the tab
  * @returns {HTMLDivElement}
  */
-function createTab(label) {
+export function createTab(label) {
     const tab = document.createElement("div");
     tab.textContent = label;
     tab.classList.add("header-tab", "dynamic-tab");

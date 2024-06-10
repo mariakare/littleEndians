@@ -10,6 +10,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-auth.js";
 
 import {setupUserPage} from "./getContent.js";
+import {setupToken} from "./header";
 import * as authentication from "./authentication.js";
 
 // we setup the authentication, and then wire up some key events to event handlers
@@ -144,6 +145,8 @@ function wireUpAuthChange() {
       const logoutButton = document.getElementById("btnLogout");
       logoutButton.style.display = "";
 
+
+      setupToken(token);
       setupUserPage(token);
     });
 
