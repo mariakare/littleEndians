@@ -34,13 +34,17 @@ function adaptHeaderManager() {
     addExitManagerButton();
 
     // Create the tabs
-    const tab1 = createTab("Active bundles", "/page1");
-    const tab2 = createTab("Add new bunldes", "/page2");
+    const tab1 = createTab("Active bundles");
+    const tab2 = createTab("Add new bundles");
+    const tab3 = createTab("Customers");
+    const tab4 = createTab("Orders");
 
     // Append tabs to the header menu
     const headerMenu = document.querySelector(".header-menu");
-    headerMenu.insertBefore(tab2, headerMenu.lastElementChild); // Insert Page 2 tab before logout button
-    headerMenu.insertBefore(tab1, tab2); // Insert Page 1 tab before Page 2 tab
+    headerMenu.insertBefore(tab4, headerMenu.lastElementChild); // Insert Page 2 tab before logout button
+    headerMenu.insertBefore(tab3, tab4); // Insert Page 1 tab before Page 2 tab
+    headerMenu.insertBefore(tab2, tab3);
+    headerMenu.insertBefore(tab1, tab2);
 
 
     //remove cart button
@@ -189,38 +193,70 @@ function createTab(label) {
     const tab = document.createElement("div");
     tab.textContent = label;
     tab.classList.add("header-tab", "dynamic-tab");
-    tab.addEventListener("click", () => {
-        setActiveTab(tab);
-        if (label == "Active bundles") {
-            // Call function to display bundles
-            getBundles(tkn)
-                .then((data) => {
-                    displayManagerBundles(data);
-                    setupEditForm();
-                    // displayManagerBundles(data);
-                    // // Reattach event listeners after displaying bundles
-                    // attachEventListeners();
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
-        } else {
-            // Call function to display new bundles page
-            getProducts(tkn)
-                .then((data) => {
-                    displayProducts(data);
-                    // Reattach event listeners after displaying bundles
-                    // attachEventListeners();
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
+    switch (label){
+        case "Active bundles":
+            tab.addEventListener("click", () => {
+                setActiveTab(tab);
+                getBundles(tkn)
+                    .then((data) => {
+                        displayManagerBundles(data);
+                        setupEditForm();
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+            });
+            break;
+        case "Add new bundles":
+            tab.addEventListener("click", () => {
+                setActiveTab(tab);
+                getProducts(tkn)
+                    .then((data) => {
+                        displayProducts(data);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+            });
+            break;
+        case "Customers":
+            tab.addEventListener("click", () => {
+                setActiveTab(tab);
+                getCustomers(tkn)
+                    .then((data) => {
+                        displayCustomers(data);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+            });
+            break;
+        case "Orders":
+            tab.addEventListener("click", () => {
+                setActiveTab(tab);
+                getOrders(tkn)
+                    .then((data) => {
+                        displayOrders(data);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+            });
+            break;
+    }
 
-        }
-    });
+
     return tab;
 }
 
+
+function displayCustomers(jsonData){
+    console.log("To be implemented: displayCustomers")
+}
+
+function displayOrders(jsonData){
+    console.log("To be implemented: displayOrders")
+}
 
 /**
  * Basic setup for modal window used to edit bundles
@@ -553,6 +589,36 @@ function getProducts() {
         });
 
 
+}
+
+function getCustomers() {
+    return fetch('/api/getAllCustomers', {
+        headers: { Authorization: 'Bearer ' + tkn}
+    })
+        .then((response) => {
+            return response.text();
+        })
+        .then((data) => {
+            return data;
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+}
+
+function getOrders() {
+    return fetch('/api/getAllOrders', {
+        headers: { Authorization: 'Bearer ' + tkn}
+    })
+        .then((response) => {
+            return response.text();
+        })
+        .then((data) => {
+            return data;
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
 }
 
 

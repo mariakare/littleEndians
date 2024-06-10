@@ -40,12 +40,6 @@ function removeExtraButtons() {
         }
     });
 
-    // // Remove dynamically added buttons
-    // const dynamicButtons = headerButtonsContainer.querySelectorAll('.dynamic-button');
-    // dynamicButtons.forEach(button => {
-    //     headerButtonsContainer.removeChild(button);
-    // });
-
     // Remove dynamically added tabs
     const dynamicTabs = headerMenu.querySelectorAll('.dynamic-tab');
     dynamicTabs.forEach(tab => {
