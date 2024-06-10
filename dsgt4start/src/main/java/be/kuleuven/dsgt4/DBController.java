@@ -215,57 +215,60 @@ class DBController {
         }
     }
 
+
     @GetMapping("/api/getCart")
     public String getCart() throws ExecutionException, InterruptedException {
         var user = WebSecurityConfig.getUser();
 
-        System.out.println("User:"+user);
+        Map<String, List<Map<String, Object>>> cartData = new HashMap<>();
+        cartData.put("cart", new ArrayList<>()); // Renamed to "cart" to match JS
+        cartData.put("shipping", new ArrayList<>()); // Renamed to "shipping" to match JS
+        cartData.put("past", new ArrayList<>()); // Renamed to "past" to match JS
 
-        // Reference to the user's document
         CollectionReference basketRef = db.collection("user").document(user.getEmail()).collection("basket");
+        cartData.get("cart").addAll(getCartItemsFromCollection(basketRef, user.getEmail()));
 
-        ApiFuture<QuerySnapshot> querySnapshot = basketRef.get();
-        List<Map<String, Object>> shoppingCart = new ArrayList<>();
+        CollectionReference processingRef = db.collection("user").document(user.getEmail()).collection("processing");
+        cartData.get("shipping").addAll(getCartItemsFromCollection(processingRef, user.getEmail()));
 
-        StringBuilder jsonDataBuilder = new StringBuilder();
-        jsonDataBuilder.append("{\n");
-        jsonDataBuilder.append("  \"cart\": [\n");
+        CollectionReference orderedRef = db.collection("user").document(user.getEmail()).collection("ordered");
+        cartData.get("past").addAll(getCartItemsFromCollection(orderedRef, user.getEmail()));
 
-        for (QueryDocumentSnapshot document : querySnapshot.get().getDocuments()) {
+        Gson gson = new Gson();
+        String json = gson.toJson(cartData);
 
-            String id = document.getString("id");
-            jsonDataBuilder.append("    {\n");
-            jsonDataBuilder.append("    \"id\": \"").append(id).append("\",\n");
+        System.out.println(json);
+        return json;
+    }
+
+    private List<Map<String, Object>> getCartItemsFromCollection(CollectionReference collectionRef, String userId)
+            throws ExecutionException, InterruptedException {
+        List<Map<String, Object>> cartItems = new ArrayList<>();
+
+        ApiFuture<QuerySnapshot> snapshotFuture = collectionRef.get();
+        QuerySnapshot snapshot = snapshotFuture.get();
+        for (QueryDocumentSnapshot document : snapshot.getDocuments()) {
+            Map<String, Object> itemData = new HashMap<>();
+            itemData.put("id", document.getString("id"));
+            itemData.put("userId", userId);
 
             DocumentReference bundleRef = (DocumentReference) document.get("bundleRef");
-            String bundleName = "";
-            String bundleId = "";
-
-
-            DocumentSnapshot bundleSnapshot = bundleRef.get().get();
-            if (bundleSnapshot.exists()) {
-                // Extract product data from the product document
-                bundleName = bundleSnapshot.getString("name");
-                bundleId = bundleSnapshot.getString("id");
+            if (bundleRef != null) {
+                DocumentSnapshot bundleSnapshot = bundleRef.get().get();
+                if (bundleSnapshot.exists()) {
+                    String bundleId = bundleSnapshot.getString("id");
+                    itemData.put("bundleId", bundleId); // Use 'bundleId' instead of 'bundleRef'
+                    itemData.put("name", bundleSnapshot.getString("name"));
+                } else {
+                    System.out.println("Bundle does not exist for item: " + document.getId());
+                }
             } else {
-                System.out.println("bundle does not exist");
+                System.out.println("bundleRef is null for item: " + document.getId());
             }
-
-            jsonDataBuilder.append("    \"name\": \"").append(bundleName).append("\",\n");
-            jsonDataBuilder.append("    \"bundleId\": \"").append(bundleId).append("\"\n");
-            jsonDataBuilder.append("    },\n");
-
+            cartItems.add(itemData);
         }
 
-        if (!querySnapshot.get().getDocuments().isEmpty()) {
-            jsonDataBuilder.deleteCharAt(jsonDataBuilder.length() - 2); // Removes the last comma
-        }
-
-        jsonDataBuilder.append("]\n");
-        jsonDataBuilder.append("}\n");
-
-        //System.out.println(jsonDataBuilder.toString());
-        return jsonDataBuilder.toString();
+        return cartItems;
     }
 
     @DeleteMapping("/api/removeFromCart")
@@ -627,6 +630,7 @@ class DBController {
     @PostMapping("/api/buyBundle")
     public String sendReservation(@RequestBody String jsonString) throws InterruptedException, ExecutionException {
         System.out.println("i am in reserve");
+        System.out.println(jsonString);
 
         int startIndex = jsonString.indexOf(':') + 2;
 
@@ -635,6 +639,8 @@ class DBController {
 
 // Extract the value as a substring
         String bundleId = jsonString.substring(startIndex, endIndex).trim(); // Trim leading/trailing spaces
+
+
 
         System.out.println("Bundle ID: " + bundleId);
         var user = WebSecurityConfig.getUser();

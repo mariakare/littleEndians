@@ -93,9 +93,9 @@ function displaySec(data, head, clear, isCart){
             buyButton.textContent = 'Buy';
             buyButton.classList.add('buy-button');
             buyButton.addEventListener('click', function() {
-                // Handle delete action
+                // Handle buy action
                 console.log(item);
-                buyBundle(item.id);
+                buyBundle(item.id); // Pass item.bundleId to buyBundle
             });
             itemDiv.appendChild(buyButton);
 
@@ -106,7 +106,7 @@ function displaySec(data, head, clear, isCart){
             deleteButton.addEventListener('click', function() {
                 // Handle delete action
                 console.log(item);
-                deleteCartBundle(item.id);
+                deleteCartBundle(item.id); // This is correct
             });
             itemDiv.appendChild(deleteButton);
 
