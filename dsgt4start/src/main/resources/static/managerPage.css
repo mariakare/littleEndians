@@ -121,11 +121,11 @@
 }
 
 
-#contentdiv {
-    padding: 0;
-    margin: 0;
-    list-style-type: none; /* Remove bullet points */
-}
+/*#contentdiv {*/
+/*    padding: 0;*/
+/*    margin: 0;*/
+/*    list-style-type: none; !* Remove bullet points *!*/
+/*}*/
 
 .user {
     padding: 10px;

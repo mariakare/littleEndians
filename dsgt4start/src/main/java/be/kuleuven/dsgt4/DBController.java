@@ -870,7 +870,7 @@ class DBController {
     }
 
 
-    @GetMapping("/api/getUsers")
+    @GetMapping("/api/getAllCustomers")
     public String getAllUsers() throws ExecutionException, InterruptedException {
         // Get a reference to the users collection
         System.out.println("in getAllUsers");
