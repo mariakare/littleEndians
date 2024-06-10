@@ -28,6 +28,8 @@ import java.util.*;
 @RestController
 class DBController {
 
+    final static String apiToken="Iw8zeveVyaPNWonPNaU0213uw3g6Ei";
+
     @Autowired
     WebClient.Builder webClientBuilder;
 
@@ -290,16 +292,6 @@ class DBController {
     }
 
 
-//    @PostMapping("/api/buyBundle")
-//    public ResponseEntity<String> buyBundle(@RequestBody String bundleId) throws ExecutionException, InterruptedException {
-//        // Print out the bundleId
-//        System.out.println("Buying bundle with ID: " + bundleId);
-//        // Return a success response
-//        return ResponseEntity.status(HttpStatus.OK).body("Bundle with ID: " + bundleId);
-//    }
-
-
-
     @GetMapping("/api/getProducts")
     public String getProducts() throws JsonProcessingException {
         WebClient webClient = webClientBuilder.build();
@@ -320,6 +312,7 @@ class DBController {
         for (String endpointURL : endpointURLs) {
             String responseBody = webClient.get()
                     .uri(endpointURL)
+                    .header("Authorization", "Bearer " + apiToken)
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
@@ -418,6 +411,7 @@ class DBController {
 
                     String responseBody = webClient.get()
                             .uri(endpointURL)
+                            .header("Authorization", "Bearer " + apiToken)
                             .retrieve()
                             .bodyToMono(String.class)
                             .block();
@@ -699,6 +693,7 @@ class DBController {
                 try {
                     Map responseBody = webClient.post()
                             .uri(finalUrl)
+                            .header("Authorization", "Bearer " + apiToken)
                             .body(BodyInserters.fromObject(productsToReserve))
                             .retrieve()
                             .bodyToMono(Map.class)
@@ -730,10 +725,11 @@ class DBController {
             if (isSuccesful){
                 System.out.println("Bundle reserved successfully");
                 moveBundle(bundleId, "basket", "processing");
-                buyBundle(reservations);
+                buyBundle(reservations, bundleId);
             }
             else{
-                System.out.println("Bundle was not reserved successfully:(((((");
+                System.out.println("Bundle was not reserved successfully:((((( Initiate self-destruct protocol");
+
 
             }
 
@@ -749,6 +745,55 @@ class DBController {
 
         return "nice";
 
+    }
+
+    public String cancleBundle(Map<String, String> reservations){
+        WebClient webClient = webClientBuilder.build();
+
+        try {
+
+            if (!reservations.isEmpty()) {
+                for (Map.Entry<String, String> entry : reservations.entrySet())  {
+                    String reservationId = entry.getKey();
+                    String url = entry.getValue();
+
+                    String finalUrl = url + "reservations/" + reservationId + "/cancel";
+                    System.out.println(finalUrl);
+                    try {
+                        Map responseBody = webClient.post()
+                                .uri(finalUrl)
+                                .header("Authorization", "Bearer " + apiToken)
+                                .retrieve()
+                                .bodyToMono(Map.class)
+                                .block();
+
+
+                        boolean isSuccessful = responseBody.get("status").equals("CANCEL");
+                        System.out.println(isSuccessful);
+
+
+
+                        if (isSuccessful) {
+                            System.out.println("is cancelled succesfully");
+                        }
+                        else{
+                            System.out.println("is not cancelled succesfully");
+                        }
+                    } catch (Exception e) {
+
+                    }
+
+                }
+            }
+
+        }catch(Exception e) {
+            // Handle any exceptions that might occur
+        }
+
+
+
+
+        return "";
     }
 
     public String moveBundle(String bundleId, String initCollection, String finalCollection) throws ExecutionException, InterruptedException {
@@ -777,7 +822,7 @@ class DBController {
     }
 
 
-    public String buyBundle(Map<String, String> reservations){
+    public String buyBundle(Map<String, String> reservations, String bundleId){
         System.out.println("i'm in buy");
 
 
@@ -808,6 +853,7 @@ class DBController {
                             try {
                                 Map responseBody = webClient.post()
                                         .uri(finalUrl)
+                                        .header("Authorization", "Bearer " + apiToken)
                                         .retrieve()
                                         .bodyToMono(Map.class)
                                         .block();
@@ -841,6 +887,8 @@ class DBController {
                 for (Thread thread : threads) {
                     try {
                         thread.join();
+
+                        moveBundle(bundleId, "processing", "ordered");
                     } catch (InterruptedException e) {
                         System.out.println("uh oh D:");
                     }
@@ -860,6 +908,9 @@ class DBController {
         } catch (Exception e) {
             // Handle any exceptions that might occur
         }
+
+
+
 
 
 
