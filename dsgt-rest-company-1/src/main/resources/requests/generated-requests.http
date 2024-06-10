@@ -1,7 +1,8 @@
 ###
 # Get All Suits
 ###
-GET http://localhost:8090/products
+http://ivan.canadacentral.cloudapp.azure.com:8091/products
+Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei
 
 <> 2024-05-07T194401.200.json
 

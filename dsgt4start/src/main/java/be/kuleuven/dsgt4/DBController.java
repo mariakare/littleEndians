@@ -28,7 +28,8 @@ import java.util.*;
 @RestController
 class DBController {
 
-    final static String apiToken="Iw8zeveVyaPNWonPNaU0213uw3g6Ei";
+    String apiToken="Iw8zeveVyaPNWonPNaU0213uw3g6Ei";
+    String headerValue = "Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei";
 
     @Autowired
     WebClient.Builder webClientBuilder;
@@ -302,9 +303,9 @@ class DBController {
 
         // Array of endpoint URLs
         String[] endpointURLs = {
-                "http://sud.switzerlandnorth.cloudapp.azure.com:8080/products/",
-                "http://ivan.canadacentral.cloudapp.azure.com:8080/products/",
-                "http://sud.japaneast.cloudapp.azure.com:8080/products/"
+                "http://sud.switzerlandnorth.cloudapp.azure.com:8090/products/",
+                "http://ivan.canadacentral.cloudapp.azure.com:8091/products/",
+                "http://sud.japaneast.cloudapp.azure.com:8093/products/"
         };
 
 
@@ -861,11 +862,12 @@ class DBController {
 
                                 boolean isSuccessful = responseBody.get("status").equals("CONFIRMED");
                                 System.out.println(isSuccessful);
-                                confirmed=true;
 
 
-                                if (isSuccessful) {//TODO: Test this when cart works again
+
+                                if (isSuccessful) {
                                     System.out.println("is confirmed");
+                                    confirmed=true;
                                 }
                                 else{
                                     System.out.println("is not confirmed");
