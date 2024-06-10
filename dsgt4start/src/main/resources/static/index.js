@@ -144,12 +144,7 @@ function wireUpAuthChange() {
       const logoutButton = document.getElementById("btnLogout");
       logoutButton.style.display = "";
 
-      //changing this such that we always go to user page first!
-      // if(!isManager) setupUserPage(token);
-      // else setupManagerPage(token);
       setupUserPage(token);
-      //fetchData(token);
-
     });
 
   });
