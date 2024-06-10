@@ -402,6 +402,7 @@ function checkValidBundle() {
 
     let valid = true;
     let selectedProductIds = [];
+    let selectedProducts = [];
     //ADD CODE HERE TO CHECK VALID BUNDLE
     for (let i = 0; i < 3; i++) {
         const radioGroupName = 'supplier_' + i;
@@ -412,6 +413,17 @@ function checkValidBundle() {
             if (radioButton.checked) {
                 checked = true; // At least one radio button is checked
                 selectedProductIds.push(radioButton.value)
+
+                const selectedValue = radioButton.value.split("@"); // Split value (name@productId)
+
+                    // Create an object to store product details
+                    const selectedProduct = {
+                      supplierName: selectedValue[0], // Extract supplier name
+                      productId: selectedValue[1],   // Extract product ID
+                      price: product.price          // Access price from current product
+                    };
+
+                    selectedProducts.push(selectedProduct);
             }
         });
 

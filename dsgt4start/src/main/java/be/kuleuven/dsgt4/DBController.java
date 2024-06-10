@@ -791,19 +791,20 @@ class DBController {
 
                         while (!confirmed) {
                             try {
-                                String responseBody = webClient.post()
+                                Map responseBody = webClient.post()
                                         .uri(finalUrl)
                                         .retrieve()
-                                        .bodyToMono(String.class)
+                                        .bodyToMono(Map.class)
                                         .block();
 
-                                System.out.println(responseBody);
+
+                                boolean isSuccessful = responseBody.get("status").equals("CONFIRMED");
                                 confirmed=true;
 
-                                // Check response for confirmation (modify this condition based on your supplier's response format)
-//                                if (responseBody == "sth??") {//TODO
-//                                    confirmed = true;
-//                                }
+
+                                if (isSuccessful) {//TODO: Test this when cart works again
+                                    System.out.println("is confirmed");
+                                }
                             } catch (Exception e) {
 
                             }
