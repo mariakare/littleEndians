@@ -29,26 +29,7 @@ export function setupUserPage(token)    {
 
 
 
-/**
- *  Get all available bundles and display them as content on the page
- * @param token
- */
-export function getBundles(token) {
-    return fetch('/api/getBundles', {
-        headers: { Authorization: 'Bearer ' + token}
-    })
-        .then((response) => {
-            return response.text();
-        })
-        .then((data) => {
-            return data;
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
 
-
-}
 
 export function displayBundles(data) {
 
@@ -105,6 +86,28 @@ export function displayBundles(data) {
 
         contentDiv.appendChild(bundleDiv);
     });
+}
+
+
+/**
+ *  Get all available bundles and display them as content on the page
+ * @param token
+ */
+export function getBundles(token) {
+    return fetch('/api/getBundles', {
+        headers: { Authorization: 'Bearer ' + token}
+    })
+        .then((response) => {
+            return response.text();
+        })
+        .then((data) => {
+            return data;
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+
+
 }
 
 

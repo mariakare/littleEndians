@@ -1,5 +1,5 @@
+import {adaptHeaderManager} from "./header.js";
 import {getBundles, setupUserPage} from "./getContent.js";
-import {adaptHeaderManager} from "./header.js"
 let tkn;
 let currentBundle;
 
@@ -193,7 +193,7 @@ export function createTab(label) {
 
 
 function displayCustomers(jsonData){
-    console.log("To be implemented: displayCustomers")
+    console.log(jsonData);
 }
 
 function displayOrders(jsonData){
