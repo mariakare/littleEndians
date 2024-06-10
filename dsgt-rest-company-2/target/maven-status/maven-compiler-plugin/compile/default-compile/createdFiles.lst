@@ -1,10 +1,12 @@
-be/kuleuven/safetyrestservice/SafetyRestServiceApplication.class
 be/kuleuven/safetyrestservice/exceptions/ProductNotFoundAdvice.class
+be/kuleuven/safetyrestservice/SafetyRestServiceApplication.class
 be/kuleuven/safetyrestservice/domain/Reservation.class
 be/kuleuven/safetyrestservice/controllers/ProductsRestController.class
 be/kuleuven/safetyrestservice/domain/ProductsRepository.class
 be/kuleuven/safetyrestservice/exceptions/ReservationException.class
 be/kuleuven/safetyrestservice/domain/Product.class
+be/kuleuven/safetyrestservice/config/InterceptorConfig.class
+be/kuleuven/safetyrestservice/config/ApiKeyInterceptor.class
 be/kuleuven/safetyrestservice/exceptions/ProductNotFoundException.class
 be/kuleuven/safetyrestservice/exceptions/ReservationAdvice.class
 be/kuleuven/safetyrestservice/domain/Reservation$Status.class

@@ -28,7 +28,14 @@ function setupAuth() {
     };
   } else {
     firebaseConfig = {
-      // TODO: for level 2, paste your config here
+      //for level 2, paste your config here
+      apiKey: "AIzaSyBPMUlZYq-zfFi4xV2jR6DQeb9tpbdJf4Q",
+      authDomain: "dsgt-little-endian.firebaseapp.com",
+      projectId: "dsgt-little-endian",
+      storageBucket: "dsgt-little-endian.appspot.com",
+      messagingSenderId: "400359968693",
+      appId: "1:400359968693:web:191a321f34a131d726d3fc",
+      measurementId: "G-LS6BH541L1"
     };
   }
 
