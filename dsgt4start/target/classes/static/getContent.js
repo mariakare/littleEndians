@@ -1,4 +1,5 @@
 import * as cart from "./shoppingCart.js";
+import {setupManagerPage} from "./managerPage.js";
 
 let tkn;
 
@@ -6,19 +7,50 @@ let tkn;
  *
  * @param token
  */
-export function setupUserPage(token)    {
+export function setupUserPage(token, isManager = false)    {
     tkn = token;
     getBundles(token)
         .then((data) => {
             displayBundles(data);
             cart.wireupCartButton(tkn);
             wireupBundlesButton(tkn);
+            if(isManager){
+                wireupManagerButton();
+            }
 
         })
         .catch((error) => {
             console.error(error);
         });
 }
+
+function wireupManagerButton(){
+    const headerButtonsContainer = document.getElementById("divHeaderButtons"); // Assuming the header element has an ID of "header"
+
+    // Create a new button element
+    const managerButton = document.createElement("button");
+    managerButton.id = "btnManager"; // Set an ID for the new button
+    managerButton.textContent = "ManagerPage"; // Set the button text
+    managerButton.style.display = "block"; // Ensure the button is visible
+
+    // Append the button to the header
+    const firstButton = headerButtonsContainer.firstChild;
+    headerButtonsContainer.insertBefore(managerButton, firstButton);
+
+    // Add an event listener to call the display() function when clicked
+    managerButton.addEventListener('click', function() {
+        getBundles(tkn)
+            .then((data) => {
+
+                setupManagerPage(tkn);
+
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    });
+}
+
 
 function wireupBundlesButton(tkn){
     const headerButtonsContainer = document.getElementById("divHeaderButtons"); // Assuming the header element has an ID of "header"
