@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Product Page</title>
+
+    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="managerPage.css" />
+    <link rel="stylesheet" href="header.css" />
+    <!-- add more stylesheets + -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+
+
+
+<body>
+
+
+
+<script type="module" src="getContent.js"></script>
+
+<script type="module" src="header.js"></script>
+
+<script type="module" src="authentication.js"></script>
+
+<script type="module" src="managerPage.js"></script>
+
+<script type="module" src="index.js"></script>
+
+
+
+<header>
+    <div class="header-menu">
+        <a href="/">
+            <div class="header-title">Random Shit Specials</div>
+        </a>
+        <div class="header-name" id="namediv"></div>
+
+        <div id="divHeaderButtons" class="icon-buttons-container">
+            <button  id="btnShoppingBasket" class="icon-button"><i class="fas fa-shopping-basket"></i> View Orders</button>
+            <button  id="btnLogout" class="header-icon"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+</header>
+
+
+
+<div id="logindiv" class="login">
+
+    <div class="textfield">
+        <label for="email">Email</label>
+        <input class="email" type="text" id="email" required="required"/>
+    </div>
+    <div class="textfield">
+        <label for="password">Password</label>
+        <input class="password" type="password" id="password" required="required"/>
+    </div>
+    <div class="login-button" id="btnSignUp">Sign up</div>
+    <div class="login-button" id="btnSignIn">Sign In</div>
+</div>
+
+
+
+<!-- Modal HTML -->
+<div id="editBundleModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Edit Bundle</h2>
+        <form id="editBundleForm">
+            <label for="editBundleTitle">Bundle Title:</label>
+            <input type="text" id="editBundleTitle" name="editBundleTitle">
+            <label for="editBundleDescription">Bundle Description:</label>
+            <textarea id="editBundleDescription" name="editBundleDescription"></textarea>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+<!-- Your scripts here -->
+
+
+
+<div class="page" id="contentdiv">
+</div>
+
+
+
+<footer class="bottom-bar">
+    <p>&copy; 2024 The Little Endians. All rights reserved.</p>
+</footer>
+
+</body>
+</html>
