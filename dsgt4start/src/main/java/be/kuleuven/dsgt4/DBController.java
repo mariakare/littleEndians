@@ -499,7 +499,7 @@ class DBController {
         data.put("name", bundleTitle);
         data.put("description", bundleDescription);
         data.put("productIds", productIdFinal);
-        data.put("price", totalPrice);
+        data.put("price", totalPrice*0.9);//add 10 precent discount
 
         // Process bundle data
         String response = "Bundle Title: " + bundleTitle + "\n" +
