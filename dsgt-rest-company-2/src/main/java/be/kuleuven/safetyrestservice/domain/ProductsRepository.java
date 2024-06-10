@@ -3,6 +3,7 @@ package be.kuleuven.safetyrestservice.domain;
 import be.kuleuven.safetyrestservice.exceptions.ReservationException;
 import be.kuleuven.safetyrestservice.exceptions.ProductNotFoundException;
 
+import be.kuleuven.safetyrestservice.domain.Reservation;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -135,7 +136,8 @@ public class ProductsRepository {
     //confirm reservation
     public synchronized void confirmReservation(String reservationId) {
         Reservation reservation = getReservationById(reservationId);
-        reservation.setStatus(Reservation.Status.CONFIRMED);
+        reservation.confirmReservation();
+        // reservation.setStatus(Reservation.Status.CONFIRMED);
     }
 
 

@@ -21,7 +21,7 @@ public class ProductsRepository {
 
     @PostConstruct
     public void initializeProducts() {
-
+        //perhaps we can consider using a database for one of the services just so they are not all the same
         Product suit = new Product();
         suit.setId("5268203c-de76-4921-a3e3-439db69c462a");
         suit.setName("Louis Vuitton Tuxedo");
@@ -136,7 +136,7 @@ public class ProductsRepository {
     public synchronized void confirmReservation(String reservationId) {
         Reservation reservation = getReservationById(reservationId);
         reservation.confirmReservation();
-        //reservation.setStatus(Reservation.Status.CONFIRMED);
+        // reservation.setStatus(Reservation.Status.CONFIRMED);
     }
 
 

@@ -89,15 +89,23 @@ public class ProductsRestController {
     // 5. Cancel Reservation
     @PostMapping("/reservations/{id}/cancel")
     public ResponseEntity<?> cancelReservation(@PathVariable String id) {
+        Reservation reservation = productsRepository.getReservationById(id);
         productsRepository.cancelReservation(id);
-        return ResponseEntity.ok().build();
+        // return ResponseEntity.ok().build();
+        return ResponseEntity.ok(EntityModel.of(reservation,
+                linkTo(methodOn(ProductsRestController.class).getReservationById(reservation.getReservationId())).withSelfRel()));
     }
 
     // 6. Confirm Reservation (Buy)
     @PostMapping("/reservations/{id}/confirm")
     public ResponseEntity<?> confirmReservation(@PathVariable String id) {
+        Reservation reservation = productsRepository.getReservationById(id);
         productsRepository.confirmReservation(id);
-        return ResponseEntity.ok().build();
+
+        // return ResponseEntity.ok().build();
+        return ResponseEntity.ok(EntityModel.of(reservation,
+                linkTo(methodOn(ProductsRestController.class).getReservationById(reservation.getReservationId())).withSelfRel()));
     }
+
 
 }

@@ -48,7 +48,7 @@ public class Reservation {
         this.status = Status.CONFIRMED;
 
         // Schedule the status change to DELIVERED after a random delay
-        int delay = (int) (Math.random() * 21) + 10; // Random delay between 10 and 30 seconds
+        int delay = (int) (Math.random() * 21) + 40; // Random delay between 40 and 60 seconds
         scheduler.schedule(() -> {
             this.status = Status.DELIVERED;
         }, delay, TimeUnit.SECONDS);
@@ -119,5 +119,3 @@ public class Reservation {
         return Objects.hash(reservationId, timestamp, status, products);
     }
 }
-
-
