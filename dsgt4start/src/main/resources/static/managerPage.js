@@ -118,7 +118,7 @@ function displayManagerBundles(data) {
 
 
 // Function to set active tab
-function setActiveTab(tab) {
+export function setActiveTab(tab) {
     const tabs = document.querySelectorAll(".header-tab");
     tabs.forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
@@ -193,7 +193,32 @@ export function createTab(label) {
 
 
 function displayCustomers(jsonData){
-    console.log(jsonData);
+    const users = JSON.parse(jsonData);
+    const contentDiv = document.getElementById('contentdiv');
+    // Clear the contentDiv before adding new users
+    contentDiv.innerHTML = '';
+    // Create a list element
+    const userList = document.createElement('ul');
+    userList.id = 'user-list';
+
+    users.forEach(user => {
+        // Create a list item for the user
+        const userItem = document.createElement('li');
+        userItem.classList.add('user');
+
+        userItem.innerHTML = `
+            <div class="user-info">
+                <p class="user-role">Role: ${user.role}</p>
+                <p class="user-email">Email: ${user.email}</p>
+            </div>
+        `;
+
+        // Append the user item to the userList
+        userList.appendChild(userItem);
+    });
+
+    // Append the userList to the contentDiv
+    contentDiv.appendChild(userList);
 }
 
 function displayOrders(jsonData){

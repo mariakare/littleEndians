@@ -119,3 +119,26 @@
     resize: vertical; /* Allow vertical resizing */
     min-height: 100px; /* Set a minimum height */
 }
+
+
+#contentdiv {
+    padding: 0;
+    margin: 0;
+    list-style-type: none; /* Remove bullet points */
+}
+
+.user {
+    padding: 10px;
+    margin: 0;
+    border-bottom: 1px solid #ccc; /* Border between items */
+    background-color: #f9f9f9;
+}
+
+.user:last-child {
+    border-bottom: none; /* Remove the border from the last item */
+}
+
+.user-role, .user-email {
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+}

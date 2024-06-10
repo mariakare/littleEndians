@@ -1,5 +1,5 @@
 import {getBundles, setupUserPage} from "./getContent.js";
-import {setupManagerPage, createTab} from "./managerPage.js";
+import {setupManagerPage, createTab, setActiveTab} from "./managerPage.js";
 import {setToken, getCart} from "./shoppingCart.js";
 import {displayBundles} from "./getContent.js";
 
