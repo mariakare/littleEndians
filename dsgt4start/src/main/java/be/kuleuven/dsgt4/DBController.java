@@ -214,6 +214,8 @@ class DBController {
     public String getCart() throws ExecutionException, InterruptedException {
         var user = WebSecurityConfig.getUser();
 
+        System.out.println("User:"+user);
+
         // Reference to the user's document
         CollectionReference basketRef = db.collection("user").document(user.getEmail()).collection("basket");
 
@@ -385,11 +387,13 @@ class DBController {
         }
     }
 
-    private List<DocumentReference> addProduct(String[] productIds){
+    private Map<DocumentReference, Double> addProduct(String[] productIds){
         //CollectionReference products = db.collection("products");
         WebClient webClient = webClientBuilder.build();
         int i=0;
+
         List<DocumentReference> documentReferences = new ArrayList<>();
+        Map<DocumentReference, Double> documentMap = new HashMap<>();
 
         for (String id: productIds){
 
@@ -400,6 +404,7 @@ class DBController {
 
             ApiFuture<DocumentSnapshot> future = docRef.get();
             try {
+                double price=0;
                 // Get the document snapshot
                 DocumentSnapshot document = future.get();
 
@@ -415,6 +420,8 @@ class DBController {
                             .bodyToMono(String.class)
                             .block();
 
+                    System.out.println(responseBody);
+
 
                     try{
 
@@ -427,6 +434,9 @@ class DBController {
                         data.put("description", rootNode.path("description").asText());
                         data.put("imageLink", rootNode.path("imageLink").asText());
                         data.put("supplier", idParts[0].substring(0, idParts[0].length() - "products/".length()));
+                        data.put("price", rootNode.path("price").asDouble());
+
+                        price=rootNode.path("price").asDouble();
 
                         ApiFuture<WriteResult> result = docRef.set(data);
 
@@ -441,6 +451,7 @@ class DBController {
                     }
                 }
                 documentReferences.add(docRef);
+                documentMap.put(docRef, price);
 
             } catch (InterruptedException | ExecutionException e) {
                 // Handle any errors that may occur
@@ -449,7 +460,7 @@ class DBController {
 
             i++;
         }
-        return documentReferences;
+        return documentMap;
     }
 
 
@@ -473,7 +484,14 @@ class DBController {
             productIdSplit[i] = productIdSplit[i].replaceAll("\"", "");
         }
 
-        List<DocumentReference> productIdFinal = addProduct(productIdSplit);
+        Map<DocumentReference, Double> products = addProduct(productIdSplit);
+
+        List<DocumentReference> productIdFinal=new ArrayList<>(products.keySet());
+
+        double totalPrice = 0.0;
+        for (Double value : products.values()) {
+            totalPrice += value;
+        }
 
         // Create a map to hold the data for the new document
         Map<String, Object> data = new HashMap<>();
@@ -481,7 +499,7 @@ class DBController {
         data.put("name", bundleTitle);
         data.put("description", bundleDescription);
         data.put("productIds", productIdFinal);
-        data.put("price", "20000000");
+        data.put("price", totalPrice);
 
         // Process bundle data
         String response = "Bundle Title: " + bundleTitle + "\n" +
@@ -790,19 +808,20 @@ class DBController {
 
                         while (!confirmed) {
                             try {
-                                String responseBody = webClient.post()
+                                Map responseBody = webClient.post()
                                         .uri(finalUrl)
                                         .retrieve()
-                                        .bodyToMono(String.class)
+                                        .bodyToMono(Map.class)
                                         .block();
 
-                                System.out.println(responseBody);
+
+                                boolean isSuccessful = responseBody.get("status").equals("CONFIRMED");
                                 confirmed=true;
 
-                                // Check response for confirmation (modify this condition based on your supplier's response format)
-//                                if (responseBody == "sth??") {//TODO
-//                                    confirmed = true;
-//                                }
+
+                                if (isSuccessful) {//TODO: Test this when cart works again
+                                    System.out.println("is confirmed");
+                                }
                             } catch (Exception e) {
 
                             }
@@ -847,7 +866,7 @@ class DBController {
     }
 
 
-    @GetMapping("/api/getAllUsers")
+    @GetMapping("/api/getUsers")
     public String getAllUsers() throws ExecutionException, InterruptedException {
         // Get a reference to the users collection
         System.out.println("in getAllUsers");
