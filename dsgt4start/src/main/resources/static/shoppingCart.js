@@ -10,10 +10,11 @@ function getCart() {
         })
         .then((data) => {
             console.log(data);
-            // displayShoppingCart(data);
+            // // displayShoppingCart(data);
             displayCartPage(data);
         })
         .catch(function (error) {
+            console.log("bro is this it?")
             console.log(error);
         });
 
@@ -77,15 +78,92 @@ function displayCartPage(data){
     // };
 
 
-    displaySec(findCategory("cart", data), "Cart", true, true);
-    displaySec(findCategory("shipping", data), "Orders on their way to you", false, false);
-    displaySec(findCategory("past", data), "Past orders", false, false);
+    displaySec(data["cart"] || [], "Cart", true, true);
+    displaySec(data["shipping"] || [], "Orders on their way to you", false, false);
+    displaySec(data["past"] || [], "Past orders", false, false);
 }
 
+// function displaySec(data, head, clear, isCart){
+//     const contentDiv = document.getElementById('contentdiv');
+//     if (clear){
+//         contentDiv.innerHTML = '';
+//     }
+//
+//
+//     const cartDiv = document.createElement('div');
+//     cartDiv.classList.add('cart');
+//
+//     // Create elements to display shopping cart contents
+//     const heading = document.createElement('h2');
+//     heading.textContent = head;
+//
+//     // Append heading to containerDiv
+//     cartDiv.appendChild(heading);
+//
+//     console.log(data);
+//     data.forEach(item => {
+//         // Create a div for each item
+//         const itemDiv = document.createElement('div');
+//         itemDiv.classList.add('cart-item');
+//
+//         // Display item name
+//         const itemName = document.createElement('span');
+//         itemName.textContent = item.name;
+//         itemDiv.appendChild(itemName);
+//
+//
+//         if(isCart){
+//             // Create a buy button for each item
+//             const buyButton = document.createElement('button');
+//             buyButton.textContent = 'Buy';
+//             buyButton.classList.add('buy-button');
+//             buyButton.addEventListener('click', function() {
+//                 // Handle delete action
+//                 console.log(item);
+//                 buyBundle(item.id);
+//             });
+//             itemDiv.appendChild(buyButton);
+//
+//             // Create a delete button for each item
+//             const deleteButton = document.createElement('button');
+//             deleteButton.textContent = 'Delete';
+//             deleteButton.classList.add('delete-button');
+//             deleteButton.addEventListener('click', function() {
+//                 // Handle delete action
+//                 console.log(item);
+//                 deleteCartBundle(item.id);
+//             });
+//             itemDiv.appendChild(deleteButton);
+//
+//         }
+//
+//         cartDiv.appendChild(itemDiv);
+//     });
+//
+//     if(isCart){
+//         // Create the buy button
+//         const buyButton = document.createElement('button');
+//         buyButton.textContent = 'Buy';
+//         buyButton.id = 'buy-cart';
+//         buyButton.addEventListener('click', function() {
+//             // Handle buy action
+//             buyAll();
+//             // You can add your buy functionality here
+//         });
+//
+//         // Append the buy button to the cartDiv
+//         cartDiv.appendChild(buyButton);
+//     }
+//
+//     // Append the cartDiv to the contentDiv
+//     contentDiv.appendChild(cartDiv);
+// }
 function displaySec(data, head, clear, isCart){
     const contentDiv = document.getElementById('contentdiv');
     if (clear){
         contentDiv.innerHTML = '';
+        console.log("Here you see cart data:");
+        console.log(data);
     }
 
 
@@ -156,100 +234,22 @@ function displaySec(data, head, clear, isCart){
     // Append the cartDiv to the contentDiv
     contentDiv.appendChild(cartDiv);
 }
-function displaySec(data, head, clear, isCart){
-    const contentDiv = document.getElementById('contentdiv');
-    if (clear){
-        contentDiv.innerHTML = '';
-    }
 
 
-    const cartDiv = document.createElement('div');
-    cartDiv.classList.add('cart');
-
-    // Create elements to display shopping cart contents
-    const heading = document.createElement('h2');
-    heading.textContent = head;
-
-    // Append heading to containerDiv
-    cartDiv.appendChild(heading);
-
-    data.forEach(item => {
-        // Create a div for each item
-        const itemDiv = document.createElement('div');
-        itemDiv.classList.add('cart-item');
-
-        // Display item name
-        const itemName = document.createElement('span');
-        itemName.textContent = item.name;
-        itemDiv.appendChild(itemName);
-
-
-        if(isCart){
-            // Create a buy button for each item
-            const buyButton = document.createElement('button');
-            buyButton.textContent = 'Buy';
-            buyButton.classList.add('buy-button');
-            buyButton.addEventListener('click', function() {
-                // Handle delete action
-                console.log(item);
-                buyBundle(item.id);
-            });
-            itemDiv.appendChild(buyButton);
-
-            // Create a delete button for each item
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
-            deleteButton.classList.add('delete-button');
-            deleteButton.addEventListener('click', function() {
-                // Handle delete action
-                console.log(item);
-                deleteCartBundle(item.id);
-            });
-            itemDiv.appendChild(deleteButton);
-
-        }
-
-        cartDiv.appendChild(itemDiv);
-    });
-
-    if(isCart){
-        // Create the buy button
-        const buyButton = document.createElement('button');
-        buyButton.textContent = 'Buy';
-        buyButton.id = 'buy-cart';
-        buyButton.addEventListener('click', function() {
-            // Handle buy action
-            buyAll();
-            // You can add your buy functionality here
-        });
-
-        // Append the buy button to the cartDiv
-        cartDiv.appendChild(buyButton);
-    }
-
-    // Append the cartDiv to the contentDiv
-    contentDiv.appendChild(cartDiv);
-}
-function findCategory(categoryName, jsonData) {
-    const item = jsonData.items.find(item => item.category.toLowerCase() === categoryName.toLowerCase());
-    if (item) {
-        return item.bundles;
-    } else {
-        console.log(`Category ${categoryName} not found.`);
-    }
-}
-
-
-
-
-function findCategory(categoryName, jsonData) {
-    const item = jsonData.items.find(item => item.category.toLowerCase() === categoryName.toLowerCase());
-    if (item) {
-        return item.bundles;
-    } else {
-        console.log(`Category ${categoryName} not found.`);
-    }
-}
+// function findCategory(categoryName, jsonData) {
+//     // const item = jsonData.items.find(item => item.category.toLowerCase() === categoryName.toLowerCase());
+//     // if (item) {
+//     //     return item.bundles;
+//     // } else {
+//     //     console.log(`Category ${categoryName} not found.`);
+//     // }
+//
+//     if ("cart" in jsonData && Array.isArray(jsonData.cart)) {
+//         return jsonData.cart.filter(item => item.name === categoryName);
+//     } else {
+//         return [];
+//     }
+// }
 
 
 function buyAll(){
@@ -292,32 +292,32 @@ export function wireupCartButton(token){
 }
 
 
-export function addToCart(bundleId) {
-    // Send a fetch request to the backend
-    fetch('/api/addToCart', {
-        method: 'POST',
-        headers: {
-            Authorization: 'Bearer ' + tkn
-        },
-        body: bundleId
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text();
-        })
-        .then(data => {
-            // Handle success response (optional)
-            console.log(data);
-            alert('Bundle added to cart!');
-        })
-        .catch(error => {
-            // Handle error response (optional)
-            console.error(error);
-            alert('Error adding bundle to cart: ' + error.message);
-        });
-}
+// export function addToCart(bundleId) {
+//     // Send a fetch request to the backend
+//     fetch('/api/addToCart', {
+//         method: 'POST',
+//         headers: {
+//             Authorization: 'Bearer ' + tkn
+//         },
+//         body: bundleId
+//     })
+//         .then(response => {
+//             if (!response.ok) {
+//                 throw new Error('Network response was not ok');
+//             }
+//             return response.text();
+//         })
+//         .then(data => {
+//             // Handle success response (optional)
+//             console.log(data);
+//             alert('Bundle added to cart!');
+//         })
+//         .catch(error => {
+//             // Handle error response (optional)
+//             console.error(error);
+//             alert('Error adding bundle to cart: ' + error.message);
+//         });
+// }
 
 function buyBundle(bundleId) {
     return fetch('/api/buyBundle', {
@@ -346,18 +346,18 @@ function buyBundle(bundleId) {
 }
 
 // commit
-
-export function wireupCartButton(token){
-    tkn = token;
-    const viewCartButton = document.getElementById("btnShoppingBasket");
-    if (viewCartButton.style.display === "none") {
-        viewCartButton.style.display = "block";
-    }
-    viewCartButton.addEventListener('click', function() {
-        getCart(tkn);
-    });
-
-}
+//
+// export function wireupCartButton(token){
+//     tkn = token;
+//     const viewCartButton = document.getElementById("btnShoppingBasket");
+//     if (viewCartButton.style.display === "none") {
+//         viewCartButton.style.display = "block";
+//     }
+//     viewCartButton.addEventListener('click', function() {
+//         getCart(tkn);
+//     });
+//
+// }
 
 // Function to delete an item from the cart
 function deleteCartBundle(bundleId) {
