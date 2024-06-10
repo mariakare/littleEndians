@@ -147,7 +147,7 @@ function wireUpAuthChange() {
       //changing this such that we always go to user page first!
       // if(!isManager) setupUserPage(token);
       // else setupManagerPage(token);
-      setupUserPage(token, isManager);
+      setupUserPage(token);
       //fetchData(token);
 
     });

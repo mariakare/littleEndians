@@ -1,5 +1,6 @@
 import * as cart from "./shoppingCart.js";
 import {setupManagerPage} from "./managerPage.js";
+import * as authentication from "./authentication.js";
 
 let tkn;
 
@@ -7,14 +8,15 @@ let tkn;
  *
  * @param token
  */
-export function setupUserPage(token, isManager = false)    {
+export function setupUserPage(token)    {
     tkn = token;
     getBundles(token)
         .then((data) => {
+            removeExtraButtons();
             displayBundles(data);
             cart.wireupCartButton(tkn);
             wireupBundlesButton(tkn);
-            if(isManager){
+            if(authentication.checkUserRole(token)){
                 wireupManagerButton();
             }
 
@@ -23,6 +25,43 @@ export function setupUserPage(token, isManager = false)    {
             console.error(error);
         });
 }
+
+function removeExtraButtons() {
+    const headerButtonsContainer = document.getElementById("divHeaderButtons");
+    const headerMenu = document.querySelector(".header-menu");
+
+    const originalButtons = ["btnShoppingBasket", "btnLogout"];
+    const buttons = headerButtonsContainer.getElementsByTagName("button");
+    const buttonsArray = Array.from(buttons);
+
+    buttonsArray.forEach(button => {
+        if (!originalButtons.includes(button.id)) {
+            headerButtonsContainer.removeChild(button);
+        }
+    });
+
+    // // Remove dynamically added buttons
+    // const dynamicButtons = headerButtonsContainer.querySelectorAll('.dynamic-button');
+    // dynamicButtons.forEach(button => {
+    //     headerButtonsContainer.removeChild(button);
+    // });
+
+    // Remove dynamically added tabs
+    const dynamicTabs = headerMenu.querySelectorAll('.dynamic-tab');
+    dynamicTabs.forEach(tab => {
+        headerMenu.removeChild(tab);
+    });
+
+    // Ensure the cart button is visible again
+    const viewCartButton = document.getElementById("btnShoppingBasket");
+    if (viewCartButton) {
+        viewCartButton.style.display = "block";
+    }
+}
+
+// // Call the function to remove extra elements
+// removeExtraElements();
+
 
 function wireupManagerButton(){
     const headerButtonsContainer = document.getElementById("divHeaderButtons"); // Assuming the header element has an ID of "header"
@@ -39,15 +78,7 @@ function wireupManagerButton(){
 
     // Add an event listener to call the display() function when clicked
     managerButton.addEventListener('click', function() {
-        getBundles(tkn)
-            .then((data) => {
-
-                setupManagerPage(tkn);
-
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+        setupManagerPage(tkn);
     });
 }
 

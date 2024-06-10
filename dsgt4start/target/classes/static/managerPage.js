@@ -1,4 +1,4 @@
-import {getBundles} from "./getContent.js";
+import {getBundles, setupUserPage} from "./getContent.js";
 
 let tkn;
 let currentBundle;
@@ -29,6 +29,10 @@ export function setupManagerPage(token){
  * and one for adding new bundles
  */
 function adaptHeaderManager() {
+    // remove buttons
+    removeExtraButtons();
+    addExitManagerButton();
+
     // Create the tabs
     const tab1 = createTab("Active bundles", "/page1");
     const tab2 = createTab("Add new bunldes", "/page2");
@@ -49,6 +53,41 @@ function adaptHeaderManager() {
     setActiveTab(tab1);
 }
 
+function addExitManagerButton(){
+    const headerButtonsContainer = document.getElementById("divHeaderButtons"); // Assuming the header element has an ID of "header"
+
+    // Create a new button element
+    const returnButton = document.createElement("button");
+    returnButton.id = "btnReturn"; // Set an ID for the new button
+    returnButton.textContent = "User Page"; // Set the button text
+    returnButton.style.display = "block"; // Ensure the button is visible
+
+    // Append the button to the header
+    const firstButton = headerButtonsContainer.firstChild;
+    headerButtonsContainer.insertBefore(returnButton, firstButton);
+
+    // Add an event listener to call the display() function when clicked
+    returnButton.addEventListener('click', function() {
+        setupUserPage(tkn);
+    });
+}
+
+function removeExtraButtons() {
+    const headerButtonsContainer = document.getElementById("divHeaderButtons");
+    const originalButtons = ["btnShoppingBasket", "btnLogout"];
+
+    // Get all buttons inside the container
+    const buttons = headerButtonsContainer.getElementsByTagName("button");
+
+    // Convert HTMLCollection to an array to safely iterate and remove elements
+    const buttonsArray = Array.from(buttons);
+
+    buttonsArray.forEach(button => {
+        if (!originalButtons.includes(button.id)) {
+            headerButtonsContainer.removeChild(button);
+        }
+    });
+}
 
 /// BELOW EVERYTHING FOR EDIT/DELETE BUNDLES PAGE
 
@@ -149,7 +188,7 @@ function setActiveTab(tab) {
 function createTab(label) {
     const tab = document.createElement("div");
     tab.textContent = label;
-    tab.classList.add("header-tab");
+    tab.classList.add("header-tab", "dynamic-tab");
     tab.addEventListener("click", () => {
         setActiveTab(tab);
         if (label == "Active bundles") {
