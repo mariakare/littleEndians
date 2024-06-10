@@ -32,7 +32,6 @@ public class SecurityFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // TODO: (level 1) decode Identity Token and assign correct email and role
-        // TODO: (level 2) verify Identity Token
 
         String authorizationHeader = request.getHeader("Authorization");
         String token= null;
@@ -54,6 +53,8 @@ public class SecurityFilter extends OncePerRequestFilter {
         context.setAuthentication(new FirebaseAuthentication(user));
 
         filterChain.doFilter(request, response);
+
+        // TODO: (level 2) verify Identity Token
 
     }
 

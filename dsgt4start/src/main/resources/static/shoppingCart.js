@@ -1,6 +1,8 @@
 let tkn;
 
-function getCart() {
+export function setToken(token){tkn = token}
+
+export function getCart() {
 
     fetch('/api/getCart', {
         headers: { Authorization: 'Bearer ' + tkn}
@@ -161,17 +163,17 @@ function buyAll(){
 
 
 
-export function wireupCartButton(token){
-    tkn = token;
-    const viewCartButton = document.getElementById("btnShoppingBasket");
-    if (viewCartButton.style.display === "none") {
-        viewCartButton.style.display = "block";
-    }
-    viewCartButton.addEventListener('click', function() {
-        getCart(tkn);
-    });
-
-}
+// export function wireupCartButton(token){
+//     tkn = token;
+//     const viewCartButton = document.getElementById("btnShoppingBasket");
+//     if (viewCartButton.style.display === "none") {
+//         viewCartButton.style.display = "block";
+//     }
+//     viewCartButton.addEventListener('click', function() {
+//         getCart(tkn);
+//     });
+//
+// }
 
 
 
