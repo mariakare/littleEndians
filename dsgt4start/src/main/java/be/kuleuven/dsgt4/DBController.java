@@ -961,4 +961,64 @@ class DBController {
     }
 
 
+    @GetMapping("/api/getAllOrders")
+    public String getAllOrders() throws ExecutionException, InterruptedException {
+
+        CollectionReference usersRef = db.collection("user");
+
+        Map<String, List<Map<String, Object>>> allOrders = new HashMap<>();
+        allOrders.put("processing", new ArrayList<>());
+        allOrders.put("ordered", new ArrayList<>());
+
+        ApiFuture<QuerySnapshot> querySnapshot = usersRef.get();
+
+        for (QueryDocumentSnapshot userDoc : querySnapshot.get().getDocuments()) {
+            String userId = userDoc.getId();
+
+            // References to processing and ordered collections for the user
+            CollectionReference processingRef = db.collection("user").document(userId).collection("processing");
+            CollectionReference orderedRef = db.collection("user").document(userId).collection("ordered");
+
+            // Add orders to the respective collections in the map
+            allOrders.get("processing").addAll(getOrdersFromCollection(processingRef, userId));
+            allOrders.get("ordered").addAll(getOrdersFromCollection(orderedRef, userId));
+        }
+
+        // Convert the map to JSON
+        Gson gson = new Gson();
+        String json = gson.toJson(allOrders);
+
+        System.out.println(json);
+        return json;
+    }
+
+    private List<Map<String, Object>> getOrdersFromCollection(CollectionReference collectionRef, String userId)
+            throws ExecutionException, InterruptedException {
+        List<Map<String, Object>> orders = new ArrayList<>();
+
+        ApiFuture<QuerySnapshot> orderSnapshot = collectionRef.get();
+        for (QueryDocumentSnapshot orderDoc : orderSnapshot.get().getDocuments()) {
+            Map<String, Object> orderData = new HashMap<>();
+            orderData.put("id", orderDoc.getString("id"));
+            orderData.put("userId", userId);
+
+            DocumentReference bundleRef = (DocumentReference) orderDoc.get("bundleRef");
+            if (bundleRef != null) {
+                DocumentSnapshot bundleSnapshot = bundleRef.get().get();
+                if (bundleSnapshot.exists()) {
+                    String bundleId = bundleSnapshot.getString("id");
+                    orderData.put("bundleRef", bundleId);
+                } else {
+                    System.out.println("Bundle does not exist for order: " + orderDoc.getId());
+                }
+            } else {
+                System.out.println("bundleRef is null for order: " + orderDoc.getId());
+            }
+            orders.add(orderData);
+        }
+
+        return orders;
+    }
+
+
 }
