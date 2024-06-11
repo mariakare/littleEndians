@@ -28,6 +28,9 @@ import java.util.*;
 @RestController
 class DBController {
 
+    String apiToken="Iw8zeveVyaPNWonPNaU0213uw3g6Ei";
+    String headerValue = "Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei";
+
     @Autowired
     WebClient.Builder webClientBuilder;
 
@@ -212,57 +215,60 @@ class DBController {
         }
     }
 
+
     @GetMapping("/api/getCart")
     public String getCart() throws ExecutionException, InterruptedException {
         var user = WebSecurityConfig.getUser();
 
-        System.out.println("User:"+user);
+        Map<String, List<Map<String, Object>>> cartData = new HashMap<>();
+        cartData.put("cart", new ArrayList<>()); // Renamed to "cart" to match JS
+        cartData.put("shipping", new ArrayList<>()); // Renamed to "shipping" to match JS
+        cartData.put("past", new ArrayList<>()); // Renamed to "past" to match JS
 
-        // Reference to the user's document
         CollectionReference basketRef = db.collection("user").document(user.getEmail()).collection("basket");
+        cartData.get("cart").addAll(getCartItemsFromCollection(basketRef, user.getEmail()));
 
-        ApiFuture<QuerySnapshot> querySnapshot = basketRef.get();
-        List<Map<String, Object>> shoppingCart = new ArrayList<>();
+        CollectionReference processingRef = db.collection("user").document(user.getEmail()).collection("processing");
+        cartData.get("shipping").addAll(getCartItemsFromCollection(processingRef, user.getEmail()));
 
-        StringBuilder jsonDataBuilder = new StringBuilder();
-        jsonDataBuilder.append("{\n");
-        jsonDataBuilder.append("  \"cart\": [\n");
+        CollectionReference orderedRef = db.collection("user").document(user.getEmail()).collection("ordered");
+        cartData.get("past").addAll(getCartItemsFromCollection(orderedRef, user.getEmail()));
 
-        for (QueryDocumentSnapshot document : querySnapshot.get().getDocuments()) {
+        Gson gson = new Gson();
+        String json = gson.toJson(cartData);
 
-            String id = document.getString("id");
-            jsonDataBuilder.append("    {\n");
-            jsonDataBuilder.append("    \"id\": \"").append(id).append("\",\n");
+        System.out.println(json);
+        return json;
+    }
+
+    private List<Map<String, Object>> getCartItemsFromCollection(CollectionReference collectionRef, String userId)
+            throws ExecutionException, InterruptedException {
+        List<Map<String, Object>> cartItems = new ArrayList<>();
+
+        ApiFuture<QuerySnapshot> snapshotFuture = collectionRef.get();
+        QuerySnapshot snapshot = snapshotFuture.get();
+        for (QueryDocumentSnapshot document : snapshot.getDocuments()) {
+            Map<String, Object> itemData = new HashMap<>();
+            itemData.put("id", document.getString("id"));
+            itemData.put("userId", userId);
 
             DocumentReference bundleRef = (DocumentReference) document.get("bundleRef");
-            String bundleName = "";
-            String bundleId = "";
-
-
-            DocumentSnapshot bundleSnapshot = bundleRef.get().get();
-            if (bundleSnapshot.exists()) {
-                // Extract product data from the product document
-                bundleName = bundleSnapshot.getString("name");
-                bundleId = bundleSnapshot.getString("id");
+            if (bundleRef != null) {
+                DocumentSnapshot bundleSnapshot = bundleRef.get().get();
+                if (bundleSnapshot.exists()) {
+                    String bundleId = bundleSnapshot.getString("id");
+                    itemData.put("bundleId", bundleId); // Use 'bundleId' instead of 'bundleRef'
+                    itemData.put("name", bundleSnapshot.getString("name"));
+                } else {
+                    System.out.println("Bundle does not exist for item: " + document.getId());
+                }
             } else {
-                System.out.println("bundle does not exist");
+                System.out.println("bundleRef is null for item: " + document.getId());
             }
-
-            jsonDataBuilder.append("    \"name\": \"").append(bundleName).append("\",\n");
-            jsonDataBuilder.append("    \"bundleId\": \"").append(bundleId).append("\"\n");
-            jsonDataBuilder.append("    },\n");
-
+            cartItems.add(itemData);
         }
 
-        if (!querySnapshot.get().getDocuments().isEmpty()) {
-            jsonDataBuilder.deleteCharAt(jsonDataBuilder.length() - 2); // Removes the last comma
-        }
-
-        jsonDataBuilder.append("]\n");
-        jsonDataBuilder.append("}\n");
-
-        //System.out.println(jsonDataBuilder.toString());
-        return jsonDataBuilder.toString();
+        return cartItems;
     }
 
     @DeleteMapping("/api/removeFromCart")
@@ -290,16 +296,6 @@ class DBController {
     }
 
 
-//    @PostMapping("/api/buyBundle")
-//    public ResponseEntity<String> buyBundle(@RequestBody String bundleId) throws ExecutionException, InterruptedException {
-//        // Print out the bundleId
-//        System.out.println("Buying bundle with ID: " + bundleId);
-//        // Return a success response
-//        return ResponseEntity.status(HttpStatus.OK).body("Bundle with ID: " + bundleId);
-//    }
-
-
-
     @GetMapping("/api/getProducts")
     public String getProducts() throws JsonProcessingException {
         WebClient webClient = webClientBuilder.build();
@@ -310,9 +306,9 @@ class DBController {
 
         // Array of endpoint URLs
         String[] endpointURLs = {
-                "http://sud.switzerlandnorth.cloudapp.azure.com:8080/products/",
-                "http://ivan.canadacentral.cloudapp.azure.com:8080/products/",
-                "http://sud.japaneast.cloudapp.azure.com:8080/products/"
+                "http://sud.switzerlandnorth.cloudapp.azure.com:8090/products/",
+                "http://ivan.canadacentral.cloudapp.azure.com:8091/products/",
+                "http://sud.japaneast.cloudapp.azure.com:8093/products/"
         };
 
 
@@ -320,6 +316,7 @@ class DBController {
         for (String endpointURL : endpointURLs) {
             String responseBody = webClient.get()
                     .uri(endpointURL)
+                    .header("Authorization", "Bearer " + apiToken)
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
@@ -418,6 +415,7 @@ class DBController {
 
                     String responseBody = webClient.get()
                             .uri(endpointURL)
+                            .header("Authorization", "Bearer " + apiToken)
                             .retrieve()
                             .bodyToMono(String.class)
                             .block();
@@ -501,7 +499,7 @@ class DBController {
         data.put("name", bundleTitle);
         data.put("description", bundleDescription);
         data.put("productIds", productIdFinal);
-        data.put("price", totalPrice);
+        data.put("price", totalPrice*0.9);//add 10 precent discount
 
         // Process bundle data
         String response = "Bundle Title: " + bundleTitle + "\n" +
@@ -630,8 +628,9 @@ class DBController {
     }
 
     @PostMapping("/api/buyBundle")
-    public String sendReservation(@RequestBody String jsonString) throws InterruptedException, ExecutionException {
+    public ResponseEntity<String> sendReservation(@RequestBody String jsonString) throws InterruptedException, ExecutionException {
         System.out.println("i am in reserve");
+        System.out.println(jsonString);
 
         int startIndex = jsonString.indexOf(':') + 2;
 
@@ -640,6 +639,8 @@ class DBController {
 
 // Extract the value as a substring
         String bundleId = jsonString.substring(startIndex, endIndex).trim(); // Trim leading/trailing spaces
+
+
 
         System.out.println("Bundle ID: " + bundleId);
         var user = WebSecurityConfig.getUser();
@@ -669,7 +670,7 @@ class DBController {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             System.out.println("bundle doesn't exist");
-            return "Bundle Does not Exist!";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("bundle doesn't exist.");
         }
         System.out.println("yesyesyes");
 
@@ -699,6 +700,7 @@ class DBController {
                 try {
                     Map responseBody = webClient.post()
                             .uri(finalUrl)
+                            .header("Authorization", "Bearer " + apiToken)
                             .body(BodyInserters.fromObject(productsToReserve))
                             .retrieve()
                             .bodyToMono(Map.class)
@@ -729,11 +731,16 @@ class DBController {
 
             if (isSuccesful){
                 System.out.println("Bundle reserved successfully");
-                moveBundle(bundleId, "basket", "processing");
-                buyBundle(reservations);
+                moveBundle(bundleId, "basket", "processing", reservations);
+                buyBundle(reservations, bundleId);
+                return ResponseEntity.ok("Bundle has been reserved");
             }
+
             else{
-                System.out.println("Bundle was not reserved successfully:(((((");
+                cancelBundle(reservations);
+                System.out.println("Bundle was not reserved successfully:((((( Initiate self-destruct protocol");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to reserve.");
+
 
             }
 
@@ -746,9 +753,57 @@ class DBController {
         // send reservation per bundle
         // [add supplier field to product later]
         // return bundle reference
+        return ResponseEntity.ok("Bundle has been reserved");
 
-        return "nice";
+    }
 
+    public String cancelBundle(Map<String, String> reservations){
+        WebClient webClient = webClientBuilder.build();
+
+        try {
+
+            if (!reservations.isEmpty()) {
+                for (Map.Entry<String, String> entry : reservations.entrySet())  {
+                    String reservationId = entry.getKey();
+                    String url = entry.getValue();
+
+                    String finalUrl = url + "reservations/" + reservationId + "/cancel";
+                    System.out.println(finalUrl);
+                    try {
+                        Map responseBody = webClient.post()
+                                .uri(finalUrl)
+                                .header("Authorization", "Bearer " + apiToken)
+                                .retrieve()
+                                .bodyToMono(Map.class)
+                                .block();
+
+
+                        boolean isSuccessful = responseBody.get("status").equals("CANCEL");
+                        System.out.println(isSuccessful);
+
+
+
+                        if (isSuccessful) {
+                            System.out.println("is cancelled succesfully");
+                        }
+                        else{
+                            System.out.println("is not cancelled succesfully");
+                        }
+                    } catch (Exception e) {
+
+                    }
+
+                }
+            }
+
+        }catch(Exception e) {
+            // Handle any exceptions that might occur
+        }
+
+
+
+
+        return "";
     }
 
     public String moveBundle(String bundleId, String initCollection, String finalCollection) throws ExecutionException, InterruptedException {
@@ -765,6 +820,7 @@ class DBController {
         DocumentSnapshot document = future.get();
 
         if (document.exists()) {
+            Map<String, Object> data = new HashMap<>(document.getData());
             destinationRef.set(document.getData());
             sourceRef.delete();
             result = ("Document " + bundleId + " moved from " + initCollection + " to " + finalCollection);
@@ -777,7 +833,37 @@ class DBController {
     }
 
 
-    public String buyBundle(Map<String, String> reservations){
+    public String moveBundle(String bundleId, String initCollection, String finalCollection, Map<String, String> reservations) throws ExecutionException, InterruptedException {
+        var user = WebSecurityConfig.getUser();
+
+        System.out.println("Moving bundle now...");
+
+        String result = "";
+
+        DocumentReference sourceRef = db.collection("user").document(user.getEmail()).collection(initCollection).document(bundleId);
+        DocumentReference destinationRef = db.collection("user").document(user.getEmail()).collection(finalCollection).document(bundleId);
+
+        ApiFuture<DocumentSnapshot> future = sourceRef.get();
+        DocumentSnapshot document = future.get();
+
+        if (document.exists()) {
+            Map<String, Object> data = new HashMap<>(document.getData());
+            data.put("reservations", reservations);
+
+
+            // Set the updated data to the destination collection
+            destinationRef.set(data);
+            sourceRef.delete();
+            result = ("Document " + bundleId + " moved from " + initCollection + " to " + finalCollection);
+        } else {
+            result = ("No document found with ID " + bundleId + " in collection " + initCollection);
+        }
+
+        System.out.println(result);
+        return result;
+    }
+
+    public ResponseEntity<String> buyBundle(Map<String, String> reservations, String bundleId){
         System.out.println("i'm in buy");
 
 
@@ -808,6 +894,7 @@ class DBController {
                             try {
                                 Map responseBody = webClient.post()
                                         .uri(finalUrl)
+                                        .header("Authorization", "Bearer " + apiToken)
                                         .retrieve()
                                         .bodyToMono(Map.class)
                                         .block();
@@ -815,11 +902,12 @@ class DBController {
 
                                 boolean isSuccessful = responseBody.get("status").equals("CONFIRMED");
                                 System.out.println(isSuccessful);
-                                confirmed=true;
 
 
-                                if (isSuccessful) {//TODO: Test this when cart works again
+
+                                if (isSuccessful) {
                                     System.out.println("is confirmed");
+                                    confirmed=true;
                                 }
                                 else{
                                     System.out.println("is not confirmed");
@@ -841,8 +929,14 @@ class DBController {
                 for (Thread thread : threads) {
                     try {
                         thread.join();
+
+                        moveBundle(bundleId, "processing", "ordered");
+                        return ResponseEntity.ok("Bundle has been reserved");
                     } catch (InterruptedException e) {
                         System.out.println("uh oh D:");
+                        String result = ("No document found with ID " + bundleId + " in collection " );
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to reserve.");
+
                     }
 
                 }
@@ -865,7 +959,10 @@ class DBController {
 
 
 
-        return "";
+
+
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("you shound't have reached this");
 
     }
 
@@ -905,6 +1002,66 @@ class DBController {
         System.out.println("json:"+json);
 
         return json;
+    }
+
+
+    @GetMapping("/api/getAllOrders")
+    public String getAllOrders() throws ExecutionException, InterruptedException {
+
+        CollectionReference usersRef = db.collection("user");
+
+        Map<String, List<Map<String, Object>>> allOrders = new HashMap<>();
+        allOrders.put("processing", new ArrayList<>());
+        allOrders.put("ordered", new ArrayList<>());
+
+        ApiFuture<QuerySnapshot> querySnapshot = usersRef.get();
+
+        for (QueryDocumentSnapshot userDoc : querySnapshot.get().getDocuments()) {
+            String userId = userDoc.getId();
+
+            // References to processing and ordered collections for the user
+            CollectionReference processingRef = db.collection("user").document(userId).collection("processing");
+            CollectionReference orderedRef = db.collection("user").document(userId).collection("ordered");
+
+            // Add orders to the respective collections in the map
+            allOrders.get("processing").addAll(getOrdersFromCollection(processingRef, userId));
+            allOrders.get("ordered").addAll(getOrdersFromCollection(orderedRef, userId));
+        }
+
+        // Convert the map to JSON
+        Gson gson = new Gson();
+        String json = gson.toJson(allOrders);
+
+        System.out.println(json);
+        return json;
+    }
+
+    private List<Map<String, Object>> getOrdersFromCollection(CollectionReference collectionRef, String userId)
+            throws ExecutionException, InterruptedException {
+        List<Map<String, Object>> orders = new ArrayList<>();
+
+        ApiFuture<QuerySnapshot> orderSnapshot = collectionRef.get();
+        for (QueryDocumentSnapshot orderDoc : orderSnapshot.get().getDocuments()) {
+            Map<String, Object> orderData = new HashMap<>();
+            orderData.put("id", orderDoc.getString("id"));
+            orderData.put("userId", userId);
+
+            DocumentReference bundleRef = (DocumentReference) orderDoc.get("bundleRef");
+            if (bundleRef != null) {
+                DocumentSnapshot bundleSnapshot = bundleRef.get().get();
+                if (bundleSnapshot.exists()) {
+                    String bundleId = bundleSnapshot.getString("id");
+                    orderData.put("bundleRef", bundleId);
+                } else {
+                    System.out.println("Bundle does not exist for order: " + orderDoc.getId());
+                }
+            } else {
+                System.out.println("bundleRef is null for order: " + orderDoc.getId());
+            }
+            orders.add(orderData);
+        }
+
+        return orders;
     }
 
 

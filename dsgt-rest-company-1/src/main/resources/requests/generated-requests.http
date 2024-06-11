@@ -1,15 +1,15 @@
 ###
 # Get All Suits
 ###
-# GET http://localhost:8090/products
-GET http://localhost:8090/products
+http://ivan.canadacentral.cloudapp.azure.com:8091/products
 Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei
+
+<> 2024-05-07T194401.200.json
 
 ###
 # Get Suit By ID (Existing Suit)
 ###
 GET http://localhost:8090/products/5268203c-de76-4921-a3e3-439db69c462a
-Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei
 
 <> 2024-05-07T194420.200.json
 
@@ -17,7 +17,6 @@ Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei
 # Get Suit By ID (Non-existent Suit)
 ###
 GET http://localhost:8090/products/non-existent-product-id
-Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei
 
 <> 2024-05-07T194410.404.txt
 
@@ -25,7 +24,6 @@ Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei
 # Reserve Suits (Valid Reservation)
 ###
 POST http://localhost:8090/products/reserve
-Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei
 Content-Type: application/json
 
 {
@@ -39,7 +37,6 @@ Content-Type: application/json
 # Reserve Suits (Invalid Suit ID)
 ###
 POST http://localhost:8090/products/reserve
-Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei
 Content-Type: application/json
 
 {
@@ -52,7 +49,6 @@ Content-Type: application/json
 # Reserve Suits (Insufficient Quantity)
 ###
 POST http://localhost:8090/products/reserve
-Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei
 Content-Type: application/json
 
 {
@@ -64,8 +60,7 @@ Content-Type: application/json
 ###
 # Get Reservation By ID (Existing Reservation)
 ###
-GET http://localhost:8090/reservations/b45da5c8-aaa0-4522-96d6-077f13a42b7e
-Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei
+GET http://localhost:8090/reservations/a4cc367b-34b3-4368-b2c3-19a7496796b0
 
 <> 2024-05-07T202111.200.json
 <> 2024-05-07T194810.500.json
@@ -74,34 +69,29 @@ Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei
 # Get Reservation By ID (Non-existent Reservation)
 ###
 GET http://localhost:8090/reservations/non-existent-reservation-id
-Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei
 
 <> 2024-05-07T194841.404.txt
 
 ###
 # Cancel Reservation (Existing Reservation)
 ###
-POST http://localhost:8090/reservations/037245bf-b9f9-424c-8065-a57898ce84f6/cancel
-Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei
+POST http://localhost:8090/reservations/4f90052e-a6ab-49f1-9f43-1baec7db06db/cancel
 
 ###
 # Cancel Reservation (Non-existent Reservation)
 ###
 POST http://localhost:8090/reservations/non-existent-reservation-id/cancel
-Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei
 
 <> 2024-05-07T194734.404.txt
 
 ###
 # Confirm Reservation (Existing Reservation)
 ###
-POST http://localhost:8090/reservations/b45da5c8-aaa0-4522-96d6-077f13a42b7e/confirm
-Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei
+POST http://localhost:8090/reservations/4f90052e-a6ab-49f1-9f43-1baec7db06db/confirm
 
 ###
 # Confirm Reservation (Non-existent Reservation)
 ###
 POST http://localhost:8090/reservations/non-existent-reservation-id/confirm
-Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei
 
 <> 2024-05-07T202221.404.txt
