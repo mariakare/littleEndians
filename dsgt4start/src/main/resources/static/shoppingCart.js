@@ -177,24 +177,32 @@ function buyAll(){
 
 
 
-fbuyButtons.forEach(button => {
-    const bundleId = button.closest('.cart-item').dataset.bundleId;
-    promises.push(buyBundle(bundleId));
-});
-
-Promise.allSettled(promises)
-    .then(results => {
-        const failedBuys = results.filter(result => result.status === 'rejected');
-        if (failedBuys.length > 0) {
-            alert('Some items could not be bought. Please try again.');
-        } else {
-            alert('All items bought successfully!');
-        }
+function buyBundle(bundleId) {
+    return fetch('/api/buyBundle', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + tkn
+        },
+        body: JSON.stringify({ bundleId: bundleId })
     })
-    .catch(error => {
-        console.error('Error during the buy process:', error);
-        alert('Some items could not be bought. Please try again.');
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to buy item');
+            }
+            console.log('Item bought successfully');
+            getCart(); // Refresh the cart after buying an item
+            window.buySuccess = true;
+            return true;
+        })
+        .catch(error => {
+            console.error('Error buying item:', error);
+            getCart(); // Refresh the cart even if there's an error
+            window.buySuccess = false;
+            return false;
+        });
+}
+
 
 // Function to delete an item from the cart
 function deleteCartBundle(bundleId) {
