@@ -31,6 +31,9 @@ class DBController {
     String apiToken="Iw8zeveVyaPNWonPNaU0213uw3g6Ei";
     String headerValue = "Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei";
 
+
+    boolean temp=true;//TODO: remove after deployment
+
     @Autowired
     WebClient.Builder webClientBuilder;
 
@@ -41,8 +44,13 @@ class DBController {
 
     @PostMapping("/api/newUser")
     @ResponseBody
-    public User newuser() {
+    public User newuser() throws ExecutionException, InterruptedException {
         var user = WebSecurityConfig.getUser();
+
+        if(temp){
+            temp=false;
+            insertProducts();
+        }
 
         Map<String, Object> data = new HashMap<>();
         data.put("user", user.getEmail());
@@ -729,7 +737,7 @@ class DBController {
 
 
 
-            if (isSuccesful){
+            if(isSuccesful){
                 System.out.println("Bundle reserved successfully");
                 moveBundle(bundleId, "basket", "processing", user.getEmail(), reservations);
                 //buyBundle(reservations, bundleId, user.getEmail());
@@ -1035,6 +1043,8 @@ class DBController {
     @GetMapping("/api/getAllOrders")
     public String getAllOrders() throws ExecutionException, InterruptedException {
 
+        System.out.println("yo");
+
         CollectionReference usersRef = db.collection("user");
 
         Map<String, List<Map<String, Object>>> allOrders = new HashMap<>();
@@ -1089,6 +1099,61 @@ class DBController {
         }
 
         return orders;
+    }
+
+
+    public String insertProducts() throws ExecutionException, InterruptedException {
+
+        Map<String, Object> product1 = new HashMap<>();
+        product1.put("description", "Look at this man go");
+        product1.put("imageLink", "https://as2.ftcdn.net/v2/jpg/01/18/39/53/1000_F_118395300_KEO4hFI9FASizysdfpHnPhNuNuNpqvA0.jpg");
+        product1.put("name", "mango");
+        product1.put("price", 500);
+        product1.put("supplier", "us");
+
+        // Insert the product into the 'products' collection
+        DocumentReference docRef = db.collection("products").document();
+        ApiFuture<WriteResult> result = docRef.set(product1);
+
+        Map<String, Object> product2 = new HashMap<>();
+        product2.put("description", "greatly beloved by the littleEndians");
+        product2.put("imageLink", "https://aliveplant.com/wp-content/uploads/2021/09/aphonso.jpeg");
+        product2.put("name", "alfonso mango");
+        product2.put("price", 40);
+        product2.put("supplier", "us");
+
+        // Insert the product into the 'products' collection
+        DocumentReference docRef2 = db.collection("products").document();
+        ApiFuture<WriteResult> result2 = docRef2.set(product2);
+
+        Map<String, Object> product3 = new HashMap<>();
+        product3.put("description", "clothing brand for men");
+        product3.put("imageLink", "https://s.yimg.com/uu/api/res/1.2/C3ISPlZxBRfb13CJXZ7lkg--~B/aD0xNjU0O3c9MjMzOTtzbT0xO2FwcGlkPXl0YWNoeW9u/http://media.zenfs.com/en_US/News/US-AFPRelax/mango_man.7bc5d111754.original.jpg");
+        product3.put("name", "mango man");
+        product3.put("price", 500);
+        product3.put("supplier", "us");
+
+        // Insert the product into the 'products' collection
+        DocumentReference docRef3 = db.collection("products").document();
+        ApiFuture<WriteResult> result3 = docRef3.set(product3);
+
+        Map<String, Object> product4 = new HashMap<>();
+        product4.put("description", "a delicious refreshment");
+        product4.put("imageLink", "https://goodtimein.co.uk/wp-content/uploads/2020/09/MANGOGO-250ml-Can-1080x1080px.jpg");
+        product4.put("name", "mango go");
+        product4.put("price", 800);
+        product4.put("supplier", "us");
+
+        // Insert the product into the 'products' collection
+        DocumentReference docRef4 = db.collection("products").document();
+        ApiFuture<WriteResult> result4 = docRef4.set(product4);
+
+        // Wait for the write to complete
+        System.out.println("Successfully written! " + result.get().getUpdateTime());
+
+        // Return a message or the document ID
+        return "Product inserted successfully";
+
     }
 
 
