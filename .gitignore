@@ -1,1 +1,4 @@
 .idea/
+/dsgt4start/target/classes/be/kuleuven/dsgt4/FirestoreDataInitializer.class
+/dsgt4start/target/classes/be/kuleuven/dsgt4/StartupService$1.class
+/dsgt4start/target/classes/be/kuleuven/dsgt4/StartupService.class
