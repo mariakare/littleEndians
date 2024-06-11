@@ -99,10 +99,15 @@ public class SecurityFilter extends OncePerRequestFilter {
 
         DecodedJWT decodedJWT = JWT.decode(token);
         String email = decodedJWT.getClaim("email").asString();
-        String role = decodedJWT.getClaim("role").asString();
+        String role = decodedJWT.getClaim("roles").asString();
+
         if (role == null || role.isEmpty()) {
             role = "user"; //we see what to do w this later
+            System.out.println("the role was null");
         }
+
+        System.out.println("My current role is: " + role);
+
         var user = new User(email, role);
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new FirebaseAuthentication(user));

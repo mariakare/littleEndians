@@ -93,12 +93,15 @@ public class Dsgt4Application {
 		try {
 
 		FileInputStream serviceAccount =
-					new FileInputStream("src/main/java/be/kuleuven/dsgt4/auth/dsgt-little-endian-firebase-adminsdk-ptivq-b01d449196.json");
+					new FileInputStream("src//main//java//be//kuleuven//dsgt4//auth//dsgt-little-endian-firebase-adminsdk-ptivq-b01d449196.json");
+
+			System.out.println("fjkhlsdkjflndgffffffndlfdsjvnal");
 
 			FirebaseOptions options = new FirebaseOptions.Builder()
 					.setCredentials(GoogleCredentials.fromStream(serviceAccount))
 					.setProjectId("dsgt-little-endian")
 					.build();
+
 
 			FirebaseApp.initializeApp(options);
 			// Define the manager user emails
