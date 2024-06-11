@@ -731,11 +731,13 @@ class DBController {
 
             if (isSuccesful){
                 System.out.println("Bundle reserved successfully");
-                moveBundle(bundleId, "basket", "processing");
+                moveBundle(bundleId, "basket", "processing", reservations);
                 buyBundle(reservations, bundleId);
             }
             else{
+                cancelBundle(reservations);
                 System.out.println("Bundle was not reserved successfully:((((( Initiate self-destruct protocol");
+
 
 
             }
@@ -754,7 +756,7 @@ class DBController {
 
     }
 
-    public String cancleBundle(Map<String, String> reservations){
+    public String cancelBundle(Map<String, String> reservations){
         WebClient webClient = webClientBuilder.build();
 
         try {
@@ -817,6 +819,7 @@ class DBController {
         DocumentSnapshot document = future.get();
 
         if (document.exists()) {
+            Map<String, Object> data = new HashMap<>(document.getData());
             destinationRef.set(document.getData());
             sourceRef.delete();
             result = ("Document " + bundleId + " moved from " + initCollection + " to " + finalCollection);
@@ -828,6 +831,36 @@ class DBController {
         return result;
     }
 
+
+    public String moveBundle(String bundleId, String initCollection, String finalCollection, Map<String, String> reservations) throws ExecutionException, InterruptedException {
+        var user = WebSecurityConfig.getUser();
+
+        System.out.println("Moving bundle now...");
+
+        String result = "";
+
+        DocumentReference sourceRef = db.collection("user").document(user.getEmail()).collection(initCollection).document(bundleId);
+        DocumentReference destinationRef = db.collection("user").document(user.getEmail()).collection(finalCollection).document(bundleId);
+
+        ApiFuture<DocumentSnapshot> future = sourceRef.get();
+        DocumentSnapshot document = future.get();
+
+        if (document.exists()) {
+            Map<String, Object> data = new HashMap<>(document.getData());
+            data.put("reservations", reservations);
+
+
+            // Set the updated data to the destination collection
+            destinationRef.set(data);
+            sourceRef.delete();
+            result = ("Document " + bundleId + " moved from " + initCollection + " to " + finalCollection);
+        } else {
+            result = ("No document found with ID " + bundleId + " in collection " + initCollection);
+        }
+
+        System.out.println(result);
+        return result;
+    }
 
     public String buyBundle(Map<String, String> reservations, String bundleId){
         System.out.println("i'm in buy");
