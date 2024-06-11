@@ -1,4 +1,15 @@
 {
+  "functions": {
+    "runtime": "nodejs18",
+    "source": "functions",
+    "ignore": [
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "predeploy": [
+      "npm --prefix \"$RESOURCE_DIR\" install"
+    ]
+  },
   "emulators": {
     "ui": {
       "enabled": true,
