@@ -777,40 +777,45 @@ class DBController {
 
                 }
 
+                else{
+                    String finalUrl = supplierUrl + "products/reserve";
+                    System.out.println(finalUrl);
+
+                    Map<String, Integer> productsToReserve = new HashMap<>();
+                    productsToReserve.put(productId, 1);
+                    try {
+
+                        Map responseBody = webClient.post()
+                                .uri(finalUrl)
+                                .header("Authorization", "Bearer " + apiToken)
+                                .body(BodyInserters.fromObject(productsToReserve))
+                                .retrieve()
+                                .bodyToMono(Map.class)
+                                .block();
+                        // ... (process successful response - optional)
+
+                        System.out.println(responseBody.toString());
+
+                        boolean isSuccessful = responseBody.get("status").equals("PENDING");
+                        String reservationId = (String) responseBody.get("reservationId");
+                        reservations.put(reservationId, supplierUrl);
+                        if(!isSuccessful){
+                            isSuccesful=false;
 
 
-                String finalUrl = supplierUrl + "products/reserve";
-                System.out.println(finalUrl);
-
-                Map<String, Integer> productsToReserve = new HashMap<>();
-                productsToReserve.put(productId, 1);
-                try {
-
-                    Map responseBody = webClient.post()
-                            .uri(finalUrl)
-                            .header("Authorization", "Bearer " + apiToken)
-                            .body(BodyInserters.fromObject(productsToReserve))
-                            .retrieve()
-                            .bodyToMono(Map.class)
-                            .block();
-                    // ... (process successful response - optional)
-
-                    System.out.println(responseBody.toString());
-
-                    boolean isSuccessful = responseBody.get("status").equals("PENDING");
-                    String reservationId = (String) responseBody.get("reservationId");
-                    reservations.put(reservationId, supplierUrl);
-                    if(!isSuccessful){
+                        }
+                    } catch (Exception e) {
+                        // Handle exception within the thread (e.g., log the error)
+                        System.out.println("error in reservation of"+ productId);
                         isSuccesful=false;
 
-
                     }
-                } catch (Exception e) {
-                    // Handle exception within the thread (e.g., log the error)
-                    System.out.println("error in reservation of"+ productId);
-                    isSuccesful=false;
 
                 }
+
+
+
+
 
 
             }
@@ -1009,30 +1014,58 @@ class DBController {
                         boolean confirmed = false;
 
                         while (!confirmed) {
-                            try {
-                                Map responseBody = webClient.post()
-                                        .uri(finalUrl)
-                                        .header("Authorization", "Bearer " + apiToken)
-                                        .retrieve()
-                                        .bodyToMono(Map.class)
-                                        .block();
+                            boolean isSuccessful=false;
+                            if(url.equals("littleEndians")){
 
-
-                                boolean isSuccessful = responseBody.get("status").equals("CONFIRMED");
-                                System.out.println(isSuccessful);
-
-
-
-                                if (isSuccessful) {
-                                    System.out.println("is confirmed");
-                                    confirmed=true;
+                                DocumentReference reservationRef = db.collection("reservations").document(reservationId);
+                                DocumentSnapshot reservationDoc = null;
+                                try {
+                                    reservationDoc = reservationRef.get().get();
+                                } catch (InterruptedException | ExecutionException e) {
+                                    throw new RuntimeException(e);
                                 }
-                                else{
-                                    System.out.println("is not confirmed");
+
+
+                                if (reservationDoc.exists()) {
+                                    // Update the reservation status to "CONFIRMED"
+                                    reservationRef.update("status", "CONFIRMED");
+                                    //isSuccessful = true;
+                                } else {
+                                    System.err.println("Reservation with ID " + reservationId + " not found.");
                                 }
-                            } catch (Exception e) {
+
+                                confirmed=true;
+
+                                //isSuccessful=true;
+                            }
+                            else{
+                                try {
+                                    Map responseBody = webClient.post()
+                                            .uri(finalUrl)
+                                            .header("Authorization", "Bearer " + apiToken)
+                                            .retrieve()
+                                            .bodyToMono(Map.class)
+                                            .block();
+
+
+                                    isSuccessful = responseBody.get("status").equals("CONFIRMED");
+                                    System.out.println(isSuccessful);
+
+
+
+                                    if (isSuccessful) {
+                                        System.out.println("is confirmed");
+                                        confirmed=true;
+                                    }
+                                    else{
+                                        System.out.println("is not confirmed");
+                                    }
+                                } catch (Exception e) {
+
+                                }
 
                             }
+
                         }
 
                     });
@@ -1047,8 +1080,9 @@ class DBController {
                 for (Thread thread : threads) {
                     try {
                         thread.join();
-
+                        System.out.println("we are before movigng in buy");
                         moveBundle(bundleId, "processing", "ordered");
+                        System.out.println("we have moved");
                         return ResponseEntity.ok("Bundle has been reserved");
                     } catch (InterruptedException e) {
                         System.out.println("uh oh D:");
