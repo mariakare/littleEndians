@@ -363,16 +363,20 @@ class DBController {
         try {
             ApiFuture<QuerySnapshot> query = db.collection("products").get();
             for (DocumentSnapshot document : query.get().getDocuments()) {
-                Map<String, Object> product = document.getData();
-                // Adjust the Firestore data structure to match the external JSON structure
-                Map<String, Object> formattedProduct = new HashMap<>();
-                formattedProduct.put("id", document.getId()); // Assuming Firestore uses auto-generated IDs
-                formattedProduct.put("name", product.get("name"));
-                formattedProduct.put("price", product.get("price"));
-                formattedProduct.put("description", product.get("description"));
-                formattedProduct.put("imageLink", product.get("imageLink"));
 
-                products.add(formattedProduct);
+                if(document.get("supplier").equals("littleEndians")) {
+
+                    Map<String, Object> product = document.getData();
+                    // Adjust the Firestore data structure to match the external JSON structure
+                    Map<String, Object> formattedProduct = new HashMap<>();
+                    formattedProduct.put("id", document.getId()); // Assuming Firestore uses auto-generated IDs
+                    formattedProduct.put("name", product.get("name"));
+                    formattedProduct.put("price", product.get("price"));
+                    formattedProduct.put("description", product.get("description"));
+                    formattedProduct.put("imageLink", product.get("imageLink"));
+
+                    products.add(formattedProduct);
+                }
             }
         } catch (InterruptedException | ExecutionException e) {
             System.err.println("Error retrieving products from Firestore: " + e);
