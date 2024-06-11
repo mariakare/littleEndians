@@ -862,7 +862,7 @@ class DBController {
         return result;
     }
 
-    public String buyBundle(Map<String, String> reservations, String bundleId){
+    public ResponseEntity<String> buyBundle(Map<String, String> reservations, String bundleId){
         System.out.println("i'm in buy");
 
 
@@ -930,8 +930,12 @@ class DBController {
                         thread.join();
 
                         moveBundle(bundleId, "processing", "ordered");
+                        return ResponseEntity.ok("Bundle has been reserved");
                     } catch (InterruptedException e) {
                         System.out.println("uh oh D:");
+                        String result = ("No document found with ID " + bundleId + " in collection " );
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to reserve.");
+
                     }
 
                 }
@@ -957,7 +961,7 @@ class DBController {
 
 
 
-        return "";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("you shound't have reached this");
 
     }
 
