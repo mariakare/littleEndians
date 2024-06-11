@@ -628,7 +628,7 @@ class DBController {
     }
 
     @PostMapping("/api/buyBundle")
-    public String sendReservation(@RequestBody String jsonString) throws InterruptedException, ExecutionException {
+    public ResponseEntity<String> sendReservation(@RequestBody String jsonString) throws InterruptedException, ExecutionException {
         System.out.println("i am in reserve");
         System.out.println(jsonString);
 
@@ -670,7 +670,7 @@ class DBController {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             System.out.println("bundle doesn't exist");
-            return "Bundle Does not Exist!";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("bundle doesn't exist.");
         }
         System.out.println("yesyesyes");
 
@@ -733,11 +733,13 @@ class DBController {
                 System.out.println("Bundle reserved successfully");
                 moveBundle(bundleId, "basket", "processing", reservations);
                 buyBundle(reservations, bundleId);
+                return ResponseEntity.ok("Bundle has been reserved");
             }
+
             else{
                 cancelBundle(reservations);
                 System.out.println("Bundle was not reserved successfully:((((( Initiate self-destruct protocol");
-
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to reserve.");
 
 
             }
@@ -751,8 +753,7 @@ class DBController {
         // send reservation per bundle
         // [add supplier field to product later]
         // return bundle reference
-
-        return "nice";
+        return ResponseEntity.ok("Bundle has been reserved");
 
     }
 
