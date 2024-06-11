@@ -935,19 +935,6 @@ class DBController {
 
                 }
 
-//                for (Thread thread : threads) {
-//                    try {
-//                        thread.join();
-//                        moveBundle(bundleId, "processing", "ordered");
-//                        return ResponseEntity.ok("Bundle has been reserved");
-//                    } catch (InterruptedException e) {
-//                        System.out.println("uh oh D:");
-//                        String result = ("No document found with ID " + bundleId + " in collection " );
-//                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to reserve.");
-//
-//                    }
-//
-//                }
                 boolean status = false;
 
                 for (Thread thread : threads) {
@@ -964,18 +951,6 @@ class DBController {
                 moveBundle(bundleId, "processing", "ordered", email);
                 return ResponseEntity.ok("Bundle has been reserved");
 
-//                for (Thread thread : threads) {
-//                    try {
-//                        thread.join();
-//                        return ResponseEntity.ok("Bundle has been reserved");
-//                    } catch (InterruptedException e) {
-//                        System.out.println("Thread interrupted: " + e.getMessage());
-//                        Thread.currentThread().interrupt(); // Restore the interrupted status
-//                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to reserve.");
-//                    }
-//                }
-//
-//                moveBundle(bundleId, "processing", "ordered");
 
             } else {
                 // bruh it doesn't exist
