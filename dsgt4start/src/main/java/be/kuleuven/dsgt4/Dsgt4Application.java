@@ -1,7 +1,16 @@
 package be.kuleuven.dsgt4;
 
+
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
+
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+
+import com.google.firebase.auth.UserRecord;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +22,9 @@ import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
+import java.io.FileInputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
@@ -25,7 +37,7 @@ public class Dsgt4Application {
 	public static void main(String[] args)  {
 		//System.setProperty("server.port", System.getenv().getOrDefault("PORT", "8080"));
 		SpringApplication.run(Dsgt4Application.class, args);
-
+		setManagerRoles();
 }
 
 	@Bean
@@ -76,9 +88,43 @@ public class Dsgt4Application {
 		return firewall;
 	}
 
+	private static void setManagerRoles() {
+		try {
 
-	
+		FileInputStream serviceAccount =
+					new FileInputStream("src/main/java/be/kuleuven/dsgt4/auth/dsgt-little-endian-firebase-adminsdk-ptivq-b01d449196.json");
 
-	
+			FirebaseOptions options = new FirebaseOptions.Builder()
+					.setCredentials(GoogleCredentials.fromStream(serviceAccount))
+					.setProjectId("dsgt-little-endian")
+					.build();
+
+			FirebaseApp.initializeApp(options);
+			// Define the manager user emails
+			String[] managerEmails = {"manager@manager.com"};
+			// Iterate over manager emails
+			for (String email : managerEmails) {
+
+				FirebaseAuth auth = FirebaseAuth.getInstance();
+				try {
+					UserRecord user = auth.getUserByEmail(email);
+					// User exists, update their custom claims
+					Map<String, Object> customClaims = new HashMap<>();
+					customClaims.put("roles", "manager");
+					auth.setCustomUserClaims(user.getUid(), customClaims);
+					System.out.println("Updated custom claims for user: " + email);
+				} catch (Exception e) {
+					// Handle general exceptions
+					System.err.println("Error setting manager roles: " + e.getMessage());
+				}
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+
+	}
+
+
 
 }
