@@ -435,7 +435,8 @@ function checkValidBundle() {
     let valid = true;
     let selectedProductIds = [];
     //ADD CODE HERE TO CHECK VALID BUNDLE
-    for (let i = 0; i < 3; i++) {
+    let j=0;
+    for (let i = 0; i < 4; i++) {
         const radioGroupName = 'supplier_' + i;
         const radioButtons = document.querySelectorAll('input[type="radio"][name="' + radioGroupName + '"]');
         // I now have the radio buttons belonging to a specific supplied
@@ -443,14 +444,19 @@ function checkValidBundle() {
         radioButtons.forEach(function(radioButton) {
             if (radioButton.checked) {
                 checked = true; // At least one radio button is checked
+                j++;
                 selectedProductIds.push(radioButton.value)
             }
         });
 
-        if (!checked) {
-            valid = false;
-            break;
-        }
+        // if (!checked) {
+        //     valid = false;
+        //     break;
+        // }
+    }
+
+    if(j!=3){
+        valid=false;
     }
 
     const bundleTitle = document.getElementById('bundleTitle').value;

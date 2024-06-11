@@ -31,6 +31,9 @@ class DBController {
     String apiToken="Iw8zeveVyaPNWonPNaU0213uw3g6Ei";
     String headerValue = "Authorization: Bearer Iw8zeveVyaPNWonPNaU0213uw3g6Ei";
 
+
+    boolean temp=true;//TODO: remove after deployment
+
     @Autowired
     WebClient.Builder webClientBuilder;
 
@@ -41,8 +44,13 @@ class DBController {
 
     @PostMapping("/api/newUser")
     @ResponseBody
-    public User newuser() {
+    public User newuser() throws ExecutionException, InterruptedException {
         var user = WebSecurityConfig.getUser();
+
+        if(temp){
+            temp=false;
+            insertProducts();
+        }
 
         Map<String, Object> data = new HashMap<>();
         data.put("user", user.getEmail());
@@ -300,6 +308,8 @@ class DBController {
     public String getProducts() throws JsonProcessingException {
         WebClient webClient = webClientBuilder.build();
 
+        Gson gson = new Gson();
+
         StringBuilder jsonDataBuilder = new StringBuilder();
         jsonDataBuilder.append("{\n");
         jsonDataBuilder.append("  \"suppliers\": [\n");
@@ -337,15 +347,59 @@ class DBController {
             jsonDataBuilder.append("    }");
 
             // Add comma if there are more suppliers
-            if (!endpointURL.equals(endpointURLs[endpointURLs.length - 1])) {
+//            if (!endpointURL.equals(endpointURLs[endpointURLs.length - 1])) {
+//                jsonDataBuilder.append(",");
+//            }
+            jsonDataBuilder.append(",");
+            jsonDataBuilder.append("\n");
+        }
+
+        jsonDataBuilder.append("    {\n");
+        jsonDataBuilder.append("      \"name\": \"Supplier 4\",\n");
+        jsonDataBuilder.append("      \"products\": [\n");
+
+
+        List<Map<String, Object>> products = new ArrayList<>();
+        try {
+            ApiFuture<QuerySnapshot> query = db.collection("products").get();
+            for (DocumentSnapshot document : query.get().getDocuments()) {
+                Map<String, Object> product = document.getData();
+                // Adjust the Firestore data structure to match the external JSON structure
+                Map<String, Object> formattedProduct = new HashMap<>();
+                formattedProduct.put("id", document.getId()); // Assuming Firestore uses auto-generated IDs
+                formattedProduct.put("name", product.get("name"));
+                formattedProduct.put("price", product.get("price"));
+                formattedProduct.put("description", product.get("description"));
+                formattedProduct.put("imageLink", product.get("imageLink"));
+
+                products.add(formattedProduct);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            System.err.println("Error retrieving products from Firestore: " + e);
+        }
+
+
+
+
+        for (int i = 0; i < products.size(); i++) {
+            Map<String, Object> product = products.get(i);
+            jsonDataBuilder.append(gson.toJson(product));
+
+            if (i < products.size() - 1) {
                 jsonDataBuilder.append(",");
             }
             jsonDataBuilder.append("\n");
         }
 
+        // Close products array and supplier object
+        jsonDataBuilder.append("      ]\n"); // This was missing!
+        jsonDataBuilder.append("    }");
+
         // Close suppliers array and JSON object
         jsonDataBuilder.append("  ]\n");
         jsonDataBuilder.append("}");
+
+        // ... (Code to close the suppliers array and JSON object remains the same) ...
 
         // Print and return the JSON string
         String jsonString = jsonDataBuilder.toString();
@@ -692,44 +746,83 @@ class DBController {
 
                 String supplierUrl = (String) productSnapshot.get("supplier");
 
-                String finalUrl = supplierUrl + "products/reserve";
-                System.out.println(finalUrl);
+                if (supplierUrl.equals("littleEndians")) {
 
-                Map<String, Integer> productsToReserve = new HashMap<>();
-                productsToReserve.put(productId, 1);
-                try {
-                    Map responseBody = webClient.post()
-                            .uri(finalUrl)
-                            .header("Authorization", "Bearer " + apiToken)
-                            .body(BodyInserters.fromObject(productsToReserve))
-                            .retrieve()
-                            .bodyToMono(Map.class)
-                            .block();
-                    // ... (process successful response - optional)
+                    DocumentSnapshot productDoc = productDocRef.get().get();
 
-                    System.out.println(responseBody.toString());
+                    // Check if the amount is greater than zero
+                    if (productDoc.get("amount") != null && (long) productDoc.get("amount") > 0) {
+                        // Decrement the amount
+                        long currentAmount = (long) productDoc.get("amount");
+                        long newAmount = currentAmount - 1;
+                        productDocRef.update("amount", newAmount);
 
-                    boolean isSuccessful = responseBody.get("status").equals("PENDING");
-                    String reservationId = (String) responseBody.get("reservationId");
-                    reservations.put(reservationId, supplierUrl);
-                    if(!isSuccessful){
-                        isSuccesful=false;
+                        // Add a reservation document to the 'reservations' collection
+                        DocumentReference reservationRef = db.collection("reservations").document();
 
+                        Map<String, Object> reservationData = new HashMap<>();
+                        reservationData.put("productRef", productRef); // Add the product reference
+                        reservationData.put("status", "PENDING");
 
+                        reservationRef.set(reservationData);
+                        String reservationId = reservationRef.getId();
+                        reservations.put(reservationId, "littleEndians");
                     }
-                } catch (Exception e) {
-                    // Handle exception within the thread (e.g., log the error)
-                    System.out.println("error in reservation of"+ productId);
-                    isSuccesful=false;
+                    else{
+                        System.out.println("reserving in own products failed");
+                        isSuccesful=false;
+                        break;
+                    }
+
 
                 }
+
+                else{
+                    String finalUrl = supplierUrl + "products/reserve";
+                    System.out.println(finalUrl);
+
+                    Map<String, Integer> productsToReserve = new HashMap<>();
+                    productsToReserve.put(productId, 1);
+                    try {
+
+                        Map responseBody = webClient.post()
+                                .uri(finalUrl)
+                                .header("Authorization", "Bearer " + apiToken)
+                                .body(BodyInserters.fromObject(productsToReserve))
+                                .retrieve()
+                                .bodyToMono(Map.class)
+                                .block();
+                        // ... (process successful response - optional)
+
+                        System.out.println(responseBody.toString());
+
+                        boolean isSuccessful = responseBody.get("status").equals("PENDING");
+                        String reservationId = (String) responseBody.get("reservationId");
+                        reservations.put(reservationId, supplierUrl);
+                        if(!isSuccessful){
+                            isSuccesful=false;
+
+
+                        }
+                    } catch (Exception e) {
+                        // Handle exception within the thread (e.g., log the error)
+                        System.out.println("error in reservation of"+ productId);
+                        isSuccesful=false;
+
+                    }
+
+                }
+
+
+
+
 
 
             }
 
 
 
-            if (isSuccesful){
+            if(isSuccesful){
                 System.out.println("Bundle reserved successfully");
                 moveBundle(bundleId, "basket", "processing", reservations);
                 buyBundle(reservations, bundleId);
@@ -767,31 +860,61 @@ class DBController {
                     String reservationId = entry.getKey();
                     String url = entry.getValue();
 
-                    String finalUrl = url + "reservations/" + reservationId + "/cancel";
-                    System.out.println(finalUrl);
-                    try {
-                        Map responseBody = webClient.post()
-                                .uri(finalUrl)
-                                .header("Authorization", "Bearer " + apiToken)
-                                .retrieve()
-                                .bodyToMono(Map.class)
-                                .block();
+                    if(url.equals("littleEndians")){
+                        System.out.println("We are canceling our own product");
+
+                        DocumentReference reservationRef = db.collection("reservations").document(reservationId);
+                        DocumentSnapshot reservationDoc = reservationRef.get().get();
+
+                        DocumentReference productRef = (DocumentReference) reservationDoc.get("productRef");
+
+                        DocumentReference productDocRef = db.collection("products").document(productRef.getId());
+                        DocumentSnapshot productDoc = productDocRef.get().get();
+
+                        if (productDoc.get("amount") != null) {
+
+                            long currentAmount = (long) productDoc.get("amount");
+                            long newAmount = currentAmount + 1;
+                            productDocRef.update("amount", newAmount);
 
 
-                        boolean isSuccessful = responseBody.get("status").equals("CANCEL");
-                        System.out.println(isSuccessful);
-
-
-
-                        if (isSuccessful) {
-                            System.out.println("is cancelled succesfully");
+                            reservationRef.delete();
+                            System.out.println("Reservation " + reservationId + " cancelled and product amount updated");
+                        } else {
+                            System.err.println("bruh.");
                         }
-                        else{
-                            System.out.println("is not cancelled succesfully");
-                        }
-                    } catch (Exception e) {
 
                     }
+                    else{
+                        String finalUrl = url + "reservations/" + reservationId + "/cancel";
+                        System.out.println(finalUrl);
+                        try {
+                            Map responseBody = webClient.post()
+                                    .uri(finalUrl)
+                                    .header("Authorization", "Bearer " + apiToken)
+                                    .retrieve()
+                                    .bodyToMono(Map.class)
+                                    .block();
+
+
+                            boolean isSuccessful = responseBody.get("status").equals("CANCEL");
+                            System.out.println(isSuccessful);
+
+
+
+                            if (isSuccessful) {
+                                System.out.println("is cancelled succesfully");
+                            }
+                            else{
+                                System.out.println("is not cancelled succesfully");
+                            }
+                        } catch (Exception e) {
+
+                        }
+
+                    }
+
+
 
                 }
             }
@@ -891,30 +1014,58 @@ class DBController {
                         boolean confirmed = false;
 
                         while (!confirmed) {
-                            try {
-                                Map responseBody = webClient.post()
-                                        .uri(finalUrl)
-                                        .header("Authorization", "Bearer " + apiToken)
-                                        .retrieve()
-                                        .bodyToMono(Map.class)
-                                        .block();
+                            boolean isSuccessful=false;
+                            if(url.equals("littleEndians")){
 
-
-                                boolean isSuccessful = responseBody.get("status").equals("CONFIRMED");
-                                System.out.println(isSuccessful);
-
-
-
-                                if (isSuccessful) {
-                                    System.out.println("is confirmed");
-                                    confirmed=true;
+                                DocumentReference reservationRef = db.collection("reservations").document(reservationId);
+                                DocumentSnapshot reservationDoc = null;
+                                try {
+                                    reservationDoc = reservationRef.get().get();
+                                } catch (InterruptedException | ExecutionException e) {
+                                    throw new RuntimeException(e);
                                 }
-                                else{
-                                    System.out.println("is not confirmed");
+
+
+                                if (reservationDoc.exists()) {
+                                    // Update the reservation status to "CONFIRMED"
+                                    reservationRef.update("status", "CONFIRMED");
+                                    //isSuccessful = true;
+                                } else {
+                                    System.err.println("Reservation with ID " + reservationId + " not found.");
                                 }
-                            } catch (Exception e) {
+
+                                confirmed=true;
+
+                                //isSuccessful=true;
+                            }
+                            else{
+                                try {
+                                    Map responseBody = webClient.post()
+                                            .uri(finalUrl)
+                                            .header("Authorization", "Bearer " + apiToken)
+                                            .retrieve()
+                                            .bodyToMono(Map.class)
+                                            .block();
+
+
+                                    isSuccessful = responseBody.get("status").equals("CONFIRMED");
+                                    System.out.println(isSuccessful);
+
+
+
+                                    if (isSuccessful) {
+                                        System.out.println("is confirmed");
+                                        confirmed=true;
+                                    }
+                                    else{
+                                        System.out.println("is not confirmed");
+                                    }
+                                } catch (Exception e) {
+
+                                }
 
                             }
+
                         }
 
                     });
@@ -929,8 +1080,9 @@ class DBController {
                 for (Thread thread : threads) {
                     try {
                         thread.join();
-
+                        System.out.println("we are before movigng in buy");
                         moveBundle(bundleId, "processing", "ordered");
+                        System.out.println("we have moved");
                         return ResponseEntity.ok("Bundle has been reserved");
                     } catch (InterruptedException e) {
                         System.out.println("uh oh D:");
@@ -1008,6 +1160,8 @@ class DBController {
     @GetMapping("/api/getAllOrders")
     public String getAllOrders() throws ExecutionException, InterruptedException {
 
+        System.out.println("yo");
+
         CollectionReference usersRef = db.collection("user");
 
         Map<String, List<Map<String, Object>>> allOrders = new HashMap<>();
@@ -1062,6 +1216,65 @@ class DBController {
         }
 
         return orders;
+    }
+
+
+    public String insertProducts() throws ExecutionException, InterruptedException {
+
+        Map<String, Object> product1 = new HashMap<>();
+        product1.put("description", "Look at this man go");
+        product1.put("imageLink", "https://as2.ftcdn.net/v2/jpg/01/18/39/53/1000_F_118395300_KEO4hFI9FASizysdfpHnPhNuNuNpqvA0.jpg");
+        product1.put("name", "mango");
+        product1.put("price", 500);
+        product1.put("supplier", "littleEndians");
+        product1.put("amount", 30);
+
+        // Insert the product into the 'products' collection
+        DocumentReference docRef = db.collection("products").document();
+        ApiFuture<WriteResult> result = docRef.set(product1);
+
+        Map<String, Object> product2 = new HashMap<>();
+        product2.put("description", "greatly beloved by the littleEndians");
+        product2.put("imageLink", "https://aliveplant.com/wp-content/uploads/2021/09/aphonso.jpeg");
+        product2.put("name", "alfonso mango");
+        product2.put("price", 40);
+        product2.put("supplier", "littleEndians");
+        product2.put("amount", 30);
+
+        // Insert the product into the 'products' collection
+        DocumentReference docRef2 = db.collection("products").document();
+        ApiFuture<WriteResult> result2 = docRef2.set(product2);
+
+        Map<String, Object> product3 = new HashMap<>();
+        product3.put("description", "clothing brand for men");
+        product3.put("imageLink", "https://s.yimg.com/uu/api/res/1.2/C3ISPlZxBRfb13CJXZ7lkg--~B/aD0xNjU0O3c9MjMzOTtzbT0xO2FwcGlkPXl0YWNoeW9u/http://media.zenfs.com/en_US/News/US-AFPRelax/mango_man.7bc5d111754.original.jpg");
+        product3.put("name", "mango man");
+        product3.put("price", 500);
+        product3.put("supplier", "littleEndians");
+        product3.put("amount", 30);
+
+        // Insert the product into the 'products' collection
+        DocumentReference docRef3 = db.collection("products").document();
+        ApiFuture<WriteResult> result3 = docRef3.set(product3);
+
+        Map<String, Object> product4 = new HashMap<>();
+        product4.put("description", "a delicious refreshment");
+        product4.put("imageLink", "https://goodtimein.co.uk/wp-content/uploads/2020/09/MANGOGO-250ml-Can-1080x1080px.jpg");
+        product4.put("name", "mango go");
+        product4.put("price", 800);
+        product4.put("supplier", "littleEndians");
+        product4.put("amount", 30);
+
+        // Insert the product into the 'products' collection
+        DocumentReference docRef4 = db.collection("products").document();
+        ApiFuture<WriteResult> result4 = docRef4.set(product4);
+
+        // Wait for the write to complete
+        System.out.println("Successfully written! " + result.get().getUpdateTime());
+
+        // Return a message or the document ID
+        return "Product inserted successfully";
+
     }
 
 

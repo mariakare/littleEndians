@@ -5,6 +5,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
+import java.util.concurrent.ExecutionException;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.util.Map;
 
 @Service
 public class StartupService {
@@ -12,13 +18,22 @@ public class StartupService {
     @Autowired
     RestTemplate restTemplate;
 
+    private final DBController dbController;
+
+    @Autowired
+    public StartupService(DBController dbController) {
+        this.dbController = dbController;
+    }
+
     @PostConstruct
-    public void checkPending() {
-        String baseUrl = "http://localhost:8080"; // Base URL of your application
-        String function1Url = baseUrl + "/function1";
+    public void checkPending() throws ExecutionException, InterruptedException {
+        String orders = dbController.getAllOrders();
 
-        String response1 = restTemplate.getForObject(function1Url, String.class);
+    }
 
+    @PostConstruct
+    public void checkStart() {
+        System.out.println("We're post-constructing babyyyy");
     }
 
 }
