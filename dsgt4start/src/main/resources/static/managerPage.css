@@ -66,6 +66,12 @@
     border: 1px solid #ccc;
 }
 
+.supplier-column h2 {
+    word-wrap: break-word; /* Ensure long words break and wrap to the next line */
+    white-space: normal; /* Allow normal wrapping of text */
+    overflow-wrap: break-word; /* Break long words to wrap to the next line */
+}
+
 .new-product {
     margin-bottom: 20px;
 }
