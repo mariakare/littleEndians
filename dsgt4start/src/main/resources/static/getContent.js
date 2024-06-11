@@ -23,7 +23,9 @@ export function setupUserPage(token)    {
 
         })
         .catch((error) => {
+            console.log("Bro this is where we have the error");
             console.error(error);
+            window.location.href = '/';
         });
 }
 

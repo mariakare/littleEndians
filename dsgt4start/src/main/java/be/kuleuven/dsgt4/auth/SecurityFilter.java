@@ -70,10 +70,11 @@ public class SecurityFilter extends OncePerRequestFilter {
         if (token == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Unauthorized: Missing Authorization header.");
+            response.sendRedirect("/");
             return;
         }
 
-        token= "eyJhbGciOiJSUzI1NiIsImtpZCI6ImRmOGIxNTFiY2Q5MGQ1YjMwMjBlNTNhMzYyZTRiMzA3NTYzMzdhNjEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vZHNndC1saXR0bGUtZW5kaWFuIiwiYXVkIjoiZHNndC1saXR0bGUtZW5kaWFuIiwiYXV0aF90aW1lIjoxNzE4MDU4OTkyLCJ1c2VyX2lkIjoiOWNWMTBtZnJoRlVXYzRuNGFpak53VDNuUlFnMSIsInN1YiI6IjljVjEwbWZyaEZVV2M0bjRhaWpOd1QzblJRZzEiLCJpYXQiOjE3MTgwNTg5OTIsImV4cCI6MTcxODA2MjU5MiwiZW1haWwiOiJtYW5hZ2VyQG1hbmFnZXIuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbIm1hbmFnZXJAbWFuYWdlci5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.cDyIwjFSiK4QCTJkxmchM8d5voAv0Lx066VRM21Oz4eHhvRcFCfCx9RjhWZAmNUseRPurdAfp9hcPowKZpyiLqO9WXFai64OPEZQxUG71om7h-01KRUjFqJy6xNKDlRaX1YokqTVkN03a7sPHEzC1liAeV6CijfGiF20mHG3mgqYKmXwkpTIsuq5HD4J9LpjAhkpjEHq9zb4ITR8G166SvfuYUIvAfPwmwFeySZgO-C8od27tbHStSdmVDMEofnSncYTmFX9T4dBBJKLB9aFMb3Oa3coyJDhVkXBcwWlniarHCn0H02i5s_AdV__RRsHUnigUFq1TcZUlzW_NpfH-w";
+//        token= "eyJhbGciOiJSUzI1NiIsImtpZCI6ImRmOGIxNTFiY2Q5MGQ1YjMwMjBlNTNhMzYyZTRiMzA3NTYzMzdhNjEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vZHNndC1saXR0bGUtZW5kaWFuIiwiYXVkIjoiZHNndC1saXR0bGUtZW5kaWFuIiwiYXV0aF90aW1lIjoxNzE4MDU4OTkyLCJ1c2VyX2lkIjoiOWNWMTBtZnJoRlVXYzRuNGFpak53VDNuUlFnMSIsInN1YiI6IjljVjEwbWZyaEZVV2M0bjRhaWpOd1QzblJRZzEiLCJpYXQiOjE3MTgwNTg5OTIsImV4cCI6MTcxODA2MjU5MiwiZW1haWwiOiJtYW5hZ2VyQG1hbmFnZXIuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbIm1hbmFnZXJAbWFuYWdlci5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.cDyIwjFSiK4QCTJkxmchM8d5voAv0Lx066VRM21Oz4eHhvRcFCfCx9RjhWZAmNUseRPurdAfp9hcPowKZpyiLqO9WXFai64OPEZQxUG71om7h-01KRUjFqJy6xNKDlRaX1YokqTVkN03a7sPHEzC1liAeV6CijfGiF20mHG3mgqYKmXwkpTIsuq5HD4J9LpjAhkpjEHq9zb4ITR8G166SvfuYUIvAfPwmwFeySZgO-C8od27tbHStSdmVDMEofnSncYTmFX9T4dBBJKLB9aFMb3Oa3coyJDhVkXBcwWlniarHCn0H02i5s_AdV__RRsHUnigUFq1TcZUlzW_NpfH-w";
 
 
 
@@ -106,8 +107,12 @@ public class SecurityFilter extends OncePerRequestFilter {
             System.out.println("Token is valid.");
         } else {
             System.out.println("Token is invalid.");
-            return;
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Unauthorized: Invalid token.");
+            response.sendRedirect("/");
+            return; // Terminate the filter chain here
         }
+
 
 
 //        // 1. Fetch the public key
