@@ -512,6 +512,9 @@ class DBController {
                         //return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating document: " + e.getMessage());
                     }
                 }
+                else{
+                    price = document.getDouble("price");
+                }
                 documentReferences.add(docRef);
                 documentMap.put(docRef, price);
 
