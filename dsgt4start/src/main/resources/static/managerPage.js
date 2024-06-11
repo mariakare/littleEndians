@@ -178,6 +178,7 @@ export function createTab(label) {
                 setActiveTab(tab);
                 getOrders(tkn)
                     .then((data) => {
+                        console.log("I clicked get orders tab")
                         displayOrders(data);
                     })
                     .catch((error) => {
@@ -193,6 +194,7 @@ export function createTab(label) {
 
 
 function displayCustomers(jsonData){
+    console.log(jsonData);
     const users = JSON.parse(jsonData);
     const contentDiv = document.getElementById('contentdiv');
     // Clear the contentDiv before adding new users
@@ -221,9 +223,73 @@ function displayCustomers(jsonData){
     contentDiv.appendChild(userList);
 }
 
-function displayOrders(jsonData){
-    console.log("To be implemented: displayOrders")
+function displayOrders(jsonData) {
+    // console.log("Received JSON data:", jsonData);
+    // console.log("Ordered data:", jsonData["ordered"]);
+    // console.log("Processing data:", jsonData["processing"]);
+    // displaySec(jsonData["ordered"], "Ordered Items", true);
+    // displaySec(jsonData["processing"], "Items Being Processed", false);
+    // console.log("Received JSON data:", jsonData);
+    // const orderedData = jsonData.hasOwnProperty("ordered") ? jsonData["ordered"] : [];
+    // const processingData = jsonData.hasOwnProperty("processing") ? jsonData["processing"] : [];
+    // displaySec(orderedData, "Ordered Items", true);
+    // displaySec(processingData, "Items Being Processed", false);
+    // Parse the JSON string into an object
+    const responseObject = JSON.parse(jsonData);
+
+// Extract the arrays based on their names
+    const orderedArray = responseObject.ordered;
+    const processingArray = responseObject.processing;
+    displaySec(processingArray, "Items Being Processed", true);
+    displaySec(orderedArray, "Ordered Items", false);
+
 }
+
+function displaySec(data, head, clear) {
+    const contentDiv = document.getElementById('contentdiv');
+    if (clear) {
+        contentDiv.innerHTML = '';
+        console.log("Clearing contentDiv. Data to display:", data);
+    }
+
+    const cartDiv = document.createElement('div');
+    cartDiv.classList.add('cart');
+
+    // Create elements to display heading
+    const heading = document.createElement('h2');
+    heading.textContent = head;
+
+    // Append heading to containerDiv
+    cartDiv.appendChild(heading);
+
+    data.forEach(order => {
+        // Create a div for each order
+        const orderDiv = document.createElement('div');
+        orderDiv.classList.add('order');
+
+        // Display order details
+        const orderId = document.createElement('p');
+        orderId.textContent = `Order ID: ${order.id}`;
+        orderDiv.appendChild(orderId);
+
+        const userId = document.createElement('p');
+        userId.textContent = `User ID: ${order.userId}`;
+        orderDiv.appendChild(userId);
+
+        const bundleRef = document.createElement('p');
+        bundleRef.textContent = `Bundle Ref: ${order.bundleRef}`;
+        orderDiv.appendChild(bundleRef);
+
+        // Append the orderDiv to the cartDiv
+        cartDiv.appendChild(orderDiv);
+    });
+
+    // Append the cartDiv to the contentDiv
+    contentDiv.appendChild(cartDiv);
+}
+
+
+
 
 /**
  * Basic setup for modal window used to edit bundles
