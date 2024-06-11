@@ -91,6 +91,8 @@ Jun 11, 2024 6:18:32 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channe
 INFO: Detected non-HTTP/2 connection.
 Jun 11, 2024 6:19:29 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
+Jun 11, 2024 6:20:29 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
 Jun 11, 2024 4:30:13 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
 Jun 11, 2024 4:30:59 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
