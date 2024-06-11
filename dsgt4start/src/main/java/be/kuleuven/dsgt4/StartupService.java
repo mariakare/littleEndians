@@ -40,23 +40,26 @@ public class StartupService {
             // Initialize ObjectMapper
             ObjectMapper objectMapper = new ObjectMapper();
 
-            // Convert JSON string to Map
-            Map<String, List<Map<String, Object>>> orderMap = objectMapper.readValue(orders, new TypeReference<Map<String, List<Map<String, Object>>>>(){});
-            List<Map<String, Object>> processingMap = orderMap.get("processing");
+            if (orders != null && !orders.isEmpty()) {
+                // Convert JSON string to Map
+                Map<String, List<Map<String, Object>>> orderMap = objectMapper.readValue(orders, new TypeReference<Map<String, List<Map<String, Object>>>>() {
+                });
+                List<Map<String, Object>> processingMap = orderMap.get("processing");
 
-            if (!(processingMap.isEmpty())){
-                System.out.println("processing order processing");
-                for (Map<String, Object> processedItem : processingMap){
-                    String id = (String) processedItem.get("id");
-                    String user = (String) processedItem.get("userId");
 
-                    DocumentReference orderRef = db.collection("user").document(user).collection("processing").document(id);
-                    DocumentSnapshot orderSnap = orderRef.get().get();
-                    Map<String, String> reservations = (Map<String, String>) orderSnap.get("reservations");
+                if (processingMap != null && !processingMap.isEmpty()) {
+                    System.out.println("processing order processing");
+                    for (Map<String, Object> processedItem : processingMap) {
+                        String id = (String) processedItem.get("id");
+                        String user = (String) processedItem.get("userId");
 
-                    dbController.buyBundle(reservations,id, user);
+                        DocumentReference orderRef = db.collection("user").document(user).collection("processing").document(id);
+                        DocumentSnapshot orderSnap = orderRef.get().get();
+                        Map<String, String> reservations = (Map<String, String>) orderSnap.get("reservations");
+
+                        dbController.buyBundle(reservations, id, user);
+                    }
                 }
-
             }
 
         } catch (IOException e) {

@@ -740,7 +740,7 @@ class DBController {
             if(isSuccesful){
                 System.out.println("Bundle reserved successfully");
                 moveBundle(bundleId, "basket", "processing", user.getEmail(), reservations);
-                //buyBundle(reservations, bundleId, user.getEmail());
+                buyBundle(reservations, bundleId, user.getEmail());
                 return ResponseEntity.ok("Bundle has been reserved");
             }
 
