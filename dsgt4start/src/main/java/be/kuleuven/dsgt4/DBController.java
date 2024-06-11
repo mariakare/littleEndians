@@ -746,12 +746,46 @@ class DBController {
 
                 String supplierUrl = (String) productSnapshot.get("supplier");
 
+                if (supplierUrl.equals("littleEndians")) {
+
+                    DocumentSnapshot productDoc = productDocRef.get().get();
+
+                    // Check if the amount is greater than zero
+                    if (productDoc.get("amount") != null && (long) productDoc.get("amount") > 0) {
+                        // Decrement the amount
+                        long currentAmount = (long) productDoc.get("amount");
+                        long newAmount = currentAmount - 1;
+                        productDocRef.update("amount", newAmount);
+
+                        // Add a reservation document to the 'reservations' collection
+                        DocumentReference reservationRef = db.collection("reservations").document();
+
+                        Map<String, Object> reservationData = new HashMap<>();
+                        reservationData.put("productRef", productRef); // Add the product reference
+                        reservationData.put("status", "PENDING");
+
+                        reservationRef.set(reservationData);
+                        String reservationId = reservationRef.getId();
+                        reservations.put(reservationId, "littleEndians");
+                    }
+                    else{
+                        System.out.println("reserving in own products failed");
+                        isSuccesful=false;
+                        break;
+                    }
+
+
+                }
+
+
+
                 String finalUrl = supplierUrl + "products/reserve";
                 System.out.println(finalUrl);
 
                 Map<String, Integer> productsToReserve = new HashMap<>();
                 productsToReserve.put(productId, 1);
                 try {
+
                     Map responseBody = webClient.post()
                             .uri(finalUrl)
                             .header("Authorization", "Bearer " + apiToken)
@@ -821,31 +855,61 @@ class DBController {
                     String reservationId = entry.getKey();
                     String url = entry.getValue();
 
-                    String finalUrl = url + "reservations/" + reservationId + "/cancel";
-                    System.out.println(finalUrl);
-                    try {
-                        Map responseBody = webClient.post()
-                                .uri(finalUrl)
-                                .header("Authorization", "Bearer " + apiToken)
-                                .retrieve()
-                                .bodyToMono(Map.class)
-                                .block();
+                    if(url.equals("littleEndians")){
+                        System.out.println("We are canceling our own product");
+
+                        DocumentReference reservationRef = db.collection("reservations").document(reservationId);
+                        DocumentSnapshot reservationDoc = reservationRef.get().get();
+
+                        DocumentReference productRef = (DocumentReference) reservationDoc.get("productRef");
+
+                        DocumentReference productDocRef = db.collection("products").document(productRef.getId());
+                        DocumentSnapshot productDoc = productDocRef.get().get();
+
+                        if (productDoc.get("amount") != null) {
+
+                            long currentAmount = (long) productDoc.get("amount");
+                            long newAmount = currentAmount + 1;
+                            productDocRef.update("amount", newAmount);
 
 
-                        boolean isSuccessful = responseBody.get("status").equals("CANCEL");
-                        System.out.println(isSuccessful);
-
-
-
-                        if (isSuccessful) {
-                            System.out.println("is cancelled succesfully");
+                            reservationRef.delete();
+                            System.out.println("Reservation " + reservationId + " cancelled and product amount updated");
+                        } else {
+                            System.err.println("bruh.");
                         }
-                        else{
-                            System.out.println("is not cancelled succesfully");
-                        }
-                    } catch (Exception e) {
 
                     }
+                    else{
+                        String finalUrl = url + "reservations/" + reservationId + "/cancel";
+                        System.out.println(finalUrl);
+                        try {
+                            Map responseBody = webClient.post()
+                                    .uri(finalUrl)
+                                    .header("Authorization", "Bearer " + apiToken)
+                                    .retrieve()
+                                    .bodyToMono(Map.class)
+                                    .block();
+
+
+                            boolean isSuccessful = responseBody.get("status").equals("CANCEL");
+                            System.out.println(isSuccessful);
+
+
+
+                            if (isSuccessful) {
+                                System.out.println("is cancelled succesfully");
+                            }
+                            else{
+                                System.out.println("is not cancelled succesfully");
+                            }
+                        } catch (Exception e) {
+
+                        }
+
+                    }
+
+
 
                 }
             }
@@ -1128,7 +1192,8 @@ class DBController {
         product1.put("imageLink", "https://as2.ftcdn.net/v2/jpg/01/18/39/53/1000_F_118395300_KEO4hFI9FASizysdfpHnPhNuNuNpqvA0.jpg");
         product1.put("name", "mango");
         product1.put("price", 500);
-        product1.put("supplier", "us");
+        product1.put("supplier", "littleEndians");
+        product1.put("amount", 30);
 
         // Insert the product into the 'products' collection
         DocumentReference docRef = db.collection("products").document();
@@ -1139,7 +1204,8 @@ class DBController {
         product2.put("imageLink", "https://aliveplant.com/wp-content/uploads/2021/09/aphonso.jpeg");
         product2.put("name", "alfonso mango");
         product2.put("price", 40);
-        product2.put("supplier", "us");
+        product2.put("supplier", "littleEndians");
+        product2.put("amount", 30);
 
         // Insert the product into the 'products' collection
         DocumentReference docRef2 = db.collection("products").document();
@@ -1150,7 +1216,8 @@ class DBController {
         product3.put("imageLink", "https://s.yimg.com/uu/api/res/1.2/C3ISPlZxBRfb13CJXZ7lkg--~B/aD0xNjU0O3c9MjMzOTtzbT0xO2FwcGlkPXl0YWNoeW9u/http://media.zenfs.com/en_US/News/US-AFPRelax/mango_man.7bc5d111754.original.jpg");
         product3.put("name", "mango man");
         product3.put("price", 500);
-        product3.put("supplier", "us");
+        product3.put("supplier", "littleEndians");
+        product3.put("amount", 30);
 
         // Insert the product into the 'products' collection
         DocumentReference docRef3 = db.collection("products").document();
@@ -1161,7 +1228,8 @@ class DBController {
         product4.put("imageLink", "https://goodtimein.co.uk/wp-content/uploads/2020/09/MANGOGO-250ml-Can-1080x1080px.jpg");
         product4.put("name", "mango go");
         product4.put("price", 800);
-        product4.put("supplier", "us");
+        product4.put("supplier", "littleEndians");
+        product4.put("amount", 30);
 
         // Insert the product into the 'products' collection
         DocumentReference docRef4 = db.collection("products").document();
