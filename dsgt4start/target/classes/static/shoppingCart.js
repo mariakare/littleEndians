@@ -52,8 +52,8 @@ export function addToCart(bundleId) {
 function displayCartPage(data){
 
     displaySec(data["cart"] || [], "Cart", true, true);
-    displaySec(data["shipping"] || [], "Orders on their way to you", false, false);
-    displaySec(data["past"] || [], "Past orders", false, false);
+    // displaySec(data["shipping"] || [], "Orders on their way to you", false, false);
+    displaySec(data["past"] || [], "Bought", false, false);
 }
 
 

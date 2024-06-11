@@ -239,9 +239,8 @@ function displayOrders(jsonData) {
 
 // Extract the arrays based on their names
     const orderedArray = responseObject.ordered;
-    const processingArray = responseObject.processing;
-    displaySec(processingArray, "Items Being Processed", true);
-    displaySec(orderedArray, "Ordered Items", false);
+    // displaySec(processingArray, "Items Being Processed", true);
+    displaySec(orderedArray, "Ordered Items", true);
 
 }
 
