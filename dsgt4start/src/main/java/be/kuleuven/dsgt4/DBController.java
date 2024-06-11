@@ -12,6 +12,7 @@ import org.eclipse.jetty.util.ajax.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.security.access.AuthorizationServiceException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -296,8 +297,11 @@ class DBController {
     }
 
 
+
     @GetMapping("/api/getProducts")
+    @PreAuthorize("hasRole('manager')")
     public String getProducts() throws JsonProcessingException {
+
         WebClient webClient = webClientBuilder.build();
 
         StringBuilder jsonDataBuilder = new StringBuilder();
@@ -466,6 +470,7 @@ class DBController {
 
 
     @PostMapping("/api/addBundle")
+    @PreAuthorize("hasRole('manager')")
     public ResponseEntity<String> addBundle(
             @RequestParam("bundleTitle") String bundleTitle,
             @RequestParam("bundleDescription") String bundleDescription,
@@ -533,6 +538,7 @@ class DBController {
 
 
     @PostMapping("/api/updateBundle")
+    @PreAuthorize("hasRole('manager')")
     public String updateBundle(
             @RequestParam("bundleId") String bundleId,
             @RequestParam("bundleTitle") String bundleTitle,
@@ -577,6 +583,7 @@ class DBController {
     }
 
     @DeleteMapping("/api/deleteBundle/{bundleId}")
+    @PreAuthorize("hasRole('manager')")
     public String deleteBundle(@PathVariable String bundleId) {
         System.out.println("I am in deleteBundle");
         //bundleId="3eWJgwFYXJYh8P8caPtO";
@@ -968,6 +975,7 @@ class DBController {
 
 
     @GetMapping("/api/getAllCustomers")
+    @PreAuthorize("hasRole('manager')")
     public String getAllUsers() throws ExecutionException, InterruptedException {
         // Get a reference to the users collection
         System.out.println("in getAllUsers");
@@ -1006,6 +1014,7 @@ class DBController {
 
 
     @GetMapping("/api/getAllOrders")
+    @PreAuthorize("hasRole('manager')")
     public String getAllOrders() throws ExecutionException, InterruptedException {
 
         CollectionReference usersRef = db.collection("user");
