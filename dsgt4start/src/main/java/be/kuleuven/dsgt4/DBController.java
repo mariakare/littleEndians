@@ -731,8 +731,8 @@ class DBController {
 
             if (isSuccesful){
                 System.out.println("Bundle reserved successfully");
-                moveBundle(bundleId, "basket", "processing", reservations);
-                buyBundle(reservations, bundleId);
+                moveBundle(bundleId, "basket", "processing", user.getEmail(), reservations);
+                //buyBundle(reservations, bundleId, user.getEmail());
                 return ResponseEntity.ok("Bundle has been reserved");
             }
 
@@ -806,15 +806,14 @@ class DBController {
         return "";
     }
 
-    public String moveBundle(String bundleId, String initCollection, String finalCollection) throws ExecutionException, InterruptedException {
-        var user = WebSecurityConfig.getUser();
-
+    public String moveBundle(String bundleId, String initCollection, String finalCollection,String email) throws ExecutionException, InterruptedException {
         System.out.println("Moving bundle now...");
+        //var user = WebSecurityConfig.getUser();
 
         String result = "";
 
-        DocumentReference sourceRef = db.collection("user").document(user.getEmail()).collection(initCollection).document(bundleId);
-        DocumentReference destinationRef = db.collection("user").document(user.getEmail()).collection(finalCollection).document(bundleId);
+        DocumentReference sourceRef = db.collection("user").document(email).collection(initCollection).document(bundleId);
+        DocumentReference destinationRef = db.collection("user").document(email).collection(finalCollection).document(bundleId);
 
         ApiFuture<DocumentSnapshot> future = sourceRef.get();
         DocumentSnapshot document = future.get();
@@ -833,15 +832,15 @@ class DBController {
     }
 
 
-    public String moveBundle(String bundleId, String initCollection, String finalCollection, Map<String, String> reservations) throws ExecutionException, InterruptedException {
-        var user = WebSecurityConfig.getUser();
+    public String moveBundle(String bundleId, String initCollection, String finalCollection, String email, Map<String, String> reservations) throws ExecutionException, InterruptedException {
+        //var user = WebSecurityConfig.getUser();
 
         System.out.println("Moving bundle now...");
 
         String result = "";
 
-        DocumentReference sourceRef = db.collection("user").document(user.getEmail()).collection(initCollection).document(bundleId);
-        DocumentReference destinationRef = db.collection("user").document(user.getEmail()).collection(finalCollection).document(bundleId);
+        DocumentReference sourceRef = db.collection("user").document(email).collection(initCollection).document(bundleId);
+        DocumentReference destinationRef = db.collection("user").document(email).collection(finalCollection).document(bundleId);
 
         ApiFuture<DocumentSnapshot> future = sourceRef.get();
         DocumentSnapshot document = future.get();
@@ -863,7 +862,7 @@ class DBController {
         return result;
     }
 
-    public ResponseEntity<String> buyBundle(Map<String, String> reservations, String bundleId){
+    public ResponseEntity<String> buyBundle(Map<String, String> reservations, String bundleId, String email){
         System.out.println("i'm in buy");
 
 
@@ -889,9 +888,10 @@ class DBController {
 
                     Thread thread = new Thread(() -> {
                         boolean confirmed = false;
-
+//                        System.out.println("Waiting for confirmation...");
                         while (!confirmed) {
                             try {
+                                System.out.println("trying...");
                                 Map responseBody = webClient.post()
                                         .uri(finalUrl)
                                         .header("Authorization", "Bearer " + apiToken)
@@ -922,25 +922,52 @@ class DBController {
                 }
 
                 for (Thread thread : threads) {
+                    System.out.println("Starting thread");
                     thread.start();
 
                 }
 
+//                for (Thread thread : threads) {
+//                    try {
+//                        thread.join();
+//                        moveBundle(bundleId, "processing", "ordered");
+//                        return ResponseEntity.ok("Bundle has been reserved");
+//                    } catch (InterruptedException e) {
+//                        System.out.println("uh oh D:");
+//                        String result = ("No document found with ID " + bundleId + " in collection " );
+//                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to reserve.");
+//
+//                    }
+//
+//                }
+                boolean status = false;
+
                 for (Thread thread : threads) {
                     try {
                         thread.join();
-
-                        moveBundle(bundleId, "processing", "ordered");
-                        return ResponseEntity.ok("Bundle has been reserved");
+                        System.out.println("joined!");
                     } catch (InterruptedException e) {
                         System.out.println("uh oh D:");
                         String result = ("No document found with ID " + bundleId + " in collection " );
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to reserve.");
-
                     }
-
                 }
+                System.out.println("Ready for move");
+                moveBundle(bundleId, "processing", "ordered", email);
+                return ResponseEntity.ok("Bundle has been reserved");
 
+//                for (Thread thread : threads) {
+//                    try {
+//                        thread.join();
+//                        return ResponseEntity.ok("Bundle has been reserved");
+//                    } catch (InterruptedException e) {
+//                        System.out.println("Thread interrupted: " + e.getMessage());
+//                        Thread.currentThread().interrupt(); // Restore the interrupted status
+//                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to reserve.");
+//                    }
+//                }
+//
+//                moveBundle(bundleId, "processing", "ordered");
 
             } else {
                 // bruh it doesn't exist
