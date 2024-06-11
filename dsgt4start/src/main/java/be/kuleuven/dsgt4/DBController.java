@@ -308,6 +308,8 @@ class DBController {
     public String getProducts() throws JsonProcessingException {
         WebClient webClient = webClientBuilder.build();
 
+        Gson gson = new Gson();
+
         StringBuilder jsonDataBuilder = new StringBuilder();
         jsonDataBuilder.append("{\n");
         jsonDataBuilder.append("  \"suppliers\": [\n");
@@ -345,15 +347,59 @@ class DBController {
             jsonDataBuilder.append("    }");
 
             // Add comma if there are more suppliers
-            if (!endpointURL.equals(endpointURLs[endpointURLs.length - 1])) {
+//            if (!endpointURL.equals(endpointURLs[endpointURLs.length - 1])) {
+//                jsonDataBuilder.append(",");
+//            }
+            jsonDataBuilder.append(",");
+            jsonDataBuilder.append("\n");
+        }
+
+        jsonDataBuilder.append("    {\n");
+        jsonDataBuilder.append("      \"name\": \"Supplier 4\",\n");
+        jsonDataBuilder.append("      \"products\": [\n");
+
+
+        List<Map<String, Object>> products = new ArrayList<>();
+        try {
+            ApiFuture<QuerySnapshot> query = db.collection("products").get();
+            for (DocumentSnapshot document : query.get().getDocuments()) {
+                Map<String, Object> product = document.getData();
+                // Adjust the Firestore data structure to match the external JSON structure
+                Map<String, Object> formattedProduct = new HashMap<>();
+                formattedProduct.put("id", document.getId()); // Assuming Firestore uses auto-generated IDs
+                formattedProduct.put("name", product.get("name"));
+                formattedProduct.put("price", product.get("price"));
+                formattedProduct.put("description", product.get("description"));
+                formattedProduct.put("imageLink", product.get("imageLink"));
+
+                products.add(formattedProduct);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            System.err.println("Error retrieving products from Firestore: " + e);
+        }
+
+
+
+
+        for (int i = 0; i < products.size(); i++) {
+            Map<String, Object> product = products.get(i);
+            jsonDataBuilder.append(gson.toJson(product));
+
+            if (i < products.size() - 1) {
                 jsonDataBuilder.append(",");
             }
             jsonDataBuilder.append("\n");
         }
 
+        // Close products array and supplier object
+        jsonDataBuilder.append("      ]\n"); // This was missing!
+        jsonDataBuilder.append("    }");
+
         // Close suppliers array and JSON object
         jsonDataBuilder.append("  ]\n");
         jsonDataBuilder.append("}");
+
+        // ... (Code to close the suppliers array and JSON object remains the same) ...
 
         // Print and return the JSON string
         String jsonString = jsonDataBuilder.toString();
