@@ -449,15 +449,13 @@ function checkValidBundle() {
             }
         });
 
-        // if (!checked) {
-        //     valid = false;
-        //     break;
-        // }
+
     }
 
-    if(j!=3){
-        valid=false;
+    if(j !== 3){
+        valid = false;
     }
+
 
     const bundleTitle = document.getElementById('bundleTitle').value;
     const bundleDescription = document.getElementById('bundleDescription').value;
