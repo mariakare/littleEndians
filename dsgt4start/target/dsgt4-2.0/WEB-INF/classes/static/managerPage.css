@@ -60,7 +60,7 @@
 
 .supplier-column {
     flex: 1; /* Allow each column to grow and occupy equal space */
-    max-width: calc(33.33% - 20px); /* Set maximum width for each column */
+    max-width: calc(25% - 20px); /* Set maximum width for each column */
     margin: 0 10px;
     padding: 10px;
     border: 1px solid #ccc;
