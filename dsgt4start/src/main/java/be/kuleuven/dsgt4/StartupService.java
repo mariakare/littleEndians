@@ -19,9 +19,6 @@ import java.util.Map;
 @Service
 public class StartupService {
 
-    @Autowired
-    RestTemplate restTemplate;
-
     private final DBController dbController;
 
     @Autowired
